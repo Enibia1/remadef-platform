@@ -94,6 +94,34 @@ const RemadefAPI = {
             "/"
         );
 
+    },
+
+
+    // --------------------------------------------------------
+    // ACCOUNT REGISTRATION
+    // --------------------------------------------------------
+
+    async register(email, password) {
+
+        return await this.request(
+
+            "/api/register",
+
+            {
+                method: "POST",
+
+                body: {
+
+                    email: email,
+
+                    password: password
+
+                }
+
+            }
+
+        );
+
     }
 
 
@@ -101,10 +129,8 @@ const RemadefAPI = {
 
 
 // ============================================================
-// OPTIONAL GLOBAL ACCESS
+// GLOBAL ACCESS
 // ============================================================
-
-// Makes the API available globally to other JavaScript files
 
 window.RemadefAPI = RemadefAPI;
 
