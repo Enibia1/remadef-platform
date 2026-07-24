@@ -1,30 +1,43 @@
-"use strict";
-
-/*
-============================================================
-REMADEF ACCOUNT REGISTRATION
-Frontend Registration Controller
-============================================================
-*/
-
-
 // ============================================================
-// CONFIGURATION
+// REMADEF ACCOUNT REGISTRATION
 // ============================================================
 
-const API_URL =
-    "https://6a60f589000c366da0d3.sfo.appwrite.run";
+document.addEventListener("DOMContentLoaded", () => {
 
-const LOGIN_PAGE =
-    "login.html";
+// --------------------------------------------------------
+// ELEMENTS
+// --------------------------------------------------------
+
+const form = document.getElementById("register-form");
+
+const emailInput =
+    document.getElementById("email");
+
+const phoneInput =
+    document.getElementById("phone");
+
+const passwordInput =
+    document.getElementById("password");
+
+const confirmPasswordInput =
+    document.getElementById("confirm-password");
+
+const submitButton =
+    document.getElementById("register-button");
+
+const errorBox =
+    document.getElementById("error");
+
+const successBox =
+    document.getElementById("success");
 
 
-// ============================================================
-// DOM ELEMENTS
-// ============================================================
+// --------------------------------------------------------
+// REGISTRATION METHOD
+// --------------------------------------------------------
 
-const form =
-    document.getElementById("form");
+let registrationMethod = "email";
+
 
 const emailTab =
     document.getElementById("email-tab");
@@ -38,786 +51,350 @@ const emailBox =
 const phoneBox =
     document.getElementById("phone-box");
 
-const emailInput =
-    document.getElementById("email");
 
-const phoneInput =
-    document.getElementById("phone");
-
-const passwordInput =
-    document.getElementById("password");
-
-const confirmInput =
-    document.getElementById("confirm");
-
-const submitButton =
-    document.getElementById("submit");
-
-const errorBox =
-    document.getElementById("error");
-
-const successBox =
-    document.getElementById("success");
-
-const traineeIdBox =
-    document.getElementById("trainee-id");
-
-const countdownBox =
-    document.getElementById("countdown");
-
-
-// ============================================================
-// PASSWORD REQUIREMENT ELEMENTS
-// ============================================================
-
-const lengthRequirement =
-    document.getElementById("length");
-
-const lowerRequirement =
-    document.getElementById("lower");
-
-const upperRequirement =
-    document.getElementById("upper");
-
-const numberRequirement =
-    document.getElementById("number");
-
-const strengthBar =
-    document.getElementById("strength-bar");
-
-const strengthText =
-    document.getElementById("strength-text");
-
-
-// ============================================================
-// STATE
-// ============================================================
-
-let registrationMethod =
-    "email";
-
-let isSubmitting =
-    false;
-
-
-// ============================================================
-// EMAIL VALIDATION
-// ============================================================
-
-function isValidEmail(email) {
-
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        .test(email);
-
-}
-
-
-// ============================================================
-// PHONE NORMALIZATION
-// ============================================================
-
-function normalizePhone(phone) {
-
-    phone =
-        phone.replace(/\D/g, "");
-
-    if (phone.startsWith("0")) {
-
-        return "+234" +
-            phone.slice(1);
-
-    }
-
-    if (phone.startsWith("234")) {
-
-        return "+" +
-            phone;
-
-    }
-
-    if (phone.length === 10) {
-
-        return "+234" +
-            phone;
-
-    }
-
-    return phone;
-
-}
-
-
-// ============================================================
-// PASSWORD REQUIREMENTS
-// ============================================================
-
-function getPasswordRequirements(password) {
-
-    return {
-
-        length:
-            password.length >= 8,
-
-        lower:
-            /[a-z]/.test(password),
-
-        upper:
-            /[A-Z]/.test(password),
-
-        number:
-            /\d/.test(password)
-
-    };
-
-}
-
-
-// ============================================================
-// UPDATE PASSWORD STRENGTH
-// ============================================================
-
-function updatePasswordStrength() {
-
-    const password =
-        passwordInput.value;
-
-    const requirements =
-        getPasswordRequirements(password);
-
-    let score =
-        0;
-
-    if (requirements.length) {
-
-        score++;
-
-    }
-
-    if (requirements.lower) {
-
-        score++;
-
-    }
-
-    if (requirements.upper) {
-
-        score++;
-
-    }
-
-    if (requirements.number) {
-
-        score++;
-
-    }
-
-
-    // --------------------------------------------------------
-    // UPDATE REQUIREMENT DISPLAY
-    // --------------------------------------------------------
-
-    lengthRequirement.textContent =
-        requirements.length
-            ? "🟢 8+ chars"
-            : "🔴 8+ chars";
-
-    lowerRequirement.textContent =
-        requirements.lower
-            ? "🟢 Lowercase"
-            : "🔴 Lowercase";
-
-    upperRequirement.textContent =
-        requirements.upper
-            ? "🟢 Uppercase"
-            : "🔴 Uppercase";
-
-    numberRequirement.textContent =
-        requirements.number
-            ? "🟢 Number"
-            : "🔴 Number";
-
-
-    // --------------------------------------------------------
-    // UPDATE STRENGTH BAR
-    // --------------------------------------------------------
-
-    const percentage =
-        (score / 4) * 100;
-
-    strengthBar.style.width =
-        percentage + "%";
-
-
-    if (!password) {
-
-        strengthText.textContent =
-            "";
-
-        return;
-
-    }
-
-
-    if (score <= 1) {
-
-        strengthText.textContent =
-            "Weak password";
-
-    }
-
-    else if (score === 2) {
-
-        strengthText.textContent =
-            "Fair password";
-
-    }
-
-    else if (score === 3) {
-
-        strengthText.textContent =
-            "Good password";
-
-    }
-
-    else {
-
-        strengthText.textContent =
-            "Strong password";
-
-    }
-
-}
-
-
-// ============================================================
-// PASSWORD VISIBILITY
-// ============================================================
-
-function togglePassword(inputId) {
-
-    const input =
-        document.getElementById(inputId);
-
-    if (!input) {
-
-        return;
-
-    }
-
-    input.type =
-        input.type === "password"
-            ? "text"
-            : "password";
-
-}
-
-
-// ============================================================
-// REGISTRATION METHOD SWITCHING
-// ============================================================
-
-emailTab.addEventListener(
-    "click",
-    function () {
-
-        registrationMethod =
-            "email";
-
-        emailTab.classList.add(
-            "active"
-        );
-
-        phoneTab.classList.remove(
-            "active"
-        );
-
-        emailBox.classList.remove(
-            "hidden"
-        );
-
-        phoneBox.classList.add(
-            "hidden"
-        );
-
-        emailInput.focus();
-
-        hideError();
-
-    }
-);
-
-
-phoneTab.addEventListener(
-    "click",
-    function () {
-
-        registrationMethod =
-            "phone";
-
-        phoneTab.classList.add(
-            "active"
-        );
-
-        emailTab.classList.remove(
-            "active"
-        );
-
-        phoneBox.classList.remove(
-            "hidden"
-        );
-
-        emailBox.classList.add(
-            "hidden"
-        );
-
-        phoneInput.focus();
-
-        hideError();
-
-    }
-);
-
-
-// ============================================================
-// PASSWORD EVENTS
-// ============================================================
-
-passwordInput.addEventListener(
-    "input",
-    updatePasswordStrength
-);
-
-
-// ============================================================
-// ERROR HANDLING
-// ============================================================
+// --------------------------------------------------------
+// HELPER: SHOW ERROR
+// --------------------------------------------------------
 
 function showError(message) {
 
-    errorBox.textContent =
-        message;
+    if (errorBox) {
 
-    errorBox.style.display =
-        "block";
+        errorBox.textContent = message;
 
-    errorBox.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest"
+        errorBox.style.display = "block";
+
+    }
+
+    if (successBox) {
+
+        successBox.style.display = "none";
+
+    }
+
+}
+
+
+// --------------------------------------------------------
+// HELPER: SHOW SUCCESS
+// --------------------------------------------------------
+
+function showSuccess(message) {
+
+    if (successBox) {
+
+        successBox.textContent = message;
+
+        successBox.style.display = "block";
+
+    }
+
+    if (errorBox) {
+
+        errorBox.style.display = "none";
+
+    }
+
+}
+
+
+// --------------------------------------------------------
+// EMAIL / PHONE SWITCH
+// --------------------------------------------------------
+
+if (emailTab) {
+
+    emailTab.addEventListener("click", () => {
+
+        registrationMethod = "email";
+
+        if (emailBox) {
+            emailBox.style.display = "block";
+        }
+
+        if (phoneBox) {
+            phoneBox.style.display = "none";
+        }
+
+        emailTab.classList.add("active");
+
+        if (phoneTab) {
+            phoneTab.classList.remove("active");
+        }
+
     });
 
 }
 
 
-function hideError() {
+if (phoneTab) {
 
-    errorBox.textContent =
-        "";
+    phoneTab.addEventListener("click", () => {
 
-    errorBox.style.display =
-        "none";
+        registrationMethod = "phone";
 
-}
-
-
-// ============================================================
-// SUCCESS SCREEN
-// ============================================================
-
-function showSuccess(data) {
-
-    form.classList.add(
-        "hidden"
-    );
-
-    successBox.style.display =
-        "block";
-
-
-    if (
-        data &&
-        data.trainee_id
-    ) {
-
-        traineeIdBox.textContent =
-            data.trainee_id;
-
-    }
-
-
-    let seconds =
-        3;
-
-    countdownBox.textContent =
-        seconds;
-
-
-    const countdown =
-        setInterval(
-            function () {
-
-                seconds--;
-
-                countdownBox.textContent =
-                    seconds;
-
-
-                if (seconds <= 0) {
-
-                    clearInterval(
-                        countdown
-                    );
-
-                    window.location.replace(
-                        LOGIN_PAGE
-                    );
-
-                }
-
-            },
-            1000
-        );
-
-}
-
-
-// ============================================================
-// FORM SUBMISSION
-// ============================================================
-
-form.addEventListener(
-    "submit",
-    async function (event) {
-
-        event.preventDefault();
-
-
-        // ----------------------------------------------------
-        // PREVENT DOUBLE SUBMISSION
-        // ----------------------------------------------------
-
-        if (isSubmitting) {
-
-            return;
-
+        if (phoneBox) {
+            phoneBox.style.display = "block";
         }
 
+        if (emailBox) {
+            emailBox.style.display = "none";
+        }
 
-        hideError();
+        phoneTab.classList.add("active");
 
+        if (emailTab) {
+            emailTab.classList.remove("active");
+        }
+
+    });
+
+}
+
+
+// --------------------------------------------------------
+// PASSWORD STRENGTH
+// --------------------------------------------------------
+
+if (passwordInput) {
+
+    passwordInput.addEventListener("input", () => {
 
         const password =
             passwordInput.value;
 
-        const confirmPassword =
-            confirmInput.value;
+        let strength = 0;
+
+        if (password.length >= 8) {
+            strength++;
+        }
+
+        if (/[A-Z]/.test(password)) {
+            strength++;
+        }
+
+        if (/[a-z]/.test(password)) {
+            strength++;
+        }
+
+        if (/[0-9]/.test(password)) {
+            strength++;
+        }
+
+        if (/[^A-Za-z0-9]/.test(password)) {
+            strength++;
+        }
+
+        const strengthBar =
+            document.getElementById("password-strength");
+
+        if (strengthBar) {
+
+            strengthBar.value = strength;
+
+        }
+
+    });
+
+}
 
 
-        // ----------------------------------------------------
-        // PASSWORD VALIDATION
-        // ----------------------------------------------------
+// --------------------------------------------------------
+// FORM SUBMISSION
+// --------------------------------------------------------
 
-        const requirements =
-            getPasswordRequirements(
-                password
-            );
+if (form) {
+
+    form.addEventListener("submit", async (event) => {
+
+        event.preventDefault();
 
 
-        if (!requirements.length) {
+        // Clear previous messages
 
-            showError(
-                "Password must be at least 8 characters."
-            );
+        if (errorBox) {
 
-            passwordInput.focus();
+            errorBox.style.display = "none";
 
-            return;
+        }
+
+        if (successBox) {
+
+            successBox.style.display = "none";
 
         }
 
 
-        if (!requirements.lower) {
+        // Prevent duplicate submissions
 
-            showError(
-                "Password must contain a lowercase letter."
-            );
+        if (submitButton) {
 
-            passwordInput.focus();
+            submitButton.disabled = true;
 
-            return;
-
-        }
-
-
-        if (!requirements.upper) {
-
-            showError(
-                "Password must contain an uppercase letter."
-            );
-
-            passwordInput.focus();
-
-            return;
+            submitButton.textContent =
+                "Creating account...";
 
         }
-
-
-        if (!requirements.number) {
-
-            showError(
-                "Password must contain a number."
-            );
-
-            passwordInput.focus();
-
-            return;
-
-        }
-
-
-        // ----------------------------------------------------
-        // CONFIRM PASSWORD
-        // ----------------------------------------------------
-
-        if (
-            password !==
-            confirmPassword
-        ) {
-
-            showError(
-                "Passwords do not match."
-            );
-
-            confirmInput.focus();
-
-            return;
-
-        }
-
-
-        // ----------------------------------------------------
-        // PREPARE REQUEST
-        // ----------------------------------------------------
-
-        const payload = {
-
-            method:
-                registrationMethod,
-
-            password:
-                password
-
-        };
-
-
-        // ----------------------------------------------------
-        // EMAIL
-        // ----------------------------------------------------
-
-        if (
-            registrationMethod ===
-            "email"
-        ) {
-
-            const email =
-                emailInput.value
-                    .trim()
-                    .toLowerCase();
-
-
-            if (!email) {
-
-                showError(
-                    "Please enter your email address."
-                );
-
-                emailInput.focus();
-
-                return;
-
-            }
-
-
-            if (!isValidEmail(email)) {
-
-                showError(
-                    "Please enter a valid email address."
-                );
-
-                emailInput.focus();
-
-                return;
-
-            }
-
-
-            payload.email =
-                email;
-
-        }
-
-
-        // ----------------------------------------------------
-        // PHONE
-        // ----------------------------------------------------
-
-        if (
-            registrationMethod ===
-            "phone"
-        ) {
-
-            const phone =
-                normalizePhone(
-                    phoneInput.value
-                );
-
-
-            if (
-                !phone.startsWith(
-                    "+234"
-                )
-            ) {
-
-                showError(
-                    "Please enter a valid Nigerian phone number."
-                );
-
-                phoneInput.focus();
-
-                return;
-
-            }
-
-
-            payload.phone =
-                phone;
-
-        }
-
-
-        // ----------------------------------------------------
-        // START REQUEST
-        // ----------------------------------------------------
-
-        isSubmitting =
-            true;
-
-        submitButton.disabled =
-            true;
-
-        submitButton.textContent =
-            "Creating account...";
 
 
         try {
 
+            const password =
+                passwordInput?.value.trim();
 
-            const response =
-                await fetch(
-                    API_URL,
-                    {
 
-                        method:
-                            "POST",
-
-                        headers:
-                            {
-
-                                "Content-Type":
-                                    "application/json"
-
-                            },
-
-                        body:
-                            JSON.stringify(
-                                payload
-                            )
-
-                    }
-                );
+            const confirmPassword =
+                confirmPasswordInput?.value.trim();
 
 
             // ------------------------------------------------
-            // READ RESPONSE SAFELY
+            // VALIDATE PASSWORD
             // ------------------------------------------------
 
-            const text =
-                await response.text();
-
-            let result;
-
-
-            try {
-
-                result =
-                    JSON.parse(
-                        text
-                    );
-
-            }
-
-            catch {
-
-                result =
-                    {};
-
-            }
-
-
-            // ------------------------------------------------
-            // HANDLE ERROR RESPONSE
-            // ------------------------------------------------
-
-            if (
-                !response.ok ||
-                !result.success
-            ) {
+            if (!password) {
 
                 throw new Error(
+                    "Please enter a password."
+                );
 
-                    result.error ||
-                    "Account creation failed."
+            }
 
+
+            if (password.length < 8) {
+
+                throw new Error(
+                    "Password must be at least 8 characters."
+                );
+
+            }
+
+
+            if (password !== confirmPassword) {
+
+                throw new Error(
+                    "Passwords do not match."
                 );
 
             }
 
 
             // ------------------------------------------------
-            // ACCOUNT CREATED
+            // BUILD REGISTRATION DATA
+            // ------------------------------------------------
+
+            const registrationData = {
+
+                password: password
+
+            };
+
+
+            if (registrationMethod === "email") {
+
+                const email =
+                    emailInput?.value.trim();
+
+
+                if (!email) {
+
+                    throw new Error(
+                        "Please enter your email address."
+                    );
+
+                }
+
+
+                registrationData.email =
+                    email;
+
+            }
+
+
+            if (registrationMethod === "phone") {
+
+                const phone =
+                    phoneInput?.value.trim();
+
+
+                if (!phone) {
+
+                    throw new Error(
+                        "Please enter your phone number."
+                    );
+
+                }
+
+
+                registrationData.phone =
+                    phone;
+
+            }
+
+
+            // ------------------------------------------------
+            // SEND TO REMADEF PLATFORM API
+            // ------------------------------------------------
+
+            const response =
+                await RemadefAPI.register(
+                    registrationData
+                );
+
+
+            // ------------------------------------------------
+            // SUCCESS
             // ------------------------------------------------
 
             showSuccess(
-                result.data
+
+                response.message ||
+
+                "Account created successfully."
+
             );
 
 
-        }
+            // Optional redirect
+
+            setTimeout(() => {
+
+                window.location.href =
+                    "login.html";
+
+            }, 1500);
 
 
-        catch (error) {
+        } catch (error) {
 
             console.error(
-                "REMADEF REGISTRATION ERROR:",
+                "Registration error:",
                 error
             );
 
 
             showError(
+
                 error.message ||
-                "Unable to create account. Please try again."
+
+                "Registration failed. Please try again."
+
             );
 
+        } finally {
 
-            isSubmitting =
-                false;
+            if (submitButton) {
 
-            submitButton.disabled =
-                false;
+                submitButton.disabled = false;
 
-            submitButton.textContent =
-                "🚀 Create Account";
+                submitButton.textContent =
+                    "Create Account";
+
+            }
 
         }
 
-    }
-);
+    });
+
+}
+
+});
