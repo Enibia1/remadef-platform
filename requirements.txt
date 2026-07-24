@@ -1,0 +1,7 @@
+REMADEF Platform API
+
+Python 3.14
+
+No external dependencies are required for the initial API.
+
+Appwrite's runtime provides the execution environment.
