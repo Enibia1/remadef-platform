@@ -4,9 +4,6 @@ def main(context):
     method = request.method
     path = request.path or "/"
 
-    if method == "OPTIONS":
-        return context.res.empty()
-
     if method == "GET" and path == "/":
         return context.res.json({
             "success": True,
@@ -27,4 +24,4 @@ def main(context):
         "error": "Endpoint not found",
         "path": path,
         "method": method
-    }, 404)
+    })
