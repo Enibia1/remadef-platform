@@ -52,10 +52,13 @@ const RemadefAPI = {
                                 "application/json",
 
                             // ========================================================
-                            // MANDATORY APPWRITE SECURITY GATEWAY ROUTING HEADER
+                            // CORE APPWRITE SECURITY & FUNCTION ROUTING HEADERS
                             // ========================================================
                             "X-Appwrite-Project":
                                 "6a634fdc00148a907132",
+
+                            "X-Appwrite-Function-Path":
+                                path,
 
                             ...(options.headers || {})
 
@@ -69,7 +72,8 @@ const RemadefAPI = {
                                     options.body
                                 )
 
-                                : undefined                    }
+                                : undefined
+                    }
 
                 );
 
