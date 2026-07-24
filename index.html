@@ -1,681 +1,681 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8"><meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1"
-    >
+<meta
+    name="theme-color"
+    content="#0B1F3A"
+>
 
-    <meta
-        name="theme-color"
-        content="#0B1F3A"
-    >
+<meta
+    name="description"
+    content="Create your REMADEF account and connect to education, apprenticeship, skills, jobs, business and opportunity."
+>
 
-    <meta
-        name="description"
-        content="Create your REMADEF account and connect to education, apprenticeship, skills, jobs, business and opportunity."
-    >
+<title>REMADEF — Create Your Account</title>
 
-    <title>REMADEF — Create Your Account</title>
+<style>
 
-    <style>
-        /* =====================================================
-           REMADEF DESIGN SYSTEM
-           Fast: no external CSS, fonts, libraries or images
-        ===================================================== */
+    :root {
+        --navy: #0B1F3A;
+        --navy-dark: #071526;
+        --navy-light: #16385F;
 
-        :root {
-            --navy: #0B1F3A;
-            --navy-dark: #071526;
-            --navy-light: #16385F;
+        --white: #FFFFFF;
+        --surface: #F5F7FA;
+        --border: #DCE3EB;
 
-            --white: #FFFFFF;
-            --surface: #F5F7FA;
-            --border: #DCE3EB;
+        --text: #172033;
+        --muted: #667085;
 
-            --text: #172033;
-            --muted: #667085;
+        --gold: #B8892D;
+        --green: #198754;
+        --red: #B42318;
 
-            --gold: #B8892D;
-            --green: #198754;
-            --red: #B42318;
+        --radius: 14px;
+    }
 
-            --radius: 14px;
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    html {
+        min-height: 100%;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 24px;
+
+        background:
+            linear-gradient(
+                180deg,
+                var(--surface) 0%,
+                var(--white) 100%
+            );
+
+        color: var(--text);
+
+        font-family:
+            Arial,
+            Helvetica,
+            sans-serif;
+
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+    }
+
+    .app {
+        width: 100%;
+        max-width: 440px;
+    }
+
+    .brand {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .brand-name {
+        color: var(--navy);
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: -0.8px;
+    }
+
+    .brand-line {
+        width: 42px;
+        height: 3px;
+
+        margin: 8px auto 0;
+
+        background: var(--gold);
+        border-radius: 999px;
+    }
+
+    .brand-description {
+        max-width: 330px;
+
+        margin: 12px auto 0;
+
+        color: var(--muted);
+
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .card {
+        background: var(--white);
+
+        border: 1px solid var(--border);
+
+        border-radius: 18px;
+
+        padding: 26px 22px;
+
+        box-shadow:
+            0 10px 30px rgba(11, 31, 58, 0.08);
+    }
+
+    .card-title {
+        margin: 0;
+
+        color: var(--navy);
+
+        font-size: 21px;
+        font-weight: 700;
+    }
+
+    .card-subtitle {
+        margin: 7px 0 20px;
+
+        color: var(--muted);
+
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .message {
+        display: none;
+
+        margin-bottom: 16px;
+        padding: 12px;
+
+        border-radius: 10px;
+
+        font-size: 13px;
+        line-height: 1.45;
+
+        white-space: pre-line;
+    }
+
+    .message.error {
+        color: var(--red);
+        background: #FFF1F0;
+        border: 1px solid #F5C2C0;
+    }
+
+    .message.success {
+        color: var(--green);
+        background: #ECFDF3;
+        border: 1px solid #B7E4C7;
+    }
+
+    .tabs {
+        display: flex;
+        gap: 4px;
+
+        padding: 4px;
+
+        margin-bottom: 18px;
+
+        background: var(--surface);
+
+        border-radius: 11px;
+    }
+
+    .tab {
+        flex: 1;
+
+        min-height: 40px;
+
+        border: 0;
+        border-radius: 8px;
+
+        background: transparent;
+
+        color: var(--muted);
+
+        font-size: 13px;
+        font-weight: 700;
+
+        cursor: pointer;
+    }
+
+    .tab.active {
+        background: var(--white);
+        color: var(--navy);
+
+        box-shadow:
+            0 1px 4px rgba(11, 31, 58, 0.12);
+    }
+
+    .field {
+        margin-bottom: 15px;
+    }
+
+    label {
+        display: block;
+
+        margin-bottom: 6px;
+
+        color: var(--text);
+
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    input {
+        width: 100%;
+
+        min-height: 46px;
+
+        padding: 12px 13px;
+
+        border: 1px solid var(--border);
+        border-radius: 10px;
+
+        background: var(--white);
+
+        color: var(--text);
+
+        font-size: 15px;
+
+        outline: none;
+
+        transition:
+            border-color 0.15s ease,
+            box-shadow 0.15s ease;
+    }
+
+    input:focus {
+        border-color: var(--navy);
+
+        box-shadow:
+            0 0 0 3px rgba(11, 31, 58, 0.10);
+    }
+
+    .password-wrapper {
+        position: relative;
+    }
+
+    .password-wrapper input {
+        padding-right: 48px;
+    }
+
+    .toggle-password {
+        position: absolute;
+
+        top: 50%;
+        right: 10px;
+
+        transform: translateY(-50%);
+
+        width: 34px;
+        height: 34px;
+
+        border: 0;
+
+        background: transparent;
+
+        font-size: 17px;
+
+        cursor: pointer;
+    }
+
+    .strength {
+        height: 4px;
+
+        margin-top: 8px;
+
+        overflow: hidden;
+
+        background: #E9EDF2;
+
+        border-radius: 999px;
+    }
+
+    #strength-bar {
+        width: 0;
+        height: 100%;
+
+        border-radius: inherit;
+
+        transition:
+            width 0.2s ease,
+            background 0.2s ease;
+    }
+
+    #strength-text {
+        min-height: 17px;
+
+        margin-top: 5px;
+
+        color: var(--muted);
+
+        font-size: 11px;
+    }
+
+    .requirements {
+        display: grid;
+
+        grid-template-columns: 1fr 1fr;
+
+        gap: 4px;
+
+        margin: 8px 0 17px;
+
+        color: var(--muted);
+
+        font-size: 11px;
+    }
+
+    .met {
+        color: var(--green);
+    }
+
+    .submit {
+        width: 100%;
+
+        min-height: 48px;
+
+        border: 0;
+        border-radius: 10px;
+
+        background: var(--navy);
+
+        color: var(--white);
+
+        font-size: 15px;
+        font-weight: 700;
+
+        cursor: pointer;
+
+        transition:
+            background 0.15s ease,
+            transform 0.1s ease;
+    }
+
+    .submit:hover {
+        background: var(--navy-light);
+    }
+
+    .submit:active {
+        transform: scale(0.99);
+    }
+
+    .submit:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+    }
+
+    .login {
+        margin-top: 20px;
+
+        text-align: center;
+
+        color: var(--muted);
+
+        font-size: 13px;
+    }
+
+    .login a {
+        color: var(--navy);
+
+        font-weight: 700;
+
+        text-decoration: none;
+    }
+
+    .footer {
+        margin-top: 18px;
+
+        text-align: center;
+
+        color: #98A2B3;
+
+        font-size: 11px;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    @media (max-width: 420px) {
+
+        body {
+            padding: 16px;
         }
+
+        .card {
+            padding: 22px 18px;
+        }
+
+        .brand-name {
+            font-size: 27px;
+        }
+
+    }
+
+    @media (prefers-reduced-motion: reduce) {
 
         *,
         *::before,
         *::after {
-            box-sizing: border-box;
+            transition: none !important;
         }
 
-        html {
-            min-height: 100%;
-        }
+    }
 
-        body {
-            margin: 0;
-            min-height: 100vh;
+</style>
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
+</head><body><main class="app">
 
-            padding: 24px;
+    <header class="brand">
 
-            background:
-                linear-gradient(
-                    180deg,
-                    var(--surface) 0%,
-                    var(--white) 100%
-                );
+        <div class="brand-name">
+            REMADEF
+        </div>
 
-            color: var(--text);
+        <div class="brand-line"></div>
 
-            font-family:
-                Arial,
-                Helvetica,
-                sans-serif;
+        <p class="brand-description">
+            One account. Multiple opportunities.
+            Connect to the REMADEF ecosystem.
+        </p>
 
-            -webkit-font-smoothing: antialiased;
-            text-rendering: optimizeLegibility;
-        }
+    </header>
 
-        .app {
-            width: 100%;
-            max-width: 440px;
-        }
 
-        .brand {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+    <section class="card">
 
-        .brand-name {
-            color: var(--navy);
-            font-size: 30px;
-            font-weight: 800;
-            letter-spacing: -0.8px;
-        }
+        <h1 class="card-title">
+            Create your REMADEF account
+        </h1>
 
-        .brand-line {
-            width: 42px;
-            height: 3px;
+        <p class="card-subtitle">
+            Your account can connect you to education,
+            apprenticeship, skills, jobs, business and more.
+        </p>
 
-            margin: 8px auto 0;
 
-            background: var(--gold);
-            border-radius: 999px;
-        }
+        <div
+            id="error"
+            class="message error"
+            role="alert"
+            aria-live="polite"
+        ></div>
 
-        .brand-description {
-            max-width: 330px;
 
-            margin: 12px auto 0;
+        <div
+            id="success"
+            class="message success"
+            role="status"
+            aria-live="polite"
+        ></div>
 
-            color: var(--muted);
 
-            font-size: 14px;
-            line-height: 1.5;
-        }
+        <form
+            id="form"
+            novalidate
+        >
 
-        .card {
-            background: var(--white);
-
-            border: 1px solid var(--border);
-
-            border-radius: 18px;
-
-            padding: 26px 22px;
-
-            box-shadow:
-                0 10px 30px rgba(11, 31, 58, 0.08);
-        }
-
-        .card-title {
-            margin: 0;
-
-            color: var(--navy);
-
-            font-size: 21px;
-            font-weight: 700;
-        }
-
-        .card-subtitle {
-            margin: 7px 0 20px;
-
-            color: var(--muted);
-
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        .message {
-            display: none;
-
-            margin-bottom: 16px;
-            padding: 12px;
-
-            border-radius: 10px;
-
-            font-size: 13px;
-            line-height: 1.45;
-
-            white-space: pre-line;
-        }
-
-        .message.error {
-            color: var(--red);
-            background: #FFF1F0;
-            border: 1px solid #F5C2C0;
-        }
-
-        .message.success {
-            color: var(--green);
-            background: #ECFDF3;
-            border: 1px solid #B7E4C7;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 4px;
-
-            padding: 4px;
-
-            margin-bottom: 18px;
-
-            background: var(--surface);
-
-            border-radius: 11px;
-        }
-
-        .tab {
-            flex: 1;
-
-            min-height: 40px;
-
-            border: 0;
-            border-radius: 8px;
-
-            background: transparent;
-
-            color: var(--muted);
-
-            font-size: 13px;
-            font-weight: 700;
-
-            cursor: pointer;
-        }
-
-        .tab.active {
-            background: var(--white);
-            color: var(--navy);
-
-            box-shadow:
-                0 1px 4px rgba(11, 31, 58, 0.12);
-        }
-
-        .field {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-
-            margin-bottom: 6px;
-
-            color: var(--text);
-
-            font-size: 13px;
-            font-weight: 700;
-        }
-
-        input {
-            width: 100%;
-
-            min-height: 46px;
-
-            padding: 12px 13px;
-
-            border: 1px solid var(--border);
-            border-radius: 10px;
-
-            background: var(--white);
-
-            color: var(--text);
-
-            font-size: 15px;
-
-            outline: none;
-
-            transition:
-                border-color 0.15s ease,
-                box-shadow 0.15s ease;
-        }
-
-        input:focus {
-            border-color: var(--navy);
-
-            box-shadow:
-                0 0 0 3px rgba(11, 31, 58, 0.10);
-        }
-
-        .password-wrapper {
-            position: relative;
-        }
-
-        .password-wrapper input {
-            padding-right: 48px;
-        }
-
-        .toggle-password {
-            position: absolute;
-
-            top: 50%;
-            right: 10px;
-
-            transform: translateY(-50%);
-
-            width: 34px;
-            height: 34px;
-
-            border: 0;
-
-            background: transparent;
-
-            font-size: 17px;
-
-            cursor: pointer;
-        }
-
-        .strength {
-            height: 4px;
-
-            margin-top: 8px;
-
-            overflow: hidden;
-
-            background: #E9EDF2;
-
-            border-radius: 999px;
-        }
-
-        #strength-bar {
-            width: 0;
-            height: 100%;
-
-            border-radius: inherit;
-
-            transition:
-                width 0.2s ease,
-                background 0.2s ease;
-        }
-
-        #strength-text {
-            min-height: 17px;
-
-            margin-top: 5px;
-
-            color: var(--muted);
-
-            font-size: 11px;
-        }
-
-        .requirements {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4px;
-
-            margin: 8px 0 17px;
-
-            color: var(--muted);
-
-            font-size: 11px;
-        }
-
-        .met {
-            color: var(--green);
-        }
-
-        .submit {
-            width: 100%;
-
-            min-height: 48px;
-
-            border: 0;
-            border-radius: 10px;
-
-            background: var(--navy);
-
-            color: var(--white);
-
-            font-size: 15px;
-            font-weight: 700;
-
-            cursor: pointer;
-
-            transition:
-                background 0.15s ease,
-                transform 0.1s ease;
-        }
-
-        .submit:hover {
-            background: var(--navy-light);
-        }
-
-        .submit:active {
-            transform: scale(0.99);
-        }
-
-        .submit:disabled {
-            opacity: 0.65;
-            cursor: not-allowed;
-        }
-
-        .login {
-            margin-top: 20px;
-
-            text-align: center;
-
-            color: var(--muted);
-
-            font-size: 13px;
-        }
-
-        .login a {
-            color: var(--navy);
-            font-weight: 700;
-            text-decoration: none;
-        }
-
-        .footer {
-            margin-top: 18px;
-
-            text-align: center;
-
-            color: #98A2B3;
-
-            font-size: 11px;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        @media (max-width: 420px) {
-
-            body {
-                padding: 16px;
-            }
-
-            .card {
-                padding: 22px 18px;
-            }
-
-            .brand-name {
-                font-size: 27px;
-            }
-
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-
-            *,
-            *::before,
-            *::after {
-                transition: none !important;
-            }
-
-        }
-    </style>
-</head>
-
-<body>
-
-    <main class="app">
-
-        <header class="brand">
-
-            <div class="brand-name">
-                REMADEF
-            </div>
-
-            <div class="brand-line"></div>
-
-            <p class="brand-description">
-                One account. Multiple opportunities.
-                Connect to the REMADEF ecosystem.
-            </p>
-
-        </header>
-
-
-        <section class="card">
-
-            <h1 class="card-title">
-                Create your REMADEF account
-            </h1>
-
-            <p class="card-subtitle">
-                Your account can connect you to education,
-                apprenticeship, skills, jobs, business and more.
-            </p>
-
-
-            <div
-                id="error"
-                class="message error"
-                role="alert"
-                aria-live="polite"
-            ></div>
-
-
-            <div
-                id="success"
-                class="message success"
-                role="status"
-                aria-live="polite"
-            ></div>
-
-
-            <form
-                id="form"
-                novalidate
-            >
-
-                <div class="tabs">
-
-                    <button
-                        id="email-tab"
-                        class="tab active"
-                        type="button"
-                    >
-                        Email
-                    </button>
-
-                    <button
-                        id="phone-tab"
-                        class="tab"
-                        type="button"
-                    >
-                        Phone
-                    </button>
-
-                </div>
-
-
-                <div
-                    id="email-box"
-                    class="field"
-                >
-
-                    <label for="email">
-                        Email address
-                    </label>
-
-                    <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        inputmode="email"
-                        autocomplete="email"
-                        placeholder="you@example.com"
-                    >
-
-                </div>
-
-
-                <div
-                    id="phone-box"
-                    class="field hidden"
-                >
-
-                    <label for="phone">
-                        Nigerian phone number
-                    </label>
-
-                    <input
-                        id="phone"
-                        name="phone"
-                        type="tel"
-                        inputmode="tel"
-                        autocomplete="tel"
-                        placeholder="8037537614"
-                    >
-
-                </div>
-
-
-                <div class="field">
-
-                    <label for="password">
-                        Password
-                    </label>
-
-                    <div class="password-wrapper">
-
-                        <input
-                            id="password"
-                            name="password"
-                            type="password"
-                            autocomplete="new-password"
-                            placeholder="Create a strong password"
-                        >
-
-                        <button
-                            class="toggle-password"
-                            type="button"
-                            data-target="password"
-                            aria-label="Show password"
-                        >
-                            👁
-                        </button>
-
-                    </div>
-
-
-                    <div class="strength">
-
-                        <div id="strength-bar"></div>
-
-                    </div>
-
-                    <div id="strength-text"></div>
-
-
-                    <div class="requirements">
-
-                        <span id="length">
-                            ○ 8+ characters
-                        </span>
-
-                        <span id="lower">
-                            ○ Lowercase
-                        </span>
-
-                        <span id="upper">
-                            ○ Uppercase
-                        </span>
-
-                        <span id="number">
-                            ○ Number
-                        </span>
-
-                    </div>
-
-                </div>
-
-
-                <div class="field">
-
-                    <label for="confirm">
-                        Confirm password
-                    </label>
-
-                    <div class="password-wrapper">
-
-                        <input
-                            id="confirm"
-                            name="confirm"
-                            type="password"
-                            autocomplete="new-password"
-                            placeholder="Confirm your password"
-                        >
-
-                        <button
-                            class="toggle-password"
-                            type="button"
-                            data-target="confirm"
-                            aria-label="Show password"
-                        >
-                            👁
-                        </button>
-
-                    </div>
-
-                </div>
-
+            <div class="tabs">
 
                 <button
-                    id="submit"
-                    class="submit"
-                    type="submit"
+                    id="email-tab"
+                    class="tab active"
+                    type="button"
                 >
-                    Create REMADEF Account
+                    Email
                 </button>
 
-            </form>
-
-
-            <div class="login">
-
-                Already have a REMADEF account?
-
-                <a href="login.html">
-                    Sign in
-                </a>
+                <button
+                    id="phone-tab"
+                    class="tab"
+                    type="button"
+                >
+                    Phone
+                </button>
 
             </div>
 
-        </section>
+
+            <div
+                id="email-box"
+                class="field"
+            >
+
+                <label for="email">
+                    Email address
+                </label>
+
+                <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    inputmode="email"
+                    autocomplete="email"
+                    placeholder="you@example.com"
+                >
+
+            </div>
 
 
-        <footer class="footer">
+            <div
+                id="phone-box"
+                class="field hidden"
+            >
 
-            REMADEF — Connecting people to opportunity.
+                <label for="phone">
+                    Nigerian phone number
+                </label>
 
-        </footer>
+                <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    inputmode="tel"
+                    autocomplete="tel"
+                    placeholder="8037537614"
+                >
 
-    </main>
+            </div>
 
 
-    <script
-        src="register.js"
-        defer
-    ></script>
+            <div class="field">
 
-</body>
+                <label for="password">
+                    Password
+                </label>
 
-</html>
+                <div class="password-wrapper">
+
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        autocomplete="new-password"
+                        placeholder="Create a strong password"
+                    >
+
+                    <button
+                        class="toggle-password"
+                        type="button"
+                        data-target="password"
+                        aria-label="Show password"
+                    >
+                        👁
+                    </button>
+
+                </div>
+
+
+                <div class="strength">
+
+                    <div id="strength-bar"></div>
+
+                </div>
+
+                <div id="strength-text"></div>
+
+
+                <div class="requirements">
+
+                    <span id="length">
+                        ○ 8+ characters
+                    </span>
+
+                    <span id="lower">
+                        ○ Lowercase
+                    </span>
+
+                    <span id="upper">
+                        ○ Uppercase
+                    </span>
+
+                    <span id="number">
+                        ○ Number
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="confirm">
+                    Confirm password
+                </label>
+
+                <div class="password-wrapper">
+
+                    <input
+                        id="confirm"
+                        name="confirm"
+                        type="password"
+                        autocomplete="new-password"
+                        placeholder="Confirm your password"
+                    >
+
+                    <button
+                        class="toggle-password"
+                        type="button"
+                        data-target="confirm"
+                        aria-label="Show password"
+                    >
+                        👁
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <button
+                id="submit"
+                class="submit"
+                type="submit"
+            >
+                Create REMADEF Account
+            </button>
+
+        </form>
+
+
+        <div class="login">
+
+            Already have a REMADEF account?
+
+            <a href="login.html">
+                Sign in
+            </a>
+
+        </div>
+
+    </section>
+
+
+    <footer class="footer">
+
+        REMADEF — Connecting people to opportunity.
+
+    </footer>
+
+</main>
+
+
+<!-- API CLIENT MUST LOAD FIRST -->
+<script
+    src="api.js"
+    defer
+></script>
+
+<!-- REGISTRATION LOGIC -->
+<script
+    src="register.js"
+    defer
+></script>
+
+</body></html>
