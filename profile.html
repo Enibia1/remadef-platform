@@ -1,1 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <meta
+        name="theme-color"
+        content="#0B1F3A"
+    >
+
+    <meta
+        name="description"
+        content="Your REMADEF identity and opportunity profile."
+    >
+
+    <title>REMADEF — Profile</title>
+
+    <style>
+
+        :root {
+
+            --navy: #0B1F3A;
+            --navy-light: #16385F;
+
+            --white: #FFFFFF;
+            --surface: #F5F7FA;
+            --border: #E1E6ED;
+
+            --text: #172033;
+            --muted: #667085;
+
+            --gold: #B8892D;
+            --green: #198754;
+
+        }
+
+
+        * {
+
+            box-sizing: border-box;
+
+        }
+
+
+        body {
+
+            margin: 0;
+
+            min-height: 100vh;
+
+            padding-bottom: 75px;
+
+            background: var(--surface);
+
+            color: var(--text);
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            -webkit-font-smoothing: antialiased;
+
+        }
+
+
+        button {
+
+            font: inherit;
+
+            cursor: pointer;
+
+        }
+
+
+        /* =========================
+           TOP BAR
+        ========================= */
+
+
+        .topbar {
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 10;
+
+            height: 62px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 0 16px;
+
+            background: var(--white);
+
+            border-bottom: 1px solid var(--border);
+
+        }
+
+
+        .logo {
+
+            color: var(--navy);
+
+            font-size: 22px;
+
+            font-weight: 800;
+
+        }
+
+
+        .back-button {
+
+            border: 0;
+
+            background: transparent;
+
+            color: var(--navy);
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+        }
+
+
+        /* =========================
+           MAIN
+        ========================= */
+
+
+        .main {
+
+            width: 100%;
+
+            max-width: 700px;
+
+            margin: auto;
+
+            padding: 18px 14px;
+
+        }
+
+
+        /* =========================
+           PROFILE HEADER
+        ========================= */
+
+
+        .profile-card {
+
+            padding: 22px 18px;
+
+            background: var(--white);
+
+            border: 1px solid var(--border);
+
+            border-radius: 16px;
+
+        }
+
+
+        .profile-header {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 15px;
+
+        }
+
+
+        .avatar {
+
+            width: 76px;
+
+            height: 76px;
+
+            display: grid;
+
+            place-items: center;
+
+            flex-shrink: 0;
+
+            border-radius: 50%;
+
+            background: var(--navy);
+
+            color: var(--white);
+
+            font-size: 28px;
+
+            font-weight: bold;
+
+        }
+
+
+        .profile-name {
+
+            margin: 0;
+
+            color: var(--navy);
+
+            font-size: 22px;
+
+        }
+
+
+        .profile-id {
+
+            margin-top: 5px;
+
+            color: var(--muted);
+
+            font-size: 12px;
+
+        }
+
+
+        .verified {
+
+            display: inline-block;
+
+            margin-top: 7px;
+
+            padding: 4px 8px;
+
+            border-radius: 5px;
+
+            background: #ECFDF3;
+
+            color: var(--green);
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+        }
+
+
+        .profile-bio {
+
+            margin: 18px 0 0;
+
+            color: var(--muted);
+
+            font-size: 13px;
+
+            line-height: 1.55;
+
+        }
+
+
+        .edit-button {
+
+            width: 100%;
+
+            min-height: 44px;
+
+            margin-top: 18px;
+
+            border: 1px solid var(--navy);
+
+            border-radius: 9px;
+
+            background: var(--white);
+
+            color: var(--navy);
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+        }
+
+
+        .edit-button:hover {
+
+            background: var(--surface);
+
+        }
+
+
+        /* =========================
+           STATS
+        ========================= */
+
+
+        .stats {
+
+            display: grid;
+
+            grid-template-columns: repeat(3, 1fr);
+
+            gap: 1px;
+
+            margin-top: 18px;
+
+            overflow: hidden;
+
+            border: 1px solid var(--border);
+
+            border-radius: 12px;
+
+            background: var(--border);
+
+        }
+
+
+        .stat {
+
+            padding: 14px 8px;
+
+            background: var(--white);
+
+            text-align: center;
+
+        }
+
+
+        .stat-number {
+
+            color: var(--navy);
+
+            font-size: 18px;
+
+            font-weight: 800;
+
+        }
+
+
+        .stat-label {
+
+            margin-top: 4px;
+
+            color: var(--muted);
+
+            font-size: 10px;
+
+        }
+
+
+        /* =========================
+           SECTIONS
+        ========================= */
+
+
+        .section {
+
+            margin-top: 18px;
+
+            padding: 18px;
+
+            background: var(--white);
+
+            border: 1px solid var(--border);
+
+            border-radius: 16px;
+
+        }
+
+
+        .section-title {
+
+            margin: 0 0 14px;
+
+            color: var(--navy);
+
+            font-size: 16px;
+
+        }
+
+
+        /* =========================
+           IDENTITY STATUS
+        ========================= */
+
+
+        .identity-row {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 12px 0;
+
+            border-bottom: 1px solid var(--border);
+
+        }
+
+
+        .identity-row:last-child {
+
+            border-bottom: 0;
+
+            padding-bottom: 0;
+
+        }
+
+
+        .identity-label {
+
+            color: var(--muted);
+
+            font-size: 12px;
+
+        }
+
+
+        .identity-value {
+
+            color: var(--text);
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+        }
+
+
+        .status {
+
+            color: var(--green);
+
+        }
+
+
+        /* =========================
+           ROLES
+        ========================= */
+
+
+        .roles {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 8px;
+
+        }
+
+
+        .role {
+
+            padding: 9px 12px;
+
+            border: 1px solid var(--border);
+
+            border-radius: 8px;
+
+            background: var(--surface);
+
+            color: var(--navy);
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+        }
+
+
+        .role.add {
+
+            border-color: var(--navy);
+
+            background: var(--navy);
+
+            color: var(--white);
+
+        }
+
+
+        /* =========================
+           OPPORTUNITY PROFILE
+        ========================= */
+
+
+        .completion {
+
+            margin-bottom: 8px;
+
+            color: var(--muted);
+
+            font-size: 12px;
+
+        }
+
+
+        .progress {
+
+            height: 7px;
+
+            overflow: hidden;
+
+            border-radius: 999px;
+
+            background: #E9EDF2;
+
+        }
+
+
+        .progress-bar {
+
+            width: 35%;
+
+            height: 100%;
+
+            border-radius: inherit;
+
+            background: var(--navy);
+
+        }
+
+
+        .complete-profile {
+
+            width: 100%;
+
+            min-height: 44px;
+
+            margin-top: 14px;
+
+            border: 0;
+
+            border-radius: 9px;
+
+            background: var(--navy);
+
+            color: var(--white);
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+        }
+
+
+        /* =========================
+           BOTTOM NAVIGATION
+        ========================= */
+
+
+        .bottom-nav {
+
+            position: fixed;
+
+            right: 0;
+
+            bottom: 0;
+
+            left: 0;
+
+            z-index: 20;
+
+            height: 64px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-around;
+
+            background: var(--white);
+
+            border-top: 1px solid var(--border);
+
+        }
+
+
+        .nav-item {
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            gap: 4px;
+
+            border: 0;
+
+            background: transparent;
+
+            color: var(--muted);
+
+            font-size: 10px;
+
+        }
+
+
+        .nav-item span {
+
+            font-size: 18px;
+
+        }
+
+
+        .nav-item.active {
+
+            color: var(--navy);
+
+            font-weight: 700;
+
+        }
+
+
+        @media (min-width: 768px) {
+
+            body {
+
+                padding-bottom: 30px;
+
+            }
+
+
+            .bottom-nav {
+
+                display: none;
+
+            }
+
+
+            .main {
+
+                padding-top: 28px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <header class="topbar">
+
+
+        <button
+            class="back-button"
+            type="button"
+            onclick="history.back()"
+        >
+
+            ← Back
+
+        </button>
+
+
+        <div class="logo">
+
+            REMADEF
+
+        </div>
+
+
+        <div style="width: 50px;"></div>
+
+
+    </header>
+
+
+    <main class="main">
+
+
+        <section class="profile-card">
+
+
+            <div class="profile-header">
+
+
+                <div class="avatar">
+
+                    U
+
+                </div>
+
+
+                <div>
+
+
+                    <h1 class="profile-name">
+
+                        REMADEF Member
+
+                    </h1>
+
+
+                    <div class="profile-id">
+
+                        REM-XXXXXXXX
+
+                    </div>
+
+
+                    <span class="verified">
+
+                        ✓ ACCOUNT ACTIVE
+
+                    </span>
+
+
+                </div>
+
+
+            </div>
+
+
+            <p class="profile-bio">
+
+                Complete your REMADEF identity to unlock
+                more opportunities across the ecosystem.
+
+            </p>
+
+
+            <button
+                class="edit-button"
+                type="button"
+            >
+
+                Edit Profile
+
+            </button>
+
+
+            <div class="stats">
+
+
+                <div class="stat">
+
+                    <div class="stat-number">
+
+                        0
+
+                    </div>
+
+                    <div class="stat-label">
+
+                        Connections
+
+                    </div>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <div class="stat-number">
+
+                        0
+
+                    </div>
+
+                    <div class="stat-label">
+
+                        Following
+
+                    </div>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <div class="stat-number">
+
+                        0
+
+                    </div>
+
+                    <div class="stat-label">
+
+                        Posts
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+        <section class="section">
+
+
+            <h2 class="section-title">
+
+                Identity
+
+            </h2>
+
+
+            <div class="identity-row">
+
+
+                <span class="identity-label">
+
+                    Account status
+
+                </span>
+
+
+                <span class="identity-value status">
+
+                    Active
+
+                </span>
+
+
+            </div>
+
+
+            <div class="identity-row">
+
+
+                <span class="identity-label">
+
+                    REMADEF ID
+
+                </span>
+
+
+                <span class="identity-value">
+
+                    REM-XXXXXXXX
+
+                </span>
+
+
+            </div>
+
+
+            <div class="identity-row">
+
+
+                <span class="identity-label">
+
+                    Email
+
+                </span>
+
+
+                <span class="identity-value">
+
+                    Not added
+
+                </span>
+
+
+            </div>
+
+
+            <div class="identity-row">
+
+
+                <span class="identity-label">
+
+                    Phone
+
+                </span>
+
+
+                <span class="identity-value">
+
+                    Not added
+
+                </span>
+
+
+            </div>
+
+
+        </section>
+
+
+        <section class="section">
+
+
+            <h2 class="section-title">
+
+                My REMADEF Roles
+
+            </h2>
+
+
+            <div class="roles">
+
+
+                <div class="role">
+
+                    REMADEF Member
+
+                </div>
+
+
+                <button
+                    class="role add"
+                    type="button"
+                >
+
+                    + Add Branch
+
+                </button>
+
+
+            </div>
+
+
+        </section>
+
+
+        <section class="section">
+
+
+            <h2 class="section-title">
+
+                Opportunity Profile
+
+            </h2>
+
+
+            <div class="completion">
+
+                Profile completion: 35%
+
+            </div>
+
+
+            <div class="progress">
+
+
+                <div class="progress-bar"></div>
+
+
+            </div>
+
+
+            <button
+                class="complete-profile"
+                type="button"
+            >
+
+                Complete My Profile
+
+            </button>
+
+
+        </section>
+
+
+    </main>
+
+
+    <nav
+        class="bottom-nav"
+        aria-label="Main navigation"
+    >
+
+
+        <button
+            class="nav-item"
+            type="button"
+            onclick="location.href='home.html'"
+        >
+
+            <span>⌂</span>
+
+            Home
+
+        </button>
+
+
+        <button
+            class="nav-item"
+            type="button"
+        >
+
+            <span>◉</span>
+
+            Explore
+
+        </button>
+
+
+        <button
+            class="nav-item"
+            type="button"
+        >
+
+            <span>＋</span>
+
+            Create
+
+        </button>
+
+
+        <button
+            class="nav-item"
+            type="button"
+        >
+
+            <span>✉</span>
+
+            Messages
+
+        </button>
+
+
+        <button
+            class="nav-item active"
+            type="button"
+        >
+
+            <span>●</span>
+
+            Profile
+
+        </button>
+
+
+    </nav>
+
+
+</body>
+
+</html>
