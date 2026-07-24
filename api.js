@@ -1,38 +1,111 @@
+// ============================================================
+// REMADEF PLATFORM API CLIENT
+// ============================================================
+
+// Main REMADEF Platform API
 const REMADEF_API =
     "https://6a6380f50016f677984e.fra.appwrite.run";
 
 
-async function apiRequest(endpoint, options = {}) {
-    const response = await fetch(
-        `${REMADEF_API}${endpoint}`,
-        {
-            ...options,
+// ============================================================
+// REMADEF API
+// ============================================================
 
-            headers: {
-                "Content-Type": "application/json",
-                ...(options.headers || {})
+const RemadefAPI = {
+
+    // --------------------------------------------------------
+    // Generic API request
+    // --------------------------------------------------------
+
+    async request(path = "/", options = {}) {
+
+        const response = await fetch(
+            `${REMADEF_API}${path}`,
+            {
+                method: options.method || "GET",
+
+                headers: {
+                    "Content-Type": "application/json",
+
+                    ...(options.headers || {})
+                },
+
+                body: options.body
+                    ? JSON.stringify(options.body)
+                    : undefined
             }
+        );
+
+
+        let data;
+
+
+        try {
+
+            data = await response.json();
+
+        } catch (error) {
+
+            throw new Error(
+                "The server returned an invalid response."
+            );
+
         }
-    );
 
 
-    let data;
+        if (!response.ok) {
 
-    try {
-        data = await response.json();
-    } catch {
-        throw new Error(
-            `Invalid server response (${response.status})`
+            throw new Error(
+
+                data.error ||
+
+                `API request failed with status ${response.status}`
+
+            );
+
+        }
+
+
+        return data;
+
+    },
+
+
+    // --------------------------------------------------------
+    // API HEALTH CHECK
+    // --------------------------------------------------------
+
+    async health() {
+
+        return await this.request(
+            "/api/health"
         );
+
+    },
+
+
+    // --------------------------------------------------------
+    // API STATUS
+    // --------------------------------------------------------
+
+    async status() {
+
+        return await this.request(
+            "/"
+        );
+
     }
 
 
-    if (!response.ok) {
-        throw new Error(
-            data.error || "API request failed"
-        );
-    }
+};
 
 
-    return data;
-}
+// ============================================================
+// OPTIONAL GLOBAL ACCESS
+// ============================================================
+
+// Makes the API available globally to other JavaScript files
+
+window.RemadefAPI = RemadefAPI;
+
+window.REMADEF_API = REMADEF_API;
