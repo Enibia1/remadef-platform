@@ -1,137 +1,142 @@
-// ============================================================
-// REMADEF PLATFORM API CLIENT
-// ============================================================
+/* ============================================================
+REMADEF PLATFORM API CLIENT
+============================================================ */
 
-// Main REMADEF Platform API
 const REMADEF_API =
-    "https://6a6380f50016f677984e.fra.appwrite.run";
-
-
-// ============================================================
-// REMADEF API
-// ============================================================
+"https://6a6380f50016f677984e.fra.appwrite.run";
 
 const RemadefAPI = {
 
-    // --------------------------------------------------------
-    // Generic API request
-    // --------------------------------------------------------
+/*
+ * Generic API request
+ */
 
-    async request(path = "/", options = {}) {
+async request(path = "/", options = {}) {
 
-        const response = await fetch(
-            `${REMADEF_API}${path}`,
-            {
-                method: options.method || "GET",
+    const response = await fetch(
 
-                headers: {
-                    "Content-Type": "application/json",
+        `${REMADEF_API}${path}`,
 
-                    ...(options.headers || {})
-                },
+        {
 
-                body: options.body
+            method:
+                options.method || "GET",
+
+            headers: {
+
+                "Content-Type":
+                    "application/json",
+
+                ...(options.headers || {})
+
+            },
+
+            body:
+
+                options.body
+
                     ? JSON.stringify(options.body)
+
                     : undefined
-            }
-        );
-
-
-        let data;
-
-
-        try {
-
-            data = await response.json();
-
-        } catch (error) {
-
-            throw new Error(
-                "The server returned an invalid response."
-            );
 
         }
 
-
-        if (!response.ok) {
-
-            throw new Error(
-
-                data.error ||
-
-                `API request failed with status ${response.status}`
-
-            );
-
-        }
+    );
 
 
-        return data;
-
-    },
+    let data;
 
 
-    // --------------------------------------------------------
-    // API HEALTH CHECK
-    // --------------------------------------------------------
+    try {
 
-    async health() {
+        data =
+            await response.json();
 
-        return await this.request(
-            "/api/health"
-        );
+    } catch {
 
-    },
+        throw new Error(
 
-
-    // --------------------------------------------------------
-    // API STATUS
-    // --------------------------------------------------------
-
-    async status() {
-
-        return await this.request(
-            "/"
-        );
-
-    },
-
-
-    // --------------------------------------------------------
-    // ACCOUNT REGISTRATION
-    // --------------------------------------------------------
-
-    async register(email, password) {
-
-        return await this.request(
-
-            "/api/register",
-
-            {
-                method: "POST",
-
-                body: {
-
-                    email: email,
-
-                    password: password
-
-                }
-
-            }
+            "The server returned an invalid response."
 
         );
 
     }
 
 
+    if (!response.ok) {
+
+        throw new Error(
+
+            data.error ||
+
+            `API request failed with status ${response.status}`
+
+        );
+
+    }
+
+
+    return data;
+
+},
+
+
+/*
+ * API HEALTH
+ */
+
+async health() {
+
+    return await this.request(
+
+        "/api/health"
+
+    );
+
+},
+
+
+/*
+ * API STATUS
+ */
+
+async status() {
+
+    return await this.request(
+
+        "/"
+
+    );
+
+},
+
+
+/*
+ * ACCOUNT REGISTRATION
+ */
+
+async register(payload) {
+
+    return await this.request(
+
+        "/api/register",
+
+        {
+
+            method: "POST",
+
+            body: payload
+
+        }
+
+    );
+
+}
+
 };
 
+window.RemadefAPI =
+RemadefAPI;
 
-// ============================================================
-// GLOBAL ACCESS
-// ============================================================
-
-window.RemadefAPI = RemadefAPI;
-
-window.REMADEF_API = REMADEF_API;
+window.REMADEF_API =
+REMADEF_API;
