@@ -2,7 +2,10 @@ def main(context):
     request = context.req
 
     method = request.method
-    path = request.path or "/"
+    path = request.path
+
+    context.log(f"Method: {method}")
+    context.log(f"Path: {path}")
 
     if method == "GET" and path == "/":
         return context.res.json({
