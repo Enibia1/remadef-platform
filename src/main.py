@@ -229,7 +229,7 @@ def main(context):
 
             elif registration_method == "phone":
 
-                if not phone:
+                if not phone or phone == "null":
 
                     return context.res.json(
 
@@ -438,7 +438,6 @@ def main(context):
 
             )
 
-
             return context.res.json(
 
                 {
@@ -458,7 +457,7 @@ def main(context):
 
 
     # ========================================================
-    # UNKNOWN ENDPOINT
+    # FALLBACK 404 ENDPOINT
     # ========================================================
 
     return context.res.json(
@@ -467,14 +466,11 @@ def main(context):
 
             "success": False,
 
-            "error":
-            "Endpoint not found",
+            "error": "Endpoint not found",
 
-            "path":
-            path,
+            "path": path,
 
-            "method":
-            method
+            "method": method
 
         },
 
