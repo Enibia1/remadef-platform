@@ -1,6 +1,6 @@
 /* ============================================================
    REMADEF PLATFORM API CLIENT
-   ============================================================ */
+============================================================ */
 
 const REMADEF_API =
     "https://6a6380f50016f677984e.fra.appwrite.run";
@@ -8,27 +8,13 @@ const REMADEF_API =
 
 const RemadefAPI = {
 
-    /*
-     * Generic API request
-     */
 
     async request(path = "/", options = {}) {
+
 
         const url =
             `${REMADEF_API}${path}`;
 
-
-        const method =
-            options.method || "GET";
-
-
-        const body =
-            options.body || null;
-
-
-        /*
-         * Visible browser debug
-         */
 
         const debug =
             document.getElementById("debug");
@@ -39,70 +25,99 @@ const RemadefAPI = {
             debug.textContent =
                 "REQUEST STARTED\n\n" +
 
-                "URL:\n" +
-                url +
+                "URL: " + url + "\n" +
 
-                "\n\nMETHOD:\n" +
-                method +
-
-                "\n\nBODY:\n" +
-
-                JSON.stringify(
-                    body,
-                    null,
-                    2
-                );
+                "METHOD: " +
+                (options.method || "GET") + "\n\n";
 
         }
 
 
-        console.log(
-            "REMADEF API REQUEST:",
-            {
-                url,
-                method,
-                body
-            }
-        );
-
-
-        let response;
-
-
         try {
 
-            response =
+
+            const response =
                 await fetch(
 
                     url,
 
                     {
 
-                        method: method,
-
+                        method:
+                            options.method || "GET",
 
                         headers: {
 
                             "Content-Type":
                                 "application/json",
 
-                            "Accept":
-                                "application/json"
+                            ...(options.headers || {})
 
                         },
 
-
                         body:
 
-                            body
+                            options.body
 
-                                ? JSON.stringify(body)
+                                ? JSON.stringify(
+                                    options.body
+                                )
 
                                 : undefined
 
                     }
 
                 );
+
+
+            if (debug) {
+
+                debug.textContent +=
+
+                    "HTTP RESPONSE RECEIVED\n\n" +
+
+                    "STATUS: " +
+
+                    response.status +
+
+                    "\n\n";
+
+            }
+
+
+            let data;
+
+
+            try {
+
+                data =
+                    await response.json();
+
+            } catch {
+
+                throw new Error(
+
+                    "Server returned invalid JSON."
+
+                );
+
+            }
+
+
+            if (!response.ok) {
+
+                throw new Error(
+
+                    data.error ||
+
+                    `API request failed with status ${response.status}`
+
+                );
+
+            }
+
+
+            return data;
 
 
         } catch (error) {
@@ -112,137 +127,41 @@ const RemadefAPI = {
 
                 debug.textContent +=
 
-                    "\n\nFETCH ERROR:\n" +
+                    "FETCH ERROR:\n\n" +
 
                     error.message;
 
             }
 
 
-            console.error(
-                "REMADEF FETCH ERROR:",
-                error
-            );
-
-
-            throw new Error(
-                "Failed to connect to the REMADEF API."
-            );
+            throw error;
 
         }
-
-
-        if (debug) {
-
-            debug.textContent +=
-
-                "\n\nRESPONSE STATUS:\n" +
-
-                response.status +
-
-                " " +
-
-                response.statusText;
-
-        }
-
-
-        console.log(
-            "REMADEF API RESPONSE:",
-            response.status,
-            response.statusText
-        );
-
-
-        const rawResponse =
-            await response.text();
-
-
-        if (debug) {
-
-            debug.textContent +=
-
-                "\n\nRAW RESPONSE:\n" +
-
-                rawResponse;
-
-        }
-
-
-        console.log(
-            "REMADEF API RAW RESPONSE:",
-            rawResponse
-        );
-
-
-        let data;
-
-
-        try {
-
-            data =
-                JSON.parse(
-                    rawResponse
-                );
-
-        } catch {
-
-
-            throw new Error(
-                "The server returned an invalid response."
-            );
-
-        }
-
-
-        if (!response.ok) {
-
-
-            throw new Error(
-
-                data.error ||
-
-                `API request failed with status ${response.status}`
-
-            );
-
-        }
-
-
-        return data;
 
     },
 
-
-    /*
-     * API HEALTH
-     */
 
     async health() {
 
         return await this.request(
+
             "/api/health"
+
         );
 
     },
 
-
-    /*
-     * API STATUS
-     */
 
     async status() {
 
         return await this.request(
+
             "/"
+
         );
 
     },
 
-
-    /*
-     * ACCOUNT REGISTRATION
-     */
 
     async register(payload) {
 
@@ -261,6 +180,7 @@ const RemadefAPI = {
         );
 
     }
+
 
 };
 
