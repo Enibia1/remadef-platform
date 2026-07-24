@@ -3,22 +3,81 @@ import re
 
 
 def main(context):
+
     request = context.req
 
     method = request.method
     path = request.path or "/"
+
+
+    # ========================================================
+    # CORS HEADERS
+    # ========================================================
+
+    CORS_HEADERS = {
+
+        "Access-Control-Allow-Origin":
+        "https://enibia1.github.io",
+
+        "Access-Control-Allow-Methods":
+        "GET, POST, OPTIONS",
+
+        "Access-Control-Allow-Headers":
+        "Content-Type",
+
+        "Access-Control-Max-Age":
+        "86400"
+
+    }
+
+
+    # ========================================================
+    # CORS PREFLIGHT
+    # ========================================================
+
+    if method == "OPTIONS":
+
+        return context.res.json(
+
+            {
+                "success": True
+            },
+
+            200,
+
+            CORS_HEADERS
+
+        )
+
 
     # ========================================================
     # API STATUS
     # ========================================================
 
     if method == "GET" and path == "/":
-        return context.res.json({
-            "success": True,
-            "service": "REMADEF Platform API",
-            "status": "online",
-            "version": "1.0.0"
-        })
+
+        return context.res.json(
+
+            {
+
+                "success": True,
+
+                "service":
+                "REMADEF Platform API",
+
+                "status":
+                "online",
+
+                "version":
+                "1.0.0"
+
+            },
+
+            200,
+
+            CORS_HEADERS
+
+        )
 
 
     # ========================================================
@@ -26,11 +85,26 @@ def main(context):
     # ========================================================
 
     if method == "GET" and path == "/api/health":
-        return context.res.json({
-            "success": True,
-            "service": "REMADEF Platform API",
-            "status": "healthy"
-        })
+
+        return context.res.json(
+
+            {
+
+                "success": True,
+
+                "service":
+                "REMADEF Platform API",
+
+                "status":
+                "healthy"
+
+            },
+
+            200,
+
+            CORS_HEADERS
+
+        )
 
 
     # ========================================================
@@ -41,101 +115,371 @@ def main(context):
 
         try:
 
+            # =================================================
+            # READ REQUEST BODY
+            # =================================================
+
             body = request.body or {}
 
+
             if isinstance(body, str):
+
                 body = json.loads(body)
 
 
+            # =================================================
+            # EXTRACT DATA
+            # =================================================
+
             email = str(
-                body.get("email", "")
+
+                body.get(
+                    "email",
+                    ""
+                )
+
             ).strip().lower()
 
 
+            phone = str(
+
+                body.get(
+                    "phone",
+                    ""
+                )
+
+            ).strip()
+
+
             password = str(
-                body.get("password", "")
+
+                body.get(
+                    "password",
+                    ""
+                )
+
             )
 
 
-            # Validate email
+            registration_method = str(
 
-            if not email:
+                body.get(
+                    "method",
+                    "email"
+                )
+
+            )
+
+
+            # =================================================
+            # EMAIL REGISTRATION
+            # =================================================
+
+            if registration_method == "email":
+
+                if not email:
+
+                    return context.res.json(
+
+                        {
+
+                            "success": False,
+
+                            "error":
+                            "Email is required"
+
+                        },
+
+                        400,
+
+                        CORS_HEADERS
+
+                    )
+
+
+                if not re.match(
+
+                    r"^[^@\s]+@[^@\s]+\.[^@\s]+$",
+
+                    email
+
+                ):
+
+                    return context.res.json(
+
+                        {
+
+                            "success": False,
+
+                            "error":
+                            "Invalid email address"
+
+                        },
+
+                        400,
+
+                        CORS_HEADERS
+
+                    )
+
+
+            # =================================================
+            # PHONE REGISTRATION
+            # =================================================
+
+            elif registration_method == "phone":
+
+                if not phone:
+
+                    return context.res.json(
+
+                        {
+
+                            "success": False,
+
+                            "error":
+                            "Phone number is required"
+
+                        },
+
+                        400,
+
+                        CORS_HEADERS
+
+                    )
+
+
+                if not re.match(
+
+                    r"^[0-9]{10,15}$",
+
+                    phone
+
+                ):
+
+                    return context.res.json(
+
+                        {
+
+                            "success": False,
+
+                            "error":
+                            "Invalid phone number"
+
+                        },
+
+                        400,
+
+                        CORS_HEADERS
+
+                    )
+
+
+            else:
 
                 return context.res.json(
+
                     {
+
                         "success": False,
-                        "error": "Email is required"
+
+                        "error":
+                        "Invalid registration method"
+
                     },
-                    400
+
+                    400,
+
+                    CORS_HEADERS
+
                 )
 
 
-            if not re.match(
-                r"^[^@\s]+@[^@\s]+\.[^@\s]+$",
-                email
-            ):
-
-                return context.res.json(
-                    {
-                        "success": False,
-                        "error": "Invalid email address"
-                    },
-                    400
-                )
-
-
-            # Validate password
+            # =================================================
+            # PASSWORD VALIDATION
+            # =================================================
 
             if len(password) < 8:
 
                 return context.res.json(
+
                     {
+
                         "success": False,
+
                         "error":
                         "Password must be at least 8 characters"
+
                     },
-                    400
+
+                    400,
+
+                    CORS_HEADERS
+
                 )
 
 
-            # Temporary response
+            if not re.search(
 
-            return context.res.json({
+                r"[a-z]",
 
-                "success": True,
+                password
 
-                "message":
-                "Registration data received successfully",
+            ):
 
-                "email": email
+                return context.res.json(
 
-            })
+                    {
+
+                        "success": False,
+
+                        "error":
+                        "Password must contain a lowercase letter"
+
+                    },
+
+                    400,
+
+                    CORS_HEADERS
+
+                )
+
+
+            if not re.search(
+
+                r"[A-Z]",
+
+                password
+
+            ):
+
+                return context.res.json(
+
+                    {
+
+                        "success": False,
+
+                        "error":
+                        "Password must contain an uppercase letter"
+
+                    },
+
+                    400,
+
+                    CORS_HEADERS
+
+                )
+
+
+            if not re.search(
+
+                r"[0-9]",
+
+                password
+
+            ):
+
+                return context.res.json(
+
+                    {
+
+                        "success": False,
+
+                        "error":
+                        "Password must contain a number"
+
+                    },
+
+                    400,
+
+                    CORS_HEADERS
+
+                )
+
+
+            # =================================================
+            # TEMPORARY SUCCESS RESPONSE
+            # =================================================
+
+            return context.res.json(
+
+                {
+
+                    "success": True,
+
+                    "message":
+                    "Registration data received successfully",
+
+                    "method":
+                    registration_method,
+
+                    "email":
+                    email if registration_method == "email"
+                    else None,
+
+                    "phone":
+                    phone if registration_method == "phone"
+                    else None
+
+                },
+
+                200,
+
+                CORS_HEADERS
+
+            )
 
 
         except Exception as error:
 
-            return context.res.json({
+            context.error(
 
-                "success": False,
+                f"Registration error: {str(error)}"
 
-                "error":
-                "Unable to process registration"
+            )
 
-            }, 500)
+
+            return context.res.json(
+
+                {
+
+                    "success": False,
+
+                    "error":
+                    "Unable to process registration"
+
+                },
+
+                500,
+
+                CORS_HEADERS
+
+            )
 
 
     # ========================================================
     # UNKNOWN ENDPOINT
     # ========================================================
 
-    return context.res.json({
+    return context.res.json(
 
-        "success": False,
+        {
 
-        "error": "Endpoint not found",
+            "success": False,
 
-        "path": path,
+            "error":
+            "Endpoint not found",
 
-        "method": method
+            "path":
+            path,
 
-    }, 404)
+            "method":
+            method
+
+        },
+
+        404,
+
+        CORS_HEADERS
+
+    )
