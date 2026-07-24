@@ -2,7 +2,6 @@
    REMADEF PLATFORM API CLIENT (MASTER CLOUD ROUTING)
 ============================================================ */
 
-// FIXED: Corrected base cloud endpoint URL sequence
 const REMADEF_API = "https://appwrite.io";
 const PROJECT_ID = "6a634fdc00148a907132";
 const FUNCTION_ID = "6a6380f40035f4b76305";
