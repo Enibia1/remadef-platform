@@ -1,7 +1,7 @@
 /* ============================================================
    REMADEF PLATFORM API CLIENT
    Appwrite Function Execution API
-   ASYNC EXECUTION POLLING
+   SYNCHRONOUS EXECUTION
 ============================================================ */
 
 const APPWRITE_ENDPOINT =
@@ -15,9 +15,6 @@ const FUNCTION_ID =
 
 const EXECUTION_URL =
     `${APPWRITE_ENDPOINT}/functions/${FUNCTION_ID}/executions`;
-
-const MAX_ATTEMPTS = 20;
-const POLL_DELAY = 1000;
 
 
 /* ============================================================
@@ -40,22 +37,7 @@ function debugLog(message) {
 
 
 /* ============================================================
-   WAIT
-============================================================ */
-
-function wait(ms) {
-
-    return new Promise(resolve => {
-
-        setTimeout(resolve, ms);
-
-    });
-
-}
-
-
-/* ============================================================
-   REGISTER
+   REMADEF API
 ============================================================ */
 
 const RemadefAPI = {
@@ -77,7 +59,9 @@ const RemadefAPI = {
 
             "API REQUEST STARTED" +
 
-            "\nURL: " + EXECUTION_URL +
+            "\nURL: " +
+
+            EXECUTION_URL +
 
             "\nMETHOD: POST" +
 
@@ -102,7 +86,7 @@ const RemadefAPI = {
 
 
             /* =================================================
-               1. CREATE APPWRITE FUNCTION EXECUTION
+               CREATE SYNCHRONOUS EXECUTION
             ================================================= */
 
             const response =
@@ -139,11 +123,22 @@ const RemadefAPI = {
 
                             },
 
+
                             body:
 
                                 JSON.stringify(payload),
 
-                            async: true
+
+                            /*
+                             * IMPORTANT
+                             *
+                             * false means Appwrite waits
+                             * for the function to finish.
+                             *
+                             * No execution polling is needed.
+                             */
+
+                            async: false
 
                         })
 
@@ -163,26 +158,27 @@ const RemadefAPI = {
             );
 
 
-            const responseText =
+            const text =
 
                 await response.text();
 
 
-            let execution;
+            let data;
 
 
             try {
 
-                execution =
-                    JSON.parse(responseText);
+                data =
+
+                    JSON.parse(text);
 
             }
 
             catch {
 
-                execution = {
+                data = {
 
-                    raw: responseText
+                    raw: text
 
                 };
 
@@ -193,27 +189,13 @@ const RemadefAPI = {
 
                 throw new Error(
 
-                    execution.message ||
+                    data.message ||
 
-                    execution.error ||
+                    data.error ||
 
-                    `Appwrite request failed: ${response.status}`
+                    data.raw ||
 
-                );
-
-            }
-
-
-            const executionId =
-
-                execution.$id;
-
-
-            if (!executionId) {
-
-                throw new Error(
-
-                    "Appwrite did not return an execution ID."
+                    `Registration failed: ${response.status}`
 
                 );
 
@@ -222,239 +204,24 @@ const RemadefAPI = {
 
             debugLog(
 
-                "EXECUTION CREATED" +
+                "FUNCTION EXECUTION COMPLETED" +
 
-                "\nID: " +
+                "\nRESPONSE: " +
 
-                executionId
+                JSON.stringify(
+
+                    data,
+
+                    null,
+
+                    2
+
+                )
 
             );
 
 
-            /* =================================================
-               2. POLL EXECUTION STATUS
-            ================================================= */
-
-            const statusURL =
-
-                `${EXECUTION_URL}/${executionId}`;
-
-
-            for (
-
-                let attempt = 1;
-
-                attempt <= MAX_ATTEMPTS;
-
-                attempt++
-
-            ) {
-
-
-                await wait(POLL_DELAY);
-
-
-                debugLog(
-
-                    "CHECKING EXECUTION" +
-
-                    "\nATTEMPT: " +
-
-                    attempt
-
-                );
-
-
-                const statusResponse =
-
-                    await fetch(
-
-                        statusURL,
-
-                        {
-
-                            method: "GET",
-
-                            headers: {
-
-                                "X-Appwrite-Project":
-                                    PROJECT_ID
-
-                            }
-
-                        }
-
-                    );
-
-
-                const statusText =
-
-                    await statusResponse.text();
-
-
-                let result;
-
-
-                try {
-
-                    result =
-                        JSON.parse(statusText);
-
-                }
-
-                catch {
-
-                    result = {
-
-                        raw: statusText
-
-                    };
-
-                }
-
-
-                if (!statusResponse.ok) {
-
-                    throw new Error(
-
-                        result.message ||
-
-                        result.error ||
-
-                        `Execution status request failed: ${statusResponse.status}`
-
-                    );
-
-                }
-
-
-                debugLog(
-
-                    "EXECUTION STATUS: " +
-
-                    result.status +
-
-                    "\nFUNCTION STATUS CODE: " +
-
-                    (result.responseStatusCode || "PENDING")
-
-                );
-
-
-                /* =============================================
-                   EXECUTION COMPLETED
-                ============================================= */
-
-                if (
-
-                    result.status ===
-
-                    "completed"
-
-                ) {
-
-
-                    let functionResponse =
-
-                        result.responseBody;
-
-
-                    try {
-
-                        functionResponse =
-
-                            JSON.parse(
-
-                                result.responseBody
-
-                            );
-
-                    }
-
-                    catch {
-
-                        // Response was not JSON
-
-                    }
-
-
-                    debugLog(
-
-                        "FUNCTION EXECUTION COMPLETED" +
-
-                        "\nSTATUS CODE: " +
-
-                        result.responseStatusCode +
-
-                        "\nRESPONSE: " +
-
-                        JSON.stringify(
-
-                            functionResponse,
-
-                            null,
-
-                            2
-
-                        )
-
-                    );
-
-
-                    if (
-
-                        result.responseStatusCode >= 400
-
-                    ) {
-
-                        throw new Error(
-
-                            functionResponse.message ||
-
-                            functionResponse.error ||
-
-                            "Registration failed."
-
-                        );
-
-                    }
-
-
-                    return functionResponse;
-
-                }
-
-
-                /* =============================================
-                   EXECUTION FAILED
-                ============================================= */
-
-                if (
-
-                    result.status ===
-
-                    "failed"
-
-                ) {
-
-                    throw new Error(
-
-                        result.errors ||
-
-                        "Function execution failed."
-
-                    );
-
-                }
-
-            }
-
-
-            throw new Error(
-
-                "Registration is taking too long. Please try again."
-
-            );
+            return data;
 
 
         }
@@ -465,7 +232,7 @@ const RemadefAPI = {
 
             debugLog(
 
-                "FETCH/API ERROR: " +
+                "API ERROR: " +
 
                 error.message
 
