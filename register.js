@@ -1,479 +1,507 @@
 /* ============================================================
-   REMADEF PLATFORM API CLIENT
-   APPWRITE EXECUTION + RESULT POLLING
+   REMADEF ACCOUNT REGISTRATION
+   FULL WORKING VERSION WITH EXECUTION RESULT POLLING
 ============================================================ */
 
-const REMADEF_API = "https://appwrite.io";
+(() => {
 
-const PROJECT_ID =
-    "6a634fdc00148a907132";
-
-const FUNCTION_ID =
-    "6a6380f40035f4b76305";
-
-const MAX_POLL_ATTEMPTS = 30;
-
-const POLL_INTERVAL = 500;
-
-
-/* ============================================================
-   DEBUG HELPER
-============================================================ */
-
-function updateDebug(message) {
-
-    const debug =
-        document.getElementById("debug");
-
-    if (!debug) return;
-
-    debug.textContent +=
-        "\n\n" + message;
-
-}
-
-
-/* ============================================================
-   WAIT
-============================================================ */
-
-function sleep(milliseconds) {
-
-    return new Promise(resolve => {
-
-        setTimeout(
-            resolve,
-            milliseconds
-        );
-
-    });
-
-}
-
-
-/* ============================================================
-   PARSE FUNCTION RESPONSE
-============================================================ */
-
-function parseResponseBody(responseBody) {
-
-    if (!responseBody) {
-
-        return {
-
-            success: true,
-
-            message:
-                "Registration completed successfully."
-
-        };
-
-    }
-
-
-    if (typeof responseBody === "object") {
-
-        return responseBody;
-
-    }
-
-
-    try {
-
-        return JSON.parse(
-            responseBody
-        );
-
-    } catch {
-
-        return {
-
-            success: true,
-
-            raw: responseBody
-
-        };
-
-    }
-
-}
-
-
-/* ============================================================
-   REMADEF API
-============================================================ */
-
-const RemadefAPI = {
+    "use strict";
 
 
     /* ========================================================
-       EXECUTE FUNCTION AND WAIT FOR RESULT
+       DOM ELEMENTS
     ======================================================== */
 
-    async request(
-
-        path = "/",
-
-        options = {}
-
-    ) {
+    const $ = id =>
+        document.getElementById(id);
 
 
-        const debug =
-            document.getElementById("debug");
+    const form =
+        $("form");
 
 
-        const functionPath =
-            path;
+    const errorBox =
+        $("error");
 
 
-        updateDebug(
-
-            "EXECUTING REMADEF REGISTRATION FUNCTION..."
-
-        );
+    const successBox =
+        $("success");
 
 
-        /* ====================================================
-           STEP 1 — CREATE EXECUTION
-        ==================================================== */
+    const emailBox =
+        $("email-box");
 
-        const executionResponse =
-            await fetch(
 
-                `${REMADEF_API}/functions/${FUNCTION_ID}/executions`,
+    const phoneBox =
+        $("phone-box");
 
-                {
 
-                    method: "POST",
+    const emailTab =
+        $("email-tab");
 
-                    headers: {
 
-                        "Content-Type":
-                            "application/json",
+    const phoneTab =
+        $("phone-tab");
 
-                        "X-Appwrite-Project":
-                            PROJECT_ID
 
-                    },
+    const emailInput =
+        $("email");
 
-                    body: JSON.stringify({
 
-                        body:
+    const phoneInput =
+        $("phone");
 
-                            options.body || {},
 
-                        path:
+    const passwordInput =
+        $("password");
 
-                            functionPath,
 
-                        method:
+    const confirmInput =
+        $("confirm");
 
-                            options.method || "GET",
 
-                        headers: {
+    const submitButton =
+        $("submit");
 
-                            "Content-Type":
-                                "application/json"
 
-                        }
+    const strengthBar =
+        $("strength-bar");
 
-                    })
 
-                }
+    const strengthText =
+        $("strength-text");
 
+
+    const lengthRequirement =
+        $("length");
+
+
+    const lowerRequirement =
+        $("lower");
+
+
+    const upperRequirement =
+        $("upper");
+
+
+    const numberRequirement =
+        $("number");
+
+
+    const debug =
+        $("debug");
+
+
+    let registrationMethod =
+        "email";
+
+
+    /* ========================================================
+       DEBUG
+    ======================================================== */
+
+    function debugLog(message) {
+
+        if (!debug) return;
+
+        debug.textContent +=
+            "\n\n" + message;
+
+    }
+
+
+    function debugReplace(message) {
+
+        if (!debug) return;
+
+        debug.textContent =
+            message;
+
+    }
+
+
+    /* ========================================================
+       MESSAGE HELPERS
+    ======================================================== */
+
+    function showError(message) {
+
+        errorBox.textContent =
+            message;
+
+        errorBox.style.display =
+            "block";
+
+        successBox.style.display =
+            "none";
+
+    }
+
+
+    function showSuccess(message) {
+
+        successBox.textContent =
+            message;
+
+        successBox.style.display =
+            "block";
+
+        errorBox.style.display =
+            "none";
+
+    }
+
+
+    function clearMessages() {
+
+        errorBox.textContent =
+            "";
+
+        successBox.textContent =
+            "";
+
+        errorBox.style.display =
+            "none";
+
+        successBox.style.display =
+            "none";
+
+    }
+
+
+    /* ========================================================
+       REGISTRATION METHOD
+    ======================================================== */
+
+    function setMethod(method) {
+
+
+        registrationMethod =
+            method;
+
+
+        if (method === "email") {
+
+
+            emailBox.classList.remove(
+                "hidden"
             );
 
 
-        if (!executionResponse.ok) {
-
-            throw new Error(
-
-                `Execution creation failed: ${executionResponse.status}`
-
+            phoneBox.classList.add(
+                "hidden"
             );
+
+
+            emailTab.classList.add(
+                "active"
+            );
+
+
+            phoneTab.classList.remove(
+                "active"
+            );
+
+
+            emailInput.required =
+                true;
+
+
+            phoneInput.required =
+                false;
+
+
+        } else {
+
+
+            emailBox.classList.add(
+                "hidden"
+            );
+
+
+            phoneBox.classList.remove(
+                "hidden"
+            );
+
+
+            emailTab.classList.remove(
+                "active"
+            );
+
+
+            phoneTab.classList.add(
+                "active"
+            );
+
+
+            emailInput.required =
+                false;
+
+
+            phoneInput.required =
+                true;
 
         }
 
 
-        const execution =
-            await executionResponse.json();
+        clearMessages();
+
+    }
 
 
-        const executionId =
-            execution.$id;
+    emailTab.addEventListener(
 
+        "click",
 
-        if (!executionId) {
+        () => {
 
-            throw new Error(
-
-                "Appwrite did not return an execution ID."
-
+            setMethod(
+                "email"
             );
 
         }
 
+    );
 
-        updateDebug(
 
-            "EXECUTION CREATED\nID: " +
-            executionId
+    phoneTab.addEventListener(
+
+        "click",
+
+        () => {
+
+            setMethod(
+                "phone"
+            );
+
+        }
+
+    );
+
+
+    /* ========================================================
+       PASSWORD STRENGTH
+    ======================================================== */
+
+    function updatePasswordStrength() {
+
+
+        const password =
+            passwordInput.value;
+
+
+        const hasLength =
+            password.length >= 8;
+
+
+        const hasLower =
+            /[a-z]/.test(password);
+
+
+        const hasUpper =
+            /[A-Z]/.test(password);
+
+
+        const hasNumber =
+            /[0-9]/.test(password);
+
+
+        const score =
+
+            Number(hasLength) +
+
+            Number(hasLower) +
+
+            Number(hasUpper) +
+
+            Number(hasNumber);
+
+
+        lengthRequirement.textContent =
+
+            `${hasLength ? "✓" : "○"} 8+ characters`;
+
+
+        lowerRequirement.textContent =
+
+            `${hasLower ? "✓" : "○"} Lowercase`;
+
+
+        upperRequirement.textContent =
+
+            `${hasUpper ? "✓" : "○"} Uppercase`;
+
+
+        numberRequirement.textContent =
+
+            `${hasNumber ? "✓" : "○"} Number`;
+
+
+        lengthRequirement.classList.toggle(
+
+            "met",
+
+            hasLength
 
         );
 
 
-        /* ====================================================
-           STEP 2 — POLL EXECUTION STATUS
-        ==================================================== */
+        lowerRequirement.classList.toggle(
 
-        for (
+            "met",
 
-            let attempt = 1;
+            hasLower
 
-            attempt <= MAX_POLL_ATTEMPTS;
-
-            attempt++
-
-        ) {
+        );
 
 
-            await sleep(
+        upperRequirement.classList.toggle(
 
-                POLL_INTERVAL
+            "met",
 
-            );
+            hasUpper
 
-
-            updateDebug(
-
-                "CHECKING EXECUTION STATUS...\nATTEMPT: " +
-                attempt
-
-            );
+        );
 
 
-            const statusResponse =
-                await fetch(
+        numberRequirement.classList.toggle(
 
-                    `${REMADEF_API}/functions/${FUNCTION_ID}/executions/${executionId}`,
+            "met",
 
-                    {
+            hasNumber
 
-                        method: "GET",
+        );
 
-                        headers: {
 
-                            "X-Appwrite-Project":
-                                PROJECT_ID
+        const widths = [
 
-                        }
+            "0%",
+
+            "25%",
+
+            "50%",
+
+            "75%",
+
+            "100%"
+
+        ];
+
+
+        const labels = [
+
+            "",
+
+            "Weak",
+
+            "Fair",
+
+            "Good",
+
+            "Strong"
+
+        ];
+
+
+        strengthBar.style.width =
+            widths[score];
+
+
+        strengthText.textContent =
+            labels[score];
+
+
+        if (score === 0) {
+
+            strengthBar.style.background =
+                "transparent";
+
+        }
+
+        else if (score <= 1) {
+
+            strengthBar.style.background =
+                "#B42318";
+
+        }
+
+        else if (score <= 2) {
+
+            strengthBar.style.background =
+                "#B8892D";
+
+        }
+
+        else {
+
+            strengthBar.style.background =
+                "#198754";
+
+        }
+
+    }
+
+
+    passwordInput.addEventListener(
+
+        "input",
+
+        updatePasswordStrength
+
+    );
+
+
+    /* ========================================================
+       SHOW / HIDE PASSWORD
+    ======================================================== */
+
+    document
+        .querySelectorAll(
+            ".toggle-password"
+        )
+        .forEach(button => {
+
+
+            button.addEventListener(
+
+                "click",
+
+                () => {
+
+
+                    const target =
+                        $(button.dataset.target);
+
+
+                    if (
+
+                        target.type ===
+                        "password"
+
+                    ) {
+
+
+                        target.type =
+                            "text";
+
+
+                        button.textContent =
+                            "🙈";
+
+
+                        button.setAttribute(
+
+                            "aria-label",
+
+                            "Hide password"
+
+                        );
+
 
                     }
 
-                );
+                    else {
 
 
-            if (!statusResponse.ok) {
-
-                throw new Error(
-
-                    `Could not retrieve execution status: ${statusResponse.status}`
-
-                );
-
-            }
-
-
-            const currentExecution =
-                await statusResponse.json();
-
-
-            const status =
-                currentExecution.status;
-
-
-            updateDebug(
-
-                "EXECUTION STATUS: " +
-                status
-
-            );
-
-
-            /* =================================================
-               COMPLETED
-            ================================================= */
-
-            if (
-
-                status ===
-                "completed"
-
-            ) {
-
-
-                updateDebug(
-
-                    "EXECUTION COMPLETED"
-
-                );
-
-
-                updateDebug(
-
-                    "HTTP STATUS: " +
-                    (
-
-                        currentExecution.responseStatusCode
-                        || "unknown"
-
-                    )
-
-                );
-
-
-                updateDebug(
-
-                    "RESPONSE RECEIVED"
-
-                );
-
-
-                return parseResponseBody(
-
-                    currentExecution.responseBody
-
-                );
-
-            }
-
-
-            /* =================================================
-               FAILED
-            ================================================= */
-
-            if (
-
-                status ===
-                "failed"
-
-            ) {
-
-
-                throw new Error(
-
-                    currentExecution.responseBody
-
-                    ||
-
-                    currentExecution.stderr
-
-                    ||
-
-                    "REMADEF function execution failed."
-
-                );
-
-            }
-
-        }
-
-
-        /* ====================================================
-           TIMEOUT
-        ==================================================== */
-
-        throw new Error(
-
-            "The REMADEF function took too long to respond."
-
-        );
-
-    },
-
-
-    /* ========================================================
-       API HEALTH
-    ======================================================== */
-
-    async health() {
-
-        return await this.request(
-
-            "/api/health",
-
-            {
-
-                method: "GET"
-
-            }
-
-        );
-
-    },
-
-
-    /* ========================================================
-       API STATUS
-    ======================================================== */
-
-    async status() {
-
-        return await this.request(
-
-            "/",
-
-            {
-
-                method: "GET"
-
-            }
-
-        );
-
-    },
-
-
-    /* ========================================================
-       ACCOUNT REGISTRATION
-    ======================================================== */
-
-    async register(payload) {
-
-        return await this.request(
-
-            "/api/register",
-
-            {
-
-                method: "POST",
-
-                body: payload
-
-            }
-
-        );
-
-    }
-
-};
-
-
-/* ============================================================
-   GLOBAL EXPORT
-============================================================ */
-
-window.RemadefAPI =
-    RemadefAPI;
-
-
-window.REMADEF_API =
-    REMADEF_API;
-
-
-updateDebug(
-
-    "REMADEF API CLIENT LOADED"
-
-);
+                        target.type =
+                            "
