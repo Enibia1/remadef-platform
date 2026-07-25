@@ -709,7 +709,6 @@
 
             </p>
 
-
         </header>
 
 
@@ -966,7 +965,6 @@
 
                     </div>
 
-
                 </div>
 
 
@@ -1017,7 +1015,6 @@
 
                     </div>
 
-
                 </div>
 
 
@@ -1041,7 +1038,6 @@
 
             <div class="login">
 
-
                 Already have a REMADEF account?
 
 
@@ -1051,9 +1047,7 @@
 
                 </a>
 
-
             </div>
-
 
         </section>
 
@@ -1066,31 +1060,40 @@
 
 
         <!-- =====================================================
-             TEMPORARY API DEBUG PANEL
+             TEMPORARY DEBUG PANEL
         ===================================================== -->
 
 
-        <pre id="debug">
-
-Waiting for registration request...
-
-        </pre>
+        <pre id="debug">Waiting for registration request...</pre>
 
 
     </main>
 
 
     <!-- =====================================================
-         API MUST LOAD BEFORE REGISTER.JS
+         IMPORTANT SCRIPT ORDER
     ===================================================== -->
 
 
-   
-    <script src="api.js?v=5"></script>
+    <!-- 1. Appwrite SDK -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/appwrite@21.1.0"
+    ></script>
 
 
+    <!-- 2. REMADEF API CLIENT -->
 
-    <script src="register.js"></script>
+    <script
+        src="api.js?v=6"
+    ></script>
+
+
+    <!-- 3. REGISTRATION LOGIC -->
+
+    <script
+        src="register.js"
+    ></script>
 
 
 </body>
