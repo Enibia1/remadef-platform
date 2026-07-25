@@ -25,11 +25,6 @@
 
     <style>
 
-        /* =====================================================
-           REMADEF DESIGN SYSTEM
-           Existing design preserved
-        ===================================================== */
-
         :root {
 
             --navy: #0B1F3A;
@@ -46,8 +41,6 @@
             --gold: #B8892D;
             --green: #198754;
             --red: #B42318;
-
-            --radius: 14px;
 
         }
 
@@ -922,9 +915,7 @@
 
                     <div class="strength">
 
-
                         <div id="strength-bar"></div>
-
 
                     </div>
 
@@ -1038,6 +1029,7 @@
 
             <div class="login">
 
+
                 Already have a REMADEF account?
 
 
@@ -1049,6 +1041,7 @@
 
             </div>
 
+
         </section>
 
 
@@ -1059,10 +1052,7 @@
         </footer>
 
 
-        <!-- =====================================================
-             TEMPORARY DEBUG PANEL
-        ===================================================== -->
-
+        <!-- TEMPORARY DEBUG PANEL -->
 
         <pre id="debug">Waiting for registration request...</pre>
 
@@ -1072,28 +1062,14 @@
 
     <!-- =====================================================
          IMPORTANT SCRIPT ORDER
+         api.js MUST LOAD FIRST
+         register.js LOADS SECOND
     ===================================================== -->
 
 
-    <!-- 1. Appwrite SDK -->
+    <script src="api.js?v=6"></script>
 
-    <script
-        src="https://cdn.jsdelivr.net/npm/appwrite@21.1.0"
-    ></script>
-
-
-    <!-- 2. REMADEF API CLIENT -->
-
-    <script
-        src="api.js?v=6"
-    ></script>
-
-
-    <!-- 3. REGISTRATION LOGIC -->
-
-    <script
-        src="register.js"
-    ></script>
+    <script src="register.js?v=6"></script>
 
 
 </body>
