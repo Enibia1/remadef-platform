@@ -1,5 +1,9 @@
 import json
 import re
+import os
+from appwrite.client import Client
+from appwrite.services.users import Users
+from appwrite.id import ID
 
 
 # ============================================================
@@ -155,18 +159,43 @@ def main(context):
 
 
             # ------------------------------------------------
-            # TEMPORARY SUCCESS
+            # APPWRITE AUTH USER CREATION
             # ------------------------------------------------
 
-            return response(
-                context,
-                {
-                    "success": True,
-                    "message":
-                    "Registration data received successfully",
-                    "email": email
-                }
-            )
+            try:
+                client = Client()
+                client.set_endpoint(os.environ.get("APPWRITE_FUNCTION_ENDPOINT", "https://fra.cloud.appwrite.io/v1"))
+                client.set_project(os.environ.get("APPWRITE_FUNCTION_PROJECT_ID"))
+                client.set_key(os.environ.get("APPWRITE_API_KEY"))
+
+                users = Users(client)
+
+                user = users.create(
+                    user_id=ID.unique(),
+                    email=email,
+                    password=password
+                )
+
+                return response(
+                    context,
+                    {
+                        "success": True,
+                        "message": "Account created successfully in Appwrite Auth",
+                        "userId": user["$id"],
+                        "email": user["email"]
+                    },
+                    200
+                )
+
+            except Exception as appwrite_error:
+                return response(
+                    context,
+                    {
+                        "success": False,
+                        "error": f"Registration failed: {str(appwrite_error)}"
+                    },
+                    400
+                )
 
 
         except Exception:
