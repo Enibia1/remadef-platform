@@ -176,13 +176,15 @@ def main(context):
                     password=password
                 )
 
+                # CORRECTION APPLIED HERE:
+                # Appwrite SDK returns a User object. Access properties using dot notation.
                 return response(
                     context,
                     {
                         "success": True,
                         "message": "Account created successfully in Appwrite Auth",
-                        "userId": user["$id"],
-                        "email": user["email"]
+                        "userId": user.$id,
+                        "email": user.email
                     },
                     200
                 )
