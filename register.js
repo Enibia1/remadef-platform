@@ -504,4 +504,628 @@
 
 
                         target.type =
-                            "
+                            "password";
+
+
+                        button.textContent =
+                            "👁";
+
+
+                        button.setAttribute(
+
+                            "aria-label",
+
+                            "Show password"
+
+                        );
+
+                    }
+
+                }
+
+            );
+
+        });
+
+
+    /* ========================================================
+       VALIDATION
+    ======================================================== */
+
+    function validateForm() {
+
+
+        const password =
+            passwordInput.value;
+
+
+        const confirm =
+            confirmInput.value;
+
+
+        if (
+
+            registrationMethod ===
+            "email"
+
+        ) {
+
+
+            const email =
+                emailInput.value.trim();
+
+
+            if (!email) {
+
+                throw new Error(
+
+                    "Please enter your email address."
+
+                );
+
+            }
+
+
+            if (
+
+                !/^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+                    .test(email)
+
+            ) {
+
+                throw new Error(
+
+                    "Please enter a valid email address."
+
+                );
+
+            }
+
+        }
+
+
+        if (
+
+            registrationMethod ===
+            "phone"
+
+        ) {
+
+
+            const phone =
+                phoneInput.value.trim();
+
+
+            if (!phone) {
+
+                throw new Error(
+
+                    "Please enter your phone number."
+
+                );
+
+            }
+
+
+            if (
+
+                !/^[0-9]{10,15}$/
+
+                    .test(phone)
+
+            ) {
+
+                throw new Error(
+
+                    "Please enter a valid phone number."
+
+                );
+
+            }
+
+        }
+
+
+        if (password.length < 8) {
+
+            throw new Error(
+
+                "Password must be at least 8 characters."
+
+            );
+
+        }
+
+
+        if (!/[a-z]/.test(password)) {
+
+            throw new Error(
+
+                "Password must contain a lowercase letter."
+
+            );
+
+        }
+
+
+        if (!/[A-Z]/.test(password)) {
+
+            throw new Error(
+
+                "Password must contain an uppercase letter."
+
+            );
+
+        }
+
+
+        if (!/[0-9]/.test(password)) {
+
+            throw new Error(
+
+                "Password must contain a number."
+
+            );
+
+        }
+
+
+        if (password !== confirm) {
+
+            throw new Error(
+
+                "Passwords do not match."
+
+            );
+
+        }
+
+
+        return {
+
+            email:
+
+                registrationMethod ===
+                "email"
+
+                    ? emailInput.value.trim()
+
+                    : null,
+
+
+            phone:
+
+                registrationMethod ===
+                "phone"
+
+                    ? phoneInput.value.trim()
+
+                    : null,
+
+
+            password:
+
+                password,
+
+
+            method:
+
+                registrationMethod
+
+        };
+
+    }
+
+
+    /* ========================================================
+       POLL APPWRITE EXECUTION RESULT
+    ======================================================== */
+
+    async function pollExecution(
+
+        executionId,
+
+        maxAttempts = 20,
+
+        delay = 1000
+
+    ) {
+
+
+        debugLog(
+
+            "POLLING EXECUTION RESULT..."
+
+        );
+
+
+        for (
+
+            let attempt = 1;
+
+            attempt <= maxAttempts;
+
+            attempt++
+
+        ) {
+
+
+            debugLog(
+
+                `POLL ATTEMPT ${attempt}/${maxAttempts}`
+
+            );
+
+
+            try {
+
+
+                const result =
+
+                    await RemadefAPI.getExecution(
+
+                        executionId
+
+                    );
+
+
+                debugLog(
+
+                    "EXECUTION STATUS: " +
+
+                    (
+
+                        result.status ||
+                        "UNKNOWN"
+
+                    )
+
+                );
+
+
+                if (
+
+                    result.status ===
+                    "completed"
+
+                ) {
+
+
+                    debugLog(
+
+                        "EXECUTION COMPLETED"
+
+                    );
+
+
+                    let body =
+                        result.responseBody;
+
+
+                    if (
+
+                        typeof body ===
+                        "string"
+
+                    ) {
+
+
+                        try {
+
+                            body =
+                                JSON.parse(body);
+
+                        }
+
+                        catch {
+
+                            body = {
+
+                                success:
+                                    true,
+
+                                message:
+                                    body
+
+                            };
+
+                        }
+
+                    }
+
+
+                    return body;
+
+                }
+
+
+                if (
+
+                    result.status ===
+                    "failed"
+
+                ) {
+
+                    throw new Error(
+
+                        "Registration execution failed."
+
+                    );
+
+                }
+
+
+            }
+
+            catch (error) {
+
+
+                debugLog(
+
+                    "POLL ERROR: " +
+                    error.message
+
+                );
+
+
+                throw error;
+
+            }
+
+
+            await new Promise(
+
+                resolve =>
+
+                    setTimeout(
+
+                        resolve,
+
+                        delay
+
+                    )
+
+            );
+
+        }
+
+
+        throw new Error(
+
+            "Registration is taking too long. Please check again."
+
+        );
+
+    }
+
+
+    /* ========================================================
+       FORM SUBMISSION
+    ======================================================== */
+
+    form.addEventListener(
+
+        "submit",
+
+        async event => {
+
+
+            event.preventDefault();
+
+
+            clearMessages();
+
+
+            submitButton.disabled =
+                true;
+
+
+            submitButton.textContent =
+                "Creating account...";
+
+
+            debugReplace(
+
+                "REGISTRATION STARTED"
+
+            );
+
+
+            try {
+
+
+                const payload =
+                    validateForm();
+
+
+                debugLog(
+
+                    "VALIDATION PASSED"
+
+                );
+
+
+                debugLog(
+
+                    "SENDING REGISTRATION REQUEST"
+
+                );
+
+
+                const execution =
+
+                    await RemadefAPI.register(
+
+                        payload
+
+                    );
+
+
+                debugLog(
+
+                    "EXECUTION CREATED"
+
+                );
+
+
+                debugLog(
+
+                    "ID: " +
+
+                    (
+
+                        execution.$id ||
+
+                        execution.id ||
+
+                        "UNKNOWN"
+
+                    )
+
+                );
+
+
+                const executionId =
+
+                    execution.$id ||
+
+                    execution.id;
+
+
+                if (!executionId) {
+
+                    throw new Error(
+
+                        "No execution ID was returned by Appwrite."
+
+                    );
+
+                }
+
+
+                const response =
+
+                    await pollExecution(
+
+                        executionId
+
+                    );
+
+
+                if (
+
+                    response &&
+                    response.success === false
+
+                ) {
+
+                    throw new Error(
+
+                        response.error ||
+
+                        "Registration failed."
+
+                    );
+
+                }
+
+
+                showSuccess(
+
+                    response.message ||
+
+                    "Your REMADEF account was created successfully."
+
+                );
+
+
+                debugLog(
+
+                    "REGISTRATION COMPLETED SUCCESSFULLY"
+
+                );
+
+
+                form.reset();
+
+
+                setMethod(
+
+                    "email"
+
+                );
+
+
+                updatePasswordStrength();
+
+
+            }
+
+            catch (error) {
+
+
+                debugLog(
+
+                    "REGISTRATION ERROR"
+
+                );
+
+
+                debugLog(
+
+                    error.message
+
+                );
+
+
+                showError(
+
+                    error.message ||
+
+                    "Registration failed. Please try again."
+
+                );
+
+            }
+
+            finally {
+
+
+                submitButton.disabled =
+                    false;
+
+
+                submitButton.textContent =
+
+                    "Create REMADEF Account";
+
+            }
+
+        }
+
+    );
+
+
+    /* ========================================================
+       INITIAL STATE
+    ======================================================== */
+
+    setMethod(
+
+        "email"
+
+    );
+
+
+    updatePasswordStrength();
+
+
+    debugReplace(
+
+        "REMADEF REGISTRATION READY"
+
+    );
+
+
+})();
