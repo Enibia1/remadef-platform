@@ -1,266 +1,415 @@
 /* ============================================================
    REMADEF PLATFORM API CLIENT
-   APPWRITE FUNCTION EXECUTION ROUTING
+   APPWRITE EXECUTION + RESULT POLLING
 ============================================================ */
 
-"use strict";
-
-
-/*
-============================================================
-APPWRITE CONFIGURATION
-============================================================
-*/
-
-const APPWRITE_ENDPOINT =
-    "https://fra.cloud.appwrite.io/v1";
-
+const REMADEF_API = "https://appwrite.io";
 
 const PROJECT_ID =
     "6a634fdc00148a907132";
 
-
 const FUNCTION_ID =
     "6a6380f40035f4b76305";
 
+const MAX_POLL_ATTEMPTS = 30;
 
-/*
-============================================================
-APPWRITE SDK
-============================================================
-*/
-
-const client =
-    new Appwrite.Client();
+const POLL_INTERVAL = 500;
 
 
-client
+/* ============================================================
+   DEBUG
+============================================================ */
 
-    .setEndpoint(
-        APPWRITE_ENDPOINT
-    )
-
-    .setProject(
-        PROJECT_ID
-    );
-
-
-const functions =
-    new Appwrite.Functions(
-        client
-    );
-
-
-/*
-============================================================
-DEBUG HELPER
-============================================================
-*/
-
-function debug(message) {
-
+function updateDebug(message) {
 
     const debug =
-        document.getElementById(
-            "debug"
-        );
+        document.getElementById("debug");
 
+    if (!debug) return;
 
-    if (debug) {
-
-        debug.textContent +=
-
-            "\n\n" +
-
-            message;
-
-    }
-
-
-    console.log(
-
-        "[REMADEF API]",
-
-        message
-
-    );
+    debug.textContent +=
+        "\n\n" + message;
 
 }
 
 
-/*
-============================================================
-REMADEF API
-============================================================
-*/
+/* ============================================================
+   WAIT
+============================================================ */
+
+function sleep(milliseconds) {
+
+    return new Promise(resolve => {
+
+        setTimeout(
+            resolve,
+            milliseconds
+        );
+
+    });
+
+}
+
+
+/* ============================================================
+   PARSE RESPONSE
+============================================================ */
+
+function parseResponseBody(responseBody) {
+
+    if (!responseBody) {
+
+        return {
+
+            success: true,
+
+            message:
+                "Registration completed successfully."
+
+        };
+
+    }
+
+
+    if (typeof responseBody === "object") {
+
+        return responseBody;
+
+    }
+
+
+    try {
+
+        return JSON.parse(
+            responseBody
+        );
+
+    } catch {
+
+        return {
+
+            success: true,
+
+            raw: responseBody
+
+        };
+
+    }
+
+}
+
+
+/* ============================================================
+   REMADEF API
+============================================================ */
 
 const RemadefAPI = {
 
 
-    async register(payload) {
+    /* ========================================================
+       GENERIC REQUEST
+    ======================================================== */
+
+    async request(
+
+        path = "/",
+
+        options = {}
+
+    ) {
 
 
-        debug(
+        updateDebug(
 
             "EXECUTING REMADEF REGISTRATION FUNCTION..."
 
         );
 
 
-        try {
+        /*
+         * THIS IS THE WORKING EXECUTION CREATION REQUEST
+         *
+         * Do not replace this with a different request format.
+         */
+
+        const executionResponse =
+            await fetch(
+
+                `${REMADEF_API}/functions/${FUNCTION_ID}/executions`,
+
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        "X-Appwrite-Project":
+                            PROJECT_ID
+
+                    },
+
+                    body: JSON.stringify({
+
+                        body:
+
+                            JSON.stringify(
+
+                                options.body || {}
+
+                            ),
+
+                        path:
+
+                            path,
+
+                        method:
+
+                            options.method || "GET",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/json"
+
+                        }
+
+                    })
+
+                }
+
+            );
 
 
-            const execution =
+        if (!executionResponse.ok) {
 
-                await functions.createExecution(
+            let errorText = "";
 
-                    FUNCTION_ID,
+            try {
 
-                    JSON.stringify(
+                errorText =
+                    await executionResponse.text();
 
-                        payload
+            } catch {
 
-                    ),
+                errorText =
+                    "No error details returned.";
 
-                    false,
+            }
 
-                    "/api/register",
 
-                    "POST",
+            throw new Error(
+
+                `Execution creation failed: ${executionResponse.status}\n${errorText}`
+
+            );
+
+        }
+
+
+        const execution =
+            await executionResponse.json();
+
+
+        const executionId =
+            execution.$id;
+
+
+        if (!executionId) {
+
+            throw new Error(
+
+                "Appwrite did not return an execution ID."
+
+            );
+
+        }
+
+
+        updateDebug(
+
+            "EXECUTION CREATED\nID: " +
+            executionId
+
+        );
+
+
+        /* ====================================================
+           POLL EXECUTION
+        ==================================================== */
+
+        for (
+
+            let attempt = 1;
+
+            attempt <= MAX_POLL_ATTEMPTS;
+
+            attempt++
+
+        ) {
+
+
+            await sleep(
+
+                POLL_INTERVAL
+
+            );
+
+
+            updateDebug(
+
+                "CHECKING EXECUTION STATUS...\nATTEMPT: " +
+                attempt
+
+            );
+
+
+            const statusResponse =
+                await fetch(
+
+                    `${REMADEF_API}/functions/${FUNCTION_ID}/executions/${executionId}`,
 
                     {
 
-                        "Content-Type":
+                        method: "GET",
 
-                            "application/json"
+                        headers: {
+
+                            "X-Appwrite-Project":
+                                PROJECT_ID
+
+                        }
 
                     }
 
                 );
 
 
-            debug(
-
-                "EXECUTION CREATED\n\n" +
-
-                "ID: " +
-
-                execution.$id
-
-            );
-
-
-            let responseBody =
-
-                execution.responseBody;
-
-
-            if (
-
-                typeof responseBody ===
-
-                "string"
-
-            ) {
-
-
-                try {
-
-                    responseBody =
-
-                        JSON.parse(
-
-                            responseBody
-
-                        );
-
-                }
-
-                catch {
-
-                    responseBody = {
-
-                        raw:
-
-                            responseBody
-
-                    };
-
-                }
-
-            }
-
-
-            if (
-
-                execution.status ===
-
-                "failed"
-
-            ) {
+            if (!statusResponse.ok) {
 
                 throw new Error(
 
-                    responseBody.error ||
+                    "Could not retrieve execution status: " +
 
-                    "Registration function failed."
+                    statusResponse.status
 
                 );
 
             }
 
 
-            return responseBody;
+            const currentExecution =
+                await statusResponse.json();
 
 
-        }
+            const status =
+                currentExecution.status;
 
-        catch (error) {
 
+            updateDebug(
 
-            debug(
-
-                "EXECUTION ERROR:\n\n" +
-
-                error.message
+                "EXECUTION STATUS: " +
+                status
 
             );
 
 
-            throw error;
+            /* =================================================
+               COMPLETED
+            ================================================= */
+
+            if (
+
+                status ===
+                "completed"
+
+            ) {
+
+
+                updateDebug(
+
+                    "EXECUTION COMPLETED"
+
+                );
+
+
+                updateDebug(
+
+                    "HTTP STATUS: " +
+
+                    (
+
+                        currentExecution.responseStatusCode
+                        || "unknown"
+
+                    )
+
+                );
+
+
+                return parseResponseBody(
+
+                    currentExecution.responseBody
+
+                );
+
+            }
+
+
+            /* =================================================
+               FAILED
+            ================================================= */
+
+            if (
+
+                status ===
+                "failed"
+
+            ) {
+
+                throw new Error(
+
+                    currentExecution.stderr
+
+                    ||
+
+                    currentExecution.responseBody
+
+                    ||
+
+                    "REMADEF function execution failed."
+
+                );
+
+            }
 
         }
+
+
+        throw new Error(
+
+            "The REMADEF function took too long to respond."
+
+        );
 
     },
 
 
+    /* ========================================================
+       HEALTH
+    ======================================================== */
+
     async health() {
 
-
-        debug(
-
-            "CHECKING API HEALTH..."
-
-        );
-
-
-        return await functions.createExecution(
-
-            FUNCTION_ID,
-
-            JSON.stringify({}),
-
-            false,
+        return await this.request(
 
             "/api/health",
 
-            "GET",
-
             {
 
-                "Content-Type":
-
-                    "application/json"
+                method: "GET"
 
             }
 
@@ -269,33 +418,42 @@ const RemadefAPI = {
     },
 
 
+    /* ========================================================
+       STATUS
+    ======================================================== */
+
     async status() {
 
-
-        debug(
-
-            "CHECKING API STATUS..."
-
-        );
-
-
-        return await functions.createExecution(
-
-            FUNCTION_ID,
-
-            JSON.stringify({}),
-
-            false,
+        return await this.request(
 
             "/",
 
-            "GET",
+            {
+
+                method: "GET"
+
+            }
+
+        );
+
+    },
+
+
+    /* ========================================================
+       REGISTRATION
+    ======================================================== */
+
+    async register(payload) {
+
+        return await this.request(
+
+            "/api/register",
 
             {
 
-                "Content-Type":
+                method: "POST",
 
-                    "application/json"
+                body: payload
 
             }
 
@@ -306,21 +464,19 @@ const RemadefAPI = {
 };
 
 
-/*
-============================================================
-GLOBAL API
-============================================================
-*/
+/* ============================================================
+   GLOBAL EXPORT
+============================================================ */
 
 window.RemadefAPI =
     RemadefAPI;
 
 
 window.REMADEF_API =
-    APPWRITE_ENDPOINT;
+    REMADEF_API;
 
 
-debug(
+updateDebug(
 
     "REMADEF API CLIENT LOADED"
 
