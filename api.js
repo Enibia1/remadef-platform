@@ -1,5 +1,5 @@
 /* ============================================================
-   REMADEF PLATFORM API CLIENT
+   REMADEF PLATFORM API
    Appwrite Function Execution API
    SYNCHRONOUS EXECUTION
 ============================================================ */
@@ -130,12 +130,18 @@ const RemadefAPI = {
 
 
                             /*
-                             * IMPORTANT
+                             * IMPORTANT:
                              *
-                             * false means Appwrite waits
-                             * for the function to finish.
+                             * async: false tells Appwrite
+                             * to wait for the function to finish.
                              *
-                             * No execution polling is needed.
+                             * Therefore:
+                             *
+                             * 202 + execution ID
+                             * is no longer expected.
+                             *
+                             * The response should contain
+                             * the actual function response.
                              */
 
                             async: false
