@@ -1,7 +1,9 @@
 /* ============================================================
    REMADEF PLATFORM API CLIENT
-   Appwrite Web SDK
 ============================================================ */
+
+const REMADEF_API =
+    "https://fra.cloud.appwrite.io/v1";
 
 const PROJECT_ID =
     "6a634fdc00148a907132";
@@ -10,110 +12,64 @@ const FUNCTION_ID =
     "6a6380f40035f4b76305";
 
 
-/*
- * Appwrite client
- */
-
 const client =
     new Appwrite.Client();
 
 
 client
-    .setEndpoint(
-        "https://fra.cloud.appwrite.io/v1"
-    )
-    .setProject(
-        PROJECT_ID
-    );
+    .setEndpoint(REMADEF_API)
+    .setProject(PROJECT_ID);
 
 
 const functions =
-    new Appwrite.Functions();
+    new Appwrite.Functions(client);
 
 
 const RemadefAPI = {
 
-
-    /*
-     * DEBUG HELPER
-     */
-
-    debug(message) {
-
-        const debug =
-            document.getElementById(
-                "debug"
-            );
-
-
-        if (!debug) return;
-
-
-        debug.textContent +=
-            "\n" + message;
-
-    },
-
-
-    /*
-     * ACCOUNT REGISTRATION
-     */
-
     async register(payload) {
 
-
-        this.debug(
-            "EXECUTING REMADEF REGISTRATION FUNCTION..."
-        );
+        const debug =
+            document.getElementById("debug");
 
 
-        try {
+        if (debug) {
 
+            debug.textContent +=
 
-            const execution =
-                await functions.createExecution(
-                    FUNCTION_ID,
-                    JSON.stringify(payload),
-                    false,
-                    "/api/register",
-                    "POST",
-                    {
-                        "Content-Type":
-                            "application/json"
-                    }
-                );
-
-
-            this.debug(
-                "EXECUTION CREATED"
-            );
-
-
-            this.debug(
-                "ID: " +
-                execution.$id
-            );
-
-
-            return execution;
-
-
-        } catch (error) {
-
-
-            this.debug(
-                "EXECUTION ERROR"
-            );
-
-
-            this.debug(
-                error.message
-            );
-
-
-            throw error;
+                "\n\nEXECUTING REMADEF REGISTRATION FUNCTION...";
 
         }
+
+
+        const execution =
+            await functions.createExecution(
+
+                FUNCTION_ID,
+
+                JSON.stringify(payload),
+
+                false,
+
+                "/api/register"
+
+            );
+
+
+        if (debug) {
+
+            debug.textContent +=
+
+                "\n\nEXECUTION CREATED" +
+
+                "\nID: " +
+
+                execution.$id;
+
+        }
+
+
+        return execution;
 
     }
 
@@ -122,3 +78,7 @@ const RemadefAPI = {
 
 window.RemadefAPI =
     RemadefAPI;
+
+
+window.REMADEF_API =
+    REMADEF_API;
