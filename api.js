@@ -1,6 +1,7 @@
 /* ============================================================
    REMADEF PLATFORM API CLIENT
    Appwrite Function Execution API
+   ASYNC EXECUTION POLLING
 ============================================================ */
 
 const APPWRITE_ENDPOINT =
@@ -12,64 +13,107 @@ const PROJECT_ID =
 const FUNCTION_ID =
     "6a6380f40035f4b76305";
 
+const EXECUTION_URL =
+    `${APPWRITE_ENDPOINT}/functions/${FUNCTION_ID}/executions`;
+
+const MAX_ATTEMPTS = 20;
+const POLL_DELAY = 1000;
+
+
+/* ============================================================
+   DEBUG LOGGER
+============================================================ */
+
+function debugLog(message) {
+
+    const debug =
+        document.getElementById("debug");
+
+    if (debug) {
+
+        debug.textContent +=
+            "\n\n" + message;
+
+    }
+
+}
+
+
+/* ============================================================
+   WAIT
+============================================================ */
+
+function wait(ms) {
+
+    return new Promise(resolve => {
+
+        setTimeout(resolve, ms);
+
+    });
+
+}
+
+
+/* ============================================================
+   REGISTER
+============================================================ */
 
 const RemadefAPI = {
 
+
     async register(payload) {
 
-        const debug =
-            document.getElementById("debug");
+
+        const maskedPayload = {
+
+            ...payload,
+
+            password: "[HIDDEN]"
+
+        };
 
 
-        const url =
-            `${APPWRITE_ENDPOINT}/functions/${FUNCTION_ID}/executions`;
+        debugLog(
 
+            "API REQUEST STARTED" +
 
-        if (debug) {
+            "\nURL: " + EXECUTION_URL +
 
-            debug.textContent +=
+            "\nMETHOD: POST" +
 
-                "\n\nAPI REQUEST STARTED" +
+            "\nPATH: /api/register" +
 
-                "\nURL: " + url +
+            "\nBODY: " +
 
-                "\nMETHOD: POST" +
+            JSON.stringify(
 
-                "\nPATH: /api/register" +
+                maskedPayload,
 
-                "\nBODY: " +
+                null,
 
-                JSON.stringify(
+                2
 
-                    {
+            )
 
-                        ...payload,
-
-                        password: "[HIDDEN]"
-
-                    },
-
-                    null,
-
-                    2
-
-                );
-
-        }
+        );
 
 
         try {
 
 
+            /* =================================================
+               1. CREATE APPWRITE FUNCTION EXECUTION
+            ================================================= */
+
             const response =
+
                 await fetch(
 
-                    url,
+                    EXECUTION_URL,
 
                     {
 
                         method: "POST",
-
 
                         headers: {
 
@@ -82,84 +126,65 @@ const RemadefAPI = {
                         },
 
 
-                        body:
+                        body: JSON.stringify({
 
-                            JSON.stringify(
+                            method: "POST",
 
-                                {
+                            path: "/api/register",
 
-                                    body:
-                                        JSON.stringify(
-                                            payload
-                                        ),
+                            headers: {
 
+                                "Content-Type":
+                                    "application/json"
 
-                                    async:
-                                        true,
+                            },
 
+                            body:
 
-                                    path:
-                                        "/api/register",
+                                JSON.stringify(payload),
 
+                            async: true
 
-                                    method:
-                                        "POST",
-
-
-                                    headers:
-
-                                        {
-
-                                            "Content-Type":
-                                                "application/json"
-
-                                        }
-
-                                }
-
-                            )
+                        })
 
                     }
 
                 );
 
 
-            if (debug) {
+            debugLog(
 
-                debug.textContent +=
+                "HTTP RESPONSE RECEIVED" +
 
-                    "\n\nHTTP RESPONSE RECEIVED" +
+                "\nSTATUS: " +
 
-                    "\nSTATUS: " +
+                response.status
 
-                    response.status;
-
-            }
+            );
 
 
-            const text =
+            const responseText =
+
                 await response.text();
 
 
-            let data;
+            let execution;
 
 
             try {
 
-                data =
-                    JSON.parse(text);
+                execution =
+                    JSON.parse(responseText);
 
             }
 
             catch {
 
-                data =
-                    {
+                execution = {
 
-                        raw:
-                            text
+                    raw: responseText
 
-                    };
+                };
 
             }
 
@@ -168,9 +193,9 @@ const RemadefAPI = {
 
                 throw new Error(
 
-                    data.message ||
+                    execution.message ||
 
-                    data.error ||
+                    execution.error ||
 
                     `Appwrite request failed: ${response.status}`
 
@@ -179,28 +204,257 @@ const RemadefAPI = {
             }
 
 
-            if (debug) {
+            const executionId =
 
-                debug.textContent +=
+                execution.$id;
 
-                    "\n\nEXECUTION CREATED" +
 
-                    "\nID: " +
+            if (!executionId) {
 
-                    (
+                throw new Error(
 
-                        data.$id ||
+                    "Appwrite did not return an execution ID."
 
-                        data.id ||
-
-                        "UNKNOWN"
-
-                    );
+                );
 
             }
 
 
-            return data;
+            debugLog(
+
+                "EXECUTION CREATED" +
+
+                "\nID: " +
+
+                executionId
+
+            );
+
+
+            /* =================================================
+               2. POLL EXECUTION STATUS
+            ================================================= */
+
+            const statusURL =
+
+                `${EXECUTION_URL}/${executionId}`;
+
+
+            for (
+
+                let attempt = 1;
+
+                attempt <= MAX_ATTEMPTS;
+
+                attempt++
+
+            ) {
+
+
+                await wait(POLL_DELAY);
+
+
+                debugLog(
+
+                    "CHECKING EXECUTION" +
+
+                    "\nATTEMPT: " +
+
+                    attempt
+
+                );
+
+
+                const statusResponse =
+
+                    await fetch(
+
+                        statusURL,
+
+                        {
+
+                            method: "GET",
+
+                            headers: {
+
+                                "X-Appwrite-Project":
+                                    PROJECT_ID
+
+                            }
+
+                        }
+
+                    );
+
+
+                const statusText =
+
+                    await statusResponse.text();
+
+
+                let result;
+
+
+                try {
+
+                    result =
+                        JSON.parse(statusText);
+
+                }
+
+                catch {
+
+                    result = {
+
+                        raw: statusText
+
+                    };
+
+                }
+
+
+                if (!statusResponse.ok) {
+
+                    throw new Error(
+
+                        result.message ||
+
+                        result.error ||
+
+                        `Execution status request failed: ${statusResponse.status}`
+
+                    );
+
+                }
+
+
+                debugLog(
+
+                    "EXECUTION STATUS: " +
+
+                    result.status +
+
+                    "\nFUNCTION STATUS CODE: " +
+
+                    (result.responseStatusCode || "PENDING")
+
+                );
+
+
+                /* =============================================
+                   EXECUTION COMPLETED
+                ============================================= */
+
+                if (
+
+                    result.status ===
+
+                    "completed"
+
+                ) {
+
+
+                    let functionResponse =
+
+                        result.responseBody;
+
+
+                    try {
+
+                        functionResponse =
+
+                            JSON.parse(
+
+                                result.responseBody
+
+                            );
+
+                    }
+
+                    catch {
+
+                        // Response was not JSON
+
+                    }
+
+
+                    debugLog(
+
+                        "FUNCTION EXECUTION COMPLETED" +
+
+                        "\nSTATUS CODE: " +
+
+                        result.responseStatusCode +
+
+                        "\nRESPONSE: " +
+
+                        JSON.stringify(
+
+                            functionResponse,
+
+                            null,
+
+                            2
+
+                        )
+
+                    );
+
+
+                    if (
+
+                        result.responseStatusCode >= 400
+
+                    ) {
+
+                        throw new Error(
+
+                            functionResponse.message ||
+
+                            functionResponse.error ||
+
+                            "Registration failed."
+
+                        );
+
+                    }
+
+
+                    return functionResponse;
+
+                }
+
+
+                /* =============================================
+                   EXECUTION FAILED
+                ============================================= */
+
+                if (
+
+                    result.status ===
+
+                    "failed"
+
+                ) {
+
+                    throw new Error(
+
+                        result.errors ||
+
+                        "Function execution failed."
+
+                    );
+
+                }
+
+            }
+
+
+            throw new Error(
+
+                "Registration is taking too long. Please try again."
+
+            );
 
 
         }
@@ -209,15 +463,13 @@ const RemadefAPI = {
         catch (error) {
 
 
-            if (debug) {
+            debugLog(
 
-                debug.textContent +=
+                "FETCH/API ERROR: " +
 
-                    "\n\nFETCH ERROR: " +
+                error.message
 
-                    error.message;
-
-            }
+            );
 
 
             throw error;
@@ -229,14 +481,22 @@ const RemadefAPI = {
 };
 
 
+/* ============================================================
+   GLOBAL API
+============================================================ */
+
 window.RemadefAPI =
+
     RemadefAPI;
 
 
 window.REMADEF_API =
+
     APPWRITE_ENDPOINT;
 
 
 console.log(
+
     "REMADEF API CLIENT LOADED"
+
 );
