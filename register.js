@@ -1,118 +1,86 @@
 /* ============================================================
    REMADEF ACCOUNT REGISTRATION
-   WORKING EXECUTION VERSION
 ============================================================ */
 
-(() => {
+(function () {
 
     "use strict";
 
 
-    /* ========================================================
-       DOM ELEMENTS
-    ======================================================== */
-
-    const $ = id =>
-        document.getElementById(id);
-
+    /* --------------------------------------------------------
+       ELEMENTS
+    -------------------------------------------------------- */
 
     const form =
-        $("form");
+        document.getElementById("form");
 
+    const email =
+        document.getElementById("email");
+
+    const phone =
+        document.getElementById("phone");
+
+    const password =
+        document.getElementById("password");
+
+    const confirm =
+        document.getElementById("confirm");
+
+    const submit =
+        document.getElementById("submit");
 
     const errorBox =
-        $("error");
-
+        document.getElementById("error");
 
     const successBox =
-        $("success");
-
-
-    const emailBox =
-        $("email-box");
-
-
-    const phoneBox =
-        $("phone-box");
-
-
-    const emailTab =
-        $("email-tab");
-
-
-    const phoneTab =
-        $("phone-tab");
-
-
-    const emailInput =
-        $("email");
-
-
-    const phoneInput =
-        $("phone");
-
-
-    const passwordInput =
-        $("password");
-
-
-    const confirmInput =
-        $("confirm");
-
-
-    const submitButton =
-        $("submit");
-
-
-    const strengthBar =
-        $("strength-bar");
-
-
-    const strengthText =
-        $("strength-text");
-
-
-    const lengthRequirement =
-        $("length");
-
-
-    const lowerRequirement =
-        $("lower");
-
-
-    const upperRequirement =
-        $("upper");
-
-
-    const numberRequirement =
-        $("number");
-
+        document.getElementById("success");
 
     const debug =
-        $("debug");
+        document.getElementById("debug");
+
+    const emailTab =
+        document.getElementById("email-tab");
+
+    const phoneTab =
+        document.getElementById("phone-tab");
+
+    const emailBox =
+        document.getElementById("email-box");
+
+    const phoneBox =
+        document.getElementById("phone-box");
+
+    const strengthBar =
+        document.getElementById("strength-bar");
+
+    const strengthText =
+        document.getElementById("strength-text");
 
 
-    let registrationMethod =
+    let method =
         "email";
 
 
-    /* ========================================================
+    /* --------------------------------------------------------
        DEBUG
-    ======================================================== */
+    -------------------------------------------------------- */
 
-    function debugLog(message) {
+    function log(message) {
 
         if (!debug) return;
 
         debug.textContent +=
-            "\n\n" + message;
+
+            "\n\n" +
+
+            message;
 
     }
 
 
-    /* ========================================================
+    /* --------------------------------------------------------
        MESSAGE HELPERS
-    ======================================================== */
+    -------------------------------------------------------- */
 
     function showError(message) {
 
@@ -159,25 +127,19 @@
     }
 
 
-    /* ========================================================
-       REGISTRATION METHOD
-    ======================================================== */
+    /* --------------------------------------------------------
+       EMAIL / PHONE TABS
+    -------------------------------------------------------- */
 
-    function setMethod(method) {
+    emailTab.addEventListener(
 
-        registrationMethod =
-            method;
+        "click",
 
+        function () {
 
-        if (method === "email") {
+            method =
+                "email";
 
-            emailBox.classList.remove(
-                "hidden"
-            );
-
-            phoneBox.classList.add(
-                "hidden"
-            );
 
             emailTab.classList.add(
                 "active"
@@ -187,415 +149,318 @@
                 "active"
             );
 
-            emailInput.required =
-                true;
 
-            phoneInput.required =
-                false;
-
-
-        } else {
-
-            emailBox.classList.add(
+            emailBox.classList.remove(
                 "hidden"
             );
 
-            phoneBox.classList.remove(
+            phoneBox.classList.add(
                 "hidden"
+            );
+
+
+            email.focus();
+
+        }
+
+    );
+
+
+    phoneTab.addEventListener(
+
+        "click",
+
+        function () {
+
+            method =
+                "phone";
+
+
+            phoneTab.classList.add(
+                "active"
             );
 
             emailTab.classList.remove(
                 "active"
             );
 
-            phoneTab.classList.add(
-                "active"
+
+            phoneBox.classList.remove(
+                "hidden"
             );
 
-            emailInput.required =
-                false;
+            emailBox.classList.add(
+                "hidden"
+            );
 
-            phoneInput.required =
-                true;
+
+            phone.focus();
 
         }
 
-
-        clearMessages();
-
-    }
-
-
-    emailTab.addEventListener(
-        "click",
-        () => setMethod("email")
     );
 
 
-    phoneTab.addEventListener(
-        "click",
-        () => setMethod("phone")
-    );
-
-
-    /* ========================================================
-       PASSWORD STRENGTH
-    ======================================================== */
-
-    function updatePasswordStrength() {
-
-        const password =
-            passwordInput.value;
-
-
-        const hasLength =
-            password.length >= 8;
-
-
-        const hasLower =
-            /[a-z]/.test(password);
-
-
-        const hasUpper =
-            /[A-Z]/.test(password);
-
-
-        const hasNumber =
-            /[0-9]/.test(password);
-
-
-        const score =
-
-            Number(hasLength) +
-
-            Number(hasLower) +
-
-            Number(hasUpper) +
-
-            Number(hasNumber);
-
-
-        lengthRequirement.textContent =
-            `${hasLength ? "✓" : "○"} 8+ characters`;
-
-
-        lowerRequirement.textContent =
-            `${hasLower ? "✓" : "○"} Lowercase`;
-
-
-        upperRequirement.textContent =
-            `${hasUpper ? "✓" : "○"} Uppercase`;
-
-
-        numberRequirement.textContent =
-            `${hasNumber ? "✓" : "○"} Number`;
-
-
-        lengthRequirement.classList.toggle(
-            "met",
-            hasLength
-        );
-
-
-        lowerRequirement.classList.toggle(
-            "met",
-            hasLower
-        );
-
-
-        upperRequirement.classList.toggle(
-            "met",
-            hasUpper
-        );
-
-
-        numberRequirement.classList.toggle(
-            "met",
-            hasNumber
-        );
-
-
-        const widths = [
-
-            "0%",
-
-            "25%",
-
-            "50%",
-
-            "75%",
-
-            "100%"
-
-        ];
-
-
-        const labels = [
-
-            "",
-
-            "Weak",
-
-            "Fair",
-
-            "Good",
-
-            "Strong"
-
-        ];
-
-
-        strengthBar.style.width =
-            widths[score];
-
-
-        strengthText.textContent =
-            labels[score];
-
-
-        if (score === 0) {
-
-            strengthBar.style.background =
-                "transparent";
-
-
-        } else if (score <= 1) {
-
-            strengthBar.style.background =
-                "#B42318";
-
-
-        } else if (score <= 2) {
-
-            strengthBar.style.background =
-                "#B8892D";
-
-
-        } else {
-
-            strengthBar.style.background =
-                "#198754";
-
-        }
-
-    }
-
-
-    passwordInput.addEventListener(
-        "input",
-        updatePasswordStrength
-    );
-
-
-    /* ========================================================
-       SHOW / HIDE PASSWORD
-    ======================================================== */
+    /* --------------------------------------------------------
+       PASSWORD VISIBILITY
+    -------------------------------------------------------- */
 
     document
-        .querySelectorAll(".toggle-password")
-        .forEach(button => {
+        .querySelectorAll(
+            ".toggle-password"
+        )
+        .forEach(
 
-            button.addEventListener(
-                "click",
-                () => {
+            function (button) {
 
-                    const target =
-                        $(button.dataset.target);
+                button.addEventListener(
 
+                    "click",
 
-                    if (
-                        target.type ===
-                        "password"
-                    ) {
+                    function () {
 
-                        target.type =
-                            "text";
-
-
-                        button.textContent =
-                            "🙈";
+                        const target =
+                            document.getElementById(
+                                button.dataset.target
+                            );
 
 
-                    } else {
+                        if (
 
-                        target.type =
-                            "password";
+                            target.type ===
+                            "password"
 
+                        ) {
 
-                        button.textContent =
-                            "👁";
+                            target.type =
+                                "text";
+
+                            button.textContent =
+                                "🙈";
+
+                            button.setAttribute(
+
+                                "aria-label",
+
+                                "Hide password"
+
+                            );
+
+                        }
+
+                        else {
+
+                            target.type =
+                                "password";
+
+                            button.textContent =
+                                "👁";
+
+                            button.setAttribute(
+
+                                "aria-label",
+
+                                "Show password"
+
+                            );
+
+                        }
 
                     }
 
-                }
-            );
-
-        });
-
-
-    /* ========================================================
-       VALIDATION
-    ======================================================== */
-
-    function validateForm() {
-
-        const password =
-            passwordInput.value;
-
-
-        const confirm =
-            confirmInput.value;
-
-
-        if (
-            registrationMethod ===
-            "email"
-        ) {
-
-            const email =
-                emailInput.value.trim();
-
-
-            if (!email) {
-
-                throw new Error(
-                    "Please enter your email address."
                 );
 
             }
 
+        );
 
-            if (
-                !/^[^\s@]+@[^\s@]+\.[^\s@]+$/
-                    .test(email)
-            ) {
 
-                throw new Error(
-                    "Please enter a valid email address."
-                );
+    /* --------------------------------------------------------
+       PASSWORD STRENGTH
+    -------------------------------------------------------- */
+
+    password.addEventListener(
+
+        "input",
+
+        function () {
+
+            const value =
+                password.value;
+
+
+            const hasLength =
+                value.length >= 8;
+
+            const hasLower =
+                /[a-z]/.test(value);
+
+            const hasUpper =
+                /[A-Z]/.test(value);
+
+            const hasNumber =
+                /[0-9]/.test(value);
+
+
+            updateRequirement(
+
+                "length",
+
+                hasLength,
+
+                "8+ characters"
+
+            );
+
+
+            updateRequirement(
+
+                "lower",
+
+                hasLower,
+
+                "Lowercase"
+
+            );
+
+
+            updateRequirement(
+
+                "upper",
+
+                hasUpper,
+
+                "Uppercase"
+
+            );
+
+
+            updateRequirement(
+
+                "number",
+
+                hasNumber,
+
+                "Number"
+
+            );
+
+
+            let score =
+                0;
+
+
+            if (hasLength)
+                score++;
+
+
+            if (hasLower)
+                score++;
+
+
+            if (hasUpper)
+                score++;
+
+
+            if (hasNumber)
+                score++;
+
+
+            if (score === 0) {
+
+                strengthBar.style.width =
+                    "0%";
+
+                strengthText.textContent =
+                    "";
+
+            }
+
+            else if (score <= 2) {
+
+                strengthBar.style.width =
+                    "35%";
+
+                strengthText.textContent =
+                    "Weak";
+
+            }
+
+            else if (score === 3) {
+
+                strengthBar.style.width =
+                    "70%";
+
+                strengthText.textContent =
+                    "Good";
+
+            }
+
+            else {
+
+                strengthBar.style.width =
+                    "100%";
+
+                strengthText.textContent =
+                    "Strong";
 
             }
 
         }
 
-
-        if (
-            registrationMethod ===
-            "phone"
-        ) {
-
-            const phone =
-                phoneInput.value.trim();
+    );
 
 
-            if (!phone) {
+    function updateRequirement(
 
-                throw new Error(
-                    "Please enter your phone number."
-                );
+        id,
 
-            }
+        valid,
 
+        label
 
-            if (
-                !/^[0-9]{10,15}$/
-                    .test(phone)
-            ) {
+    ) {
 
-                throw new Error(
-                    "Please enter a valid phone number."
-                );
-
-            }
-
-        }
+        const element =
+            document.getElementById(
+                id
+            );
 
 
-        if (password.length < 8) {
+        if (valid) {
 
-            throw new Error(
-                "Password must be at least 8 characters."
+            element.textContent =
+                "✓ " + label;
+
+            element.classList.add(
+                "met"
             );
 
         }
 
+        else {
 
-        if (!/[a-z]/.test(password)) {
+            element.textContent =
+                "○ " + label;
 
-            throw new Error(
-                "Password must contain a lowercase letter."
+            element.classList.remove(
+                "met"
             );
 
         }
-
-
-        if (!/[A-Z]/.test(password)) {
-
-            throw new Error(
-                "Password must contain an uppercase letter."
-            );
-
-        }
-
-
-        if (!/[0-9]/.test(password)) {
-
-            throw new Error(
-                "Password must contain a number."
-            );
-
-        }
-
-
-        if (password !== confirm) {
-
-            throw new Error(
-                "Passwords do not match."
-            );
-
-        }
-
-
-        return {
-
-            email:
-
-                registrationMethod ===
-                "email"
-
-                    ? emailInput.value.trim()
-
-                    : null,
-
-
-            phone:
-
-                registrationMethod ===
-                "phone"
-
-                    ? phoneInput.value.trim()
-
-                    : null,
-
-
-            password,
-
-
-            method:
-                registrationMethod
-
-        };
 
     }
 
 
-    /* ========================================================
+    /* --------------------------------------------------------
        FORM SUBMISSION
-    ======================================================== */
+    -------------------------------------------------------- */
 
     form.addEventListener(
+
         "submit",
-        async event => {
+
+        async function (event) {
 
             event.preventDefault();
 
@@ -603,62 +468,310 @@
             clearMessages();
 
 
-            if (debug) {
+            log(
+                "REGISTRATION STARTED"
+            );
 
-                debug.textContent =
-                    "REGISTRATION STARTED";
+
+            /* --------------------------------------------
+               VALIDATION
+            -------------------------------------------- */
+
+            log(
+                "VALIDATION STARTED"
+            );
+
+
+            const emailValue =
+                email.value.trim();
+
+
+            const phoneValue =
+                phone.value.trim();
+
+
+            const passwordValue =
+                password.value;
+
+
+            const confirmValue =
+                confirm.value;
+
+
+            if (
+
+                method === "email" &&
+                !emailValue
+
+            ) {
+
+                showError(
+                    "Please enter your email address."
+                );
+
+                return;
 
             }
 
 
-            submitButton.disabled =
+            if (
+
+                method === "email" &&
+                !/^[^\s@]+@[^\s@]+\.[^\s@]+$/
+                    .test(emailValue)
+
+            ) {
+
+                showError(
+                    "Please enter a valid email address."
+                );
+
+                return;
+
+            }
+
+
+            if (
+
+                method === "phone" &&
+                !phoneValue
+
+            ) {
+
+                showError(
+                    "Please enter your phone number."
+                );
+
+                return;
+
+            }
+
+
+            if (
+
+                passwordValue.length < 8
+
+            ) {
+
+                showError(
+                    "Password must be at least 8 characters."
+                );
+
+                return;
+
+            }
+
+
+            if (
+
+                !/[a-z]/.test(
+                    passwordValue
+                )
+
+            ) {
+
+                showError(
+                    "Password must contain a lowercase letter."
+                );
+
+                return;
+
+            }
+
+
+            if (
+
+                !/[A-Z]/.test(
+                    passwordValue
+                )
+
+            ) {
+
+                showError(
+                    "Password must contain an uppercase letter."
+                );
+
+                return;
+
+            }
+
+
+            if (
+
+                !/[0-9]/.test(
+                    passwordValue
+                )
+
+            ) {
+
+                showError(
+                    "Password must contain a number."
+                );
+
+                return;
+
+            }
+
+
+            if (
+
+                passwordValue !==
+                confirmValue
+
+            ) {
+
+                showError(
+                    "Passwords do not match."
+                );
+
+                return;
+
+            }
+
+
+            log(
+                "VALIDATION PASSED"
+            );
+
+
+            /* --------------------------------------------
+               VERIFY API CLIENT
+            -------------------------------------------- */
+
+            if (
+
+                typeof window.RemadefAPI ===
+                "undefined"
+
+            ) {
+
+                showError(
+                    "REMADEF API is unavailable."
+                );
+
+                log(
+                    "ERROR: window.RemadefAPI is undefined"
+                );
+
+                return;
+
+            }
+
+
+            log(
+                "SENDING REGISTRATION REQUEST"
+            );
+
+
+            submit.disabled =
                 true;
 
 
-            submitButton.textContent =
+            submit.textContent =
                 "Creating account...";
 
 
             try {
 
-                debugLog(
-                    "VALIDATION STARTED"
+
+                const payload = {
+
+
+                    email:
+
+                        method === "email"
+
+                            ? emailValue
+
+                            : null,
+
+
+                    phone:
+
+                        method === "phone"
+
+                            ? phoneValue
+
+                            : null,
+
+
+                    password:
+
+                        passwordValue,
+
+
+                    method:
+
+                        method
+
+                };
+
+
+                log(
+
+                    "PAYLOAD:\n" +
+
+                    JSON.stringify(
+
+                        {
+
+                            email:
+                                payload.email,
+
+                            phone:
+                                payload.phone,
+
+                            method:
+                                payload.method,
+
+                            password:
+                                "[HIDDEN]"
+
+                        },
+
+                        null,
+
+                        2
+
+                    )
+
                 );
 
 
-                const payload =
-                    validateForm();
+                const result =
 
+                    await window.RemadefAPI.register(
 
-                debugLog(
-                    "VALIDATION PASSED"
-                );
-
-
-                debugLog(
-                    "SENDING REGISTRATION REQUEST"
-                );
-
-
-                const response =
-                    await RemadefAPI.register(
                         payload
+
                     );
 
 
-                debugLog(
-                    "EXECUTION REQUEST COMPLETED"
+                log(
+                    "REGISTRATION RESPONSE RECEIVED"
                 );
 
 
-                debugLog(
-                    "SERVER RESPONSE RECEIVED"
+                log(
+
+                    "RESPONSE:\n" +
+
+                    JSON.stringify(
+
+                        result,
+
+                        null,
+
+                        2
+
+                    )
+
                 );
 
 
                 showSuccess(
 
-                    response.message ||
+                    result.message ||
 
                     "Your REMADEF account was created successfully."
 
@@ -668,20 +781,42 @@
                 form.reset();
 
 
-                setMethod(
-                    "email"
-                );
+                strengthBar.style.width =
+                    "0%";
 
 
-                updatePasswordStrength();
+                strengthText.textContent =
+                    "";
 
 
-            } catch (error) {
+                document
+                    .querySelectorAll(
+                        ".requirements span"
+                    )
+                    .forEach(
+
+                        function (element) {
+
+                            element.classList.remove(
+                                "met"
+                            );
+
+                        }
+
+                    );
 
 
-                debugLog(
+            }
+
+            catch (error) {
+
+
+                log(
+
                     "REGISTRATION ERROR\n" +
+
                     error.message
+
                 );
 
 
@@ -693,33 +828,33 @@
 
                 );
 
+            }
 
-            } finally {
+
+            finally {
 
 
-                submitButton.disabled =
+                submit.disabled =
                     false;
 
 
-                submitButton.textContent =
+                submit.textContent =
                     "Create REMADEF Account";
 
             }
 
         }
+
     );
 
 
-    /* ========================================================
-       INITIAL STATE
-    ======================================================== */
+    /* --------------------------------------------------------
+       READY
+    -------------------------------------------------------- */
 
-    setMethod(
-        "email"
+    log(
+        "REGISTRATION SYSTEM READY"
     );
-
-
-    updatePasswordStrength();
 
 
 })();
