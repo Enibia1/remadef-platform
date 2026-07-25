@@ -915,7 +915,9 @@
 
                     <div class="strength">
 
+
                         <div id="strength-bar"></div>
+
 
                     </div>
 
@@ -955,6 +957,7 @@
 
 
                     </div>
+
 
                 </div>
 
@@ -1006,6 +1009,7 @@
 
                     </div>
 
+
                 </div>
 
 
@@ -1052,7 +1056,10 @@
         </footer>
 
 
-        <!-- TEMPORARY DEBUG PANEL -->
+        <!-- =====================================================
+             TEMPORARY DEBUG PANEL
+        ===================================================== -->
+
 
         <pre id="debug">Waiting for registration request...</pre>
 
@@ -1061,15 +1068,148 @@
 
 
     <!-- =====================================================
-         IMPORTANT SCRIPT ORDER
-         api.js MUST LOAD FIRST
-         register.js LOADS SECOND
+         API LOADS FIRST
     ===================================================== -->
 
 
-    <script src="api.js?v=6"></script>
+    <script src="./api.js?v=7"></script>
 
-    <script src="register.js?v=6"></script>
+
+    <!-- =====================================================
+         DEBUG SCRIPT CONFIRMS API BEFORE LOADING REGISTER.JS
+    ===================================================== -->
+
+
+    <script>
+
+        window.addEventListener(
+
+            "error",
+
+            function (event) {
+
+                const debug =
+                    document.getElementById("debug");
+
+
+                if (debug) {
+
+                    debug.textContent +=
+
+                        "\n\nSCRIPT ERROR:\n" +
+
+                        event.message +
+
+                        "\nFILE: " +
+
+                        event.filename +
+
+                        "\nLINE: " +
+
+                        event.lineno;
+
+                }
+
+            }
+
+        );
+
+
+        if (
+
+            typeof window.RemadefAPI ===
+
+            "undefined"
+
+        ) {
+
+
+            document.getElementById(
+
+                "debug"
+
+            ).textContent =
+
+                "ERROR:\n\n" +
+
+                "api.js loaded, but RemadefAPI was not created.";
+
+
+        }
+
+
+        else {
+
+
+            document.getElementById(
+
+                "debug"
+
+            ).textContent =
+
+                "REMADEF API CLIENT LOADED\n\n" +
+
+                "Loading registration system...";
+
+
+            const script =
+
+                document.createElement(
+
+                    "script"
+
+                );
+
+
+            script.src =
+
+                "./register.js?v=7";
+
+
+            script.onload =
+
+                function () {
+
+
+                    document.getElementById(
+
+                        "debug"
+
+                    ).textContent +=
+
+                        "\n\nREGISTRATION SYSTEM LOADED";
+
+
+                };
+
+
+            script.onerror =
+
+                function () {
+
+
+                    document.getElementById(
+
+                        "debug"
+
+                    ).textContent +=
+
+                        "\n\nERROR: register.js FAILED TO LOAD";
+
+
+                };
+
+
+            document.body.appendChild(
+
+                script
+
+            );
+
+
+        }
+
+    </script>
 
 
 </body>
