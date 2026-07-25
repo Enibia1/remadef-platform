@@ -1,2 +1,3 @@
 # REMADEF Platform API
 # No external dependencies required
+appwrite>=5.0.0
