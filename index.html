@@ -76,25 +76,17 @@
             padding: 24px;
 
             background:
-
                 linear-gradient(
-
                     180deg,
-
                     var(--surface) 0%,
-
                     var(--white) 100%
-
                 );
 
             color: var(--text);
 
             font-family:
-
                 Arial,
-
                 Helvetica,
-
                 sans-serif;
 
             -webkit-font-smoothing: antialiased;
@@ -176,17 +168,11 @@
             padding: 26px 22px;
 
             box-shadow:
-
                 0 10px 30px rgba(
-
                     11,
-
                     31,
-
                     58,
-
                     0.08
-
                 );
 
         }
@@ -306,17 +292,11 @@
             color: var(--navy);
 
             box-shadow:
-
                 0 1px 4px rgba(
-
                     11,
-
                     31,
-
                     58,
-
                     0.12
-
                 );
 
         }
@@ -364,12 +344,6 @@
 
             outline: none;
 
-            transition:
-
-                border-color 0.15s ease,
-
-                box-shadow 0.15s ease;
-
         }
 
 
@@ -378,17 +352,11 @@
             border-color: var(--navy);
 
             box-shadow:
-
                 0 0 0 3px rgba(
-
                     11,
-
                     31,
-
                     58,
-
                     0.10
-
                 );
 
         }
@@ -457,10 +425,7 @@
             border-radius: inherit;
 
             transition:
-
-                width 0.2s ease,
-
-                background 0.2s ease;
+                width 0.2s ease;
 
         }
 
@@ -522,25 +487,12 @@
 
             cursor: pointer;
 
-            transition:
-
-                background 0.15s ease,
-
-                transform 0.1s ease;
-
         }
 
 
         .submit:hover {
 
             background: var(--navy-light);
-
-        }
-
-
-        .submit:active {
-
-            transform: scale(0.99);
 
         }
 
@@ -655,21 +607,6 @@
 
         }
 
-
-        @media (prefers-reduced-motion: reduce) {
-
-            *,
-
-            *::before,
-
-            *::after {
-
-                transition: none !important;
-
-            }
-
-        }
-
     </style>
 
 </head>
@@ -682,7 +619,6 @@
 
 
         <header class="brand">
-
 
             <div class="brand-name">
 
@@ -803,7 +739,6 @@
 
                 >
 
-
                     <label for="email">
 
                         Email address
@@ -837,7 +772,6 @@
                     class="field hidden"
 
                 >
-
 
                     <label for="phone">
 
@@ -909,15 +843,12 @@
 
                         </button>
 
-
                     </div>
 
 
                     <div class="strength">
 
-
                         <div id="strength-bar"></div>
-
 
                     </div>
 
@@ -955,9 +886,7 @@
 
                         </span>
 
-
                     </div>
-
 
                 </div>
 
@@ -1006,9 +935,7 @@
 
                         </button>
 
-
                     </div>
-
 
                 </div>
 
@@ -1033,7 +960,6 @@
 
             <div class="login">
 
-
                 Already have a REMADEF account?
 
 
@@ -1056,11 +982,6 @@
         </footer>
 
 
-        <!-- =====================================================
-             TEMPORARY DEBUG PANEL
-        ===================================================== -->
-
-
         <pre id="debug">Waiting for registration request...</pre>
 
 
@@ -1068,17 +989,15 @@
 
 
     <!-- =====================================================
-         API LOADS FIRST
+         LOAD API FIRST
     ===================================================== -->
 
-
-    <script src="./api.js?v=7"></script>
+    <script src="./api.js?v=8"></script>
 
 
     <!-- =====================================================
-         DEBUG SCRIPT CONFIRMS API BEFORE LOADING REGISTER.JS
+         ERROR DETECTION + REGISTER.JS LOADER
     ===================================================== -->
-
 
     <script>
 
@@ -1092,23 +1011,46 @@
                     document.getElementById("debug");
 
 
-                if (debug) {
+                if (!debug) return;
 
-                    debug.textContent +=
 
-                        "\n\nSCRIPT ERROR:\n" +
+                debug.textContent +=
 
-                        event.message +
+                    "\n\nSCRIPT ERROR:\n" +
 
-                        "\nFILE: " +
+                    event.message +
 
-                        event.filename +
+                    "\nFILE:\n" +
 
-                        "\nLINE: " +
+                    event.filename +
 
-                        event.lineno;
+                    "\nLINE:\n" +
 
-                }
+                    event.lineno;
+
+            }
+
+        );
+
+
+        window.addEventListener(
+
+            "unhandledrejection",
+
+            function (event) {
+
+                const debug =
+                    document.getElementById("debug");
+
+
+                if (!debug) return;
+
+
+                debug.textContent +=
+
+                    "\n\nPROMISE ERROR:\n" +
+
+                    event.reason;
 
             }
 
@@ -1118,33 +1060,26 @@
         if (
 
             typeof window.RemadefAPI ===
-
             "undefined"
 
         ) {
 
-
             document.getElementById(
-
                 "debug"
-
             ).textContent =
 
                 "ERROR:\n\n" +
 
-                "api.js loaded, but RemadefAPI was not created.";
+                "api.js loaded, but " +
 
+                "RemadefAPI was not created.";
 
         }
 
-
         else {
 
-
             document.getElementById(
-
                 "debug"
-
             ).textContent =
 
                 "REMADEF API CLIENT LOADED\n\n" +
@@ -1153,59 +1088,48 @@
 
 
             const script =
-
                 document.createElement(
-
                     "script"
-
                 );
 
 
             script.src =
-
-                "./register.js?v=7";
+                "./register.js?v=8";
 
 
             script.onload =
-
                 function () {
 
-
                     document.getElementById(
-
                         "debug"
-
                     ).textContent +=
 
-                        "\n\nREGISTRATION SYSTEM LOADED";
+                        "\n\n" +
 
+                        "REGISTRATION SYSTEM LOADED";
 
                 };
 
 
             script.onerror =
-
                 function () {
 
-
                     document.getElementById(
-
                         "debug"
-
                     ).textContent +=
 
-                        "\n\nERROR: register.js FAILED TO LOAD";
+                        "\n\n" +
 
+                        "ERROR:\n" +
+
+                        "register.js FAILED TO LOAD";
 
                 };
 
 
             document.body.appendChild(
-
                 script
-
             );
-
 
         }
 
