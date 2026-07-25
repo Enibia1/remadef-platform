@@ -1,84 +1,195 @@
 /* ============================================================
    REMADEF PLATFORM API CLIENT
+   FINAL DEBUG VERSION
 ============================================================ */
 
-const REMADEF_API =
-    "https://fra.cloud.appwrite.io/v1";
+(function () {
 
-const PROJECT_ID =
-    "6a634fdc00148a907132";
+    "use strict";
 
-const FUNCTION_ID =
-    "6a6380f40035f4b76305";
+    /* --------------------------------------------------------
+       CONFIGURATION
+    -------------------------------------------------------- */
 
+    const API_URL =
+        "https://6a6380f50016f677984e.fra.appwrite.run";
 
-const client =
-    new Appwrite.Client();
-
-
-client
-    .setEndpoint(REMADEF_API)
-    .setProject(PROJECT_ID);
+    const debug = () =>
+        document.getElementById("debug");
 
 
-const functions =
-    new Appwrite.Functions(client);
+    /* --------------------------------------------------------
+       DEBUG LOGGER
+    -------------------------------------------------------- */
+
+    function log(message) {
+
+        const box = debug();
+
+        if (!box) return;
+
+        box.textContent += "\n\n" + message;
+
+    }
 
 
-const RemadefAPI = {
+    /* --------------------------------------------------------
+       API CLIENT
+    -------------------------------------------------------- */
 
-    async register(payload) {
+    const RemadefAPI = {
 
-        const debug =
-            document.getElementById("debug");
+        async register(payload) {
 
+            log("API REQUEST STARTED");
 
-        if (debug) {
-
-            debug.textContent +=
-
-                "\n\nEXECUTING REMADEF REGISTRATION FUNCTION...";
-
-        }
-
-
-        const execution =
-            await functions.createExecution(
-
-                FUNCTION_ID,
-
-                JSON.stringify(payload),
-
-                false,
-
+            log(
+                "URL:\n" +
+                API_URL +
                 "/api/register"
+            );
+
+            log(
+                "METHOD:\nPOST"
+            );
+
+            log(
+                "BODY:\n" +
+                JSON.stringify(payload, null, 2)
+            );
+
+
+            let response;
+
+
+            try {
+
+                response = await fetch(
+
+                    API_URL + "/api/register",
+
+                    {
+
+                        method: "POST",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/json"
+
+                        },
+
+                        body:
+                            JSON.stringify(payload)
+
+                    }
+
+                );
+
+            }
+
+            catch (error) {
+
+                log(
+                    "FETCH ERROR:\n" +
+                    error.message
+                );
+
+                throw error;
+
+            }
+
+
+            log(
+
+                "HTTP RESPONSE RECEIVED\n" +
+
+                "STATUS: " +
+
+                response.status
 
             );
 
 
-        if (debug) {
+            const text =
+                await response.text();
 
-            debug.textContent +=
 
-                "\n\nEXECUTION CREATED" +
+            log(
 
-                "\nID: " +
+                "RAW RESPONSE:\n" +
 
-                execution.$id;
+                text
+
+            );
+
+
+            let data;
+
+
+            try {
+
+                data =
+                    text
+                        ? JSON.parse(text)
+                        : {};
+
+            }
+
+            catch {
+
+                data = {
+
+                    raw: text
+
+                };
+
+            }
+
+
+            if (!response.ok) {
+
+                throw new Error(
+
+                    data.message ||
+
+                    data.error ||
+
+                    "Registration request failed. HTTP " +
+
+                    response.status
+
+                );
+
+            }
+
+
+            return data;
 
         }
 
-
-        return execution;
-
-    }
-
-};
+    };
 
 
-window.RemadefAPI =
-    RemadefAPI;
+    /* --------------------------------------------------------
+       EXPOSE GLOBALLY
+    -------------------------------------------------------- */
+
+    window.RemadefAPI =
+        RemadefAPI;
 
 
-window.REMADEF_API =
-    REMADEF_API;
+    window.REMADEF_API =
+        API_URL;
+
+
+    /* --------------------------------------------------------
+       CONFIRM LOADING
+    -------------------------------------------------------- */
+
+    console.log(
+        "REMADEF API CLIENT LOADED"
+    );
+
+
+})();
