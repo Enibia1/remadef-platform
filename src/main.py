@@ -176,8 +176,7 @@ def main(context):
                     password=password
                 )
 
-                # CORRECTION APPLIED HERE:
-                # Appwrite SDK returns a User object. Access properties using dot notation.
+                # FIXED: Using dot notation (user.$id and user.email) instead of subscript brackets
                 return response(
                     context,
                     {
@@ -217,6 +216,7 @@ def main(context):
     # UNKNOWN ENDPOINT
     # ========================================================
 
+    # FIXED: Added the missing closing parenthesis for the response() function call
     return response(
         context,
         {
