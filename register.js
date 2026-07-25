@@ -1,6 +1,6 @@
 /* ============================================================
    REMADEF ACCOUNT REGISTRATION
-   FULL WORKING VERSION WITH EXECUTION RESULT POLLING
+   WORKING EXECUTION VERSION
 ============================================================ */
 
 (() => {
@@ -110,16 +110,6 @@
     }
 
 
-    function debugReplace(message) {
-
-        if (!debug) return;
-
-        debug.textContent =
-            message;
-
-    }
-
-
     /* ========================================================
        MESSAGE HELPERS
     ======================================================== */
@@ -175,37 +165,30 @@
 
     function setMethod(method) {
 
-
         registrationMethod =
             method;
 
 
         if (method === "email") {
 
-
             emailBox.classList.remove(
                 "hidden"
             );
-
 
             phoneBox.classList.add(
                 "hidden"
             );
 
-
             emailTab.classList.add(
                 "active"
             );
-
 
             phoneTab.classList.remove(
                 "active"
             );
 
-
             emailInput.required =
                 true;
-
 
             phoneInput.required =
                 false;
@@ -213,30 +196,24 @@
 
         } else {
 
-
             emailBox.classList.add(
                 "hidden"
             );
-
 
             phoneBox.classList.remove(
                 "hidden"
             );
 
-
             emailTab.classList.remove(
                 "active"
             );
-
 
             phoneTab.classList.add(
                 "active"
             );
 
-
             emailInput.required =
                 false;
-
 
             phoneInput.required =
                 true;
@@ -250,32 +227,14 @@
 
 
     emailTab.addEventListener(
-
         "click",
-
-        () => {
-
-            setMethod(
-                "email"
-            );
-
-        }
-
+        () => setMethod("email")
     );
 
 
     phoneTab.addEventListener(
-
         "click",
-
-        () => {
-
-            setMethod(
-                "phone"
-            );
-
-        }
-
+        () => setMethod("phone")
     );
 
 
@@ -284,7 +243,6 @@
     ======================================================== */
 
     function updatePasswordStrength() {
-
 
         const password =
             passwordInput.value;
@@ -318,58 +276,42 @@
 
 
         lengthRequirement.textContent =
-
             `${hasLength ? "✓" : "○"} 8+ characters`;
 
 
         lowerRequirement.textContent =
-
             `${hasLower ? "✓" : "○"} Lowercase`;
 
 
         upperRequirement.textContent =
-
             `${hasUpper ? "✓" : "○"} Uppercase`;
 
 
         numberRequirement.textContent =
-
             `${hasNumber ? "✓" : "○"} Number`;
 
 
         lengthRequirement.classList.toggle(
-
             "met",
-
             hasLength
-
         );
 
 
         lowerRequirement.classList.toggle(
-
             "met",
-
             hasLower
-
         );
 
 
         upperRequirement.classList.toggle(
-
             "met",
-
             hasUpper
-
         );
 
 
         numberRequirement.classList.toggle(
-
             "met",
-
             hasNumber
-
         );
 
 
@@ -416,23 +358,20 @@
             strengthBar.style.background =
                 "transparent";
 
-        }
 
-        else if (score <= 1) {
+        } else if (score <= 1) {
 
             strengthBar.style.background =
                 "#B42318";
 
-        }
 
-        else if (score <= 2) {
+        } else if (score <= 2) {
 
             strengthBar.style.background =
                 "#B8892D";
 
-        }
 
-        else {
+        } else {
 
             strengthBar.style.background =
                 "#198754";
@@ -443,11 +382,8 @@
 
 
     passwordInput.addEventListener(
-
         "input",
-
         updatePasswordStrength
-
     );
 
 
@@ -456,30 +392,21 @@
     ======================================================== */
 
     document
-        .querySelectorAll(
-            ".toggle-password"
-        )
+        .querySelectorAll(".toggle-password")
         .forEach(button => {
 
-
             button.addEventListener(
-
                 "click",
-
                 () => {
-
 
                     const target =
                         $(button.dataset.target);
 
 
                     if (
-
                         target.type ===
                         "password"
-
                     ) {
-
 
                         target.type =
                             "text";
@@ -489,19 +416,7 @@
                             "🙈";
 
 
-                        button.setAttribute(
-
-                            "aria-label",
-
-                            "Hide password"
-
-                        );
-
-
-                    }
-
-                    else {
-
+                    } else {
 
                         target.type =
                             "password";
@@ -510,19 +425,9 @@
                         button.textContent =
                             "👁";
 
-
-                        button.setAttribute(
-
-                            "aria-label",
-
-                            "Show password"
-
-                        );
-
                     }
 
                 }
-
             );
 
         });
@@ -534,7 +439,6 @@
 
     function validateForm() {
 
-
         const password =
             passwordInput.value;
 
@@ -544,12 +448,9 @@
 
 
         if (
-
             registrationMethod ===
             "email"
-
         ) {
-
 
             const email =
                 emailInput.value.trim();
@@ -558,26 +459,19 @@
             if (!email) {
 
                 throw new Error(
-
                     "Please enter your email address."
-
                 );
 
             }
 
 
             if (
-
                 !/^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
                     .test(email)
-
             ) {
 
                 throw new Error(
-
                     "Please enter a valid email address."
-
                 );
 
             }
@@ -586,12 +480,9 @@
 
 
         if (
-
             registrationMethod ===
             "phone"
-
         ) {
-
 
             const phone =
                 phoneInput.value.trim();
@@ -600,26 +491,19 @@
             if (!phone) {
 
                 throw new Error(
-
                     "Please enter your phone number."
-
                 );
 
             }
 
 
             if (
-
                 !/^[0-9]{10,15}$/
-
                     .test(phone)
-
             ) {
 
                 throw new Error(
-
                     "Please enter a valid phone number."
-
                 );
 
             }
@@ -630,9 +514,7 @@
         if (password.length < 8) {
 
             throw new Error(
-
                 "Password must be at least 8 characters."
-
             );
 
         }
@@ -641,9 +523,7 @@
         if (!/[a-z]/.test(password)) {
 
             throw new Error(
-
                 "Password must contain a lowercase letter."
-
             );
 
         }
@@ -652,9 +532,7 @@
         if (!/[A-Z]/.test(password)) {
 
             throw new Error(
-
                 "Password must contain an uppercase letter."
-
             );
 
         }
@@ -663,9 +541,7 @@
         if (!/[0-9]/.test(password)) {
 
             throw new Error(
-
                 "Password must contain a number."
-
             );
 
         }
@@ -674,9 +550,7 @@
         if (password !== confirm) {
 
             throw new Error(
-
                 "Passwords do not match."
-
             );
 
         }
@@ -704,198 +578,13 @@
                     : null,
 
 
-            password:
-
-                password,
+            password,
 
 
             method:
-
                 registrationMethod
 
         };
-
-    }
-
-
-    /* ========================================================
-       POLL APPWRITE EXECUTION RESULT
-    ======================================================== */
-
-    async function pollExecution(
-
-        executionId,
-
-        maxAttempts = 20,
-
-        delay = 1000
-
-    ) {
-
-
-        debugLog(
-
-            "POLLING EXECUTION RESULT..."
-
-        );
-
-
-        for (
-
-            let attempt = 1;
-
-            attempt <= maxAttempts;
-
-            attempt++
-
-        ) {
-
-
-            debugLog(
-
-                `POLL ATTEMPT ${attempt}/${maxAttempts}`
-
-            );
-
-
-            try {
-
-
-                const result =
-
-                    await RemadefAPI.getExecution(
-
-                        executionId
-
-                    );
-
-
-                debugLog(
-
-                    "EXECUTION STATUS: " +
-
-                    (
-
-                        result.status ||
-                        "UNKNOWN"
-
-                    )
-
-                );
-
-
-                if (
-
-                    result.status ===
-                    "completed"
-
-                ) {
-
-
-                    debugLog(
-
-                        "EXECUTION COMPLETED"
-
-                    );
-
-
-                    let body =
-                        result.responseBody;
-
-
-                    if (
-
-                        typeof body ===
-                        "string"
-
-                    ) {
-
-
-                        try {
-
-                            body =
-                                JSON.parse(body);
-
-                        }
-
-                        catch {
-
-                            body = {
-
-                                success:
-                                    true,
-
-                                message:
-                                    body
-
-                            };
-
-                        }
-
-                    }
-
-
-                    return body;
-
-                }
-
-
-                if (
-
-                    result.status ===
-                    "failed"
-
-                ) {
-
-                    throw new Error(
-
-                        "Registration execution failed."
-
-                    );
-
-                }
-
-
-            }
-
-            catch (error) {
-
-
-                debugLog(
-
-                    "POLL ERROR: " +
-                    error.message
-
-                );
-
-
-                throw error;
-
-            }
-
-
-            await new Promise(
-
-                resolve =>
-
-                    setTimeout(
-
-                        resolve,
-
-                        delay
-
-                    )
-
-            );
-
-        }
-
-
-        throw new Error(
-
-            "Registration is taking too long. Please check again."
-
-        );
 
     }
 
@@ -905,16 +594,21 @@
     ======================================================== */
 
     form.addEventListener(
-
         "submit",
-
         async event => {
-
 
             event.preventDefault();
 
 
             clearMessages();
+
+
+            if (debug) {
+
+                debug.textContent =
+                    "REGISTRATION STARTED";
+
+            }
 
 
             submitButton.disabled =
@@ -925,14 +619,11 @@
                 "Creating account...";
 
 
-            debugReplace(
-
-                "REGISTRATION STARTED"
-
-            );
-
-
             try {
+
+                debugLog(
+                    "VALIDATION STARTED"
+                );
 
 
                 const payload =
@@ -940,95 +631,29 @@
 
 
                 debugLog(
-
                     "VALIDATION PASSED"
-
                 );
 
 
                 debugLog(
-
                     "SENDING REGISTRATION REQUEST"
-
                 );
-
-
-                const execution =
-
-                    await RemadefAPI.register(
-
-                        payload
-
-                    );
-
-
-                debugLog(
-
-                    "EXECUTION CREATED"
-
-                );
-
-
-                debugLog(
-
-                    "ID: " +
-
-                    (
-
-                        execution.$id ||
-
-                        execution.id ||
-
-                        "UNKNOWN"
-
-                    )
-
-                );
-
-
-                const executionId =
-
-                    execution.$id ||
-
-                    execution.id;
-
-
-                if (!executionId) {
-
-                    throw new Error(
-
-                        "No execution ID was returned by Appwrite."
-
-                    );
-
-                }
 
 
                 const response =
-
-                    await pollExecution(
-
-                        executionId
-
+                    await RemadefAPI.register(
+                        payload
                     );
 
 
-                if (
+                debugLog(
+                    "EXECUTION REQUEST COMPLETED"
+                );
 
-                    response &&
-                    response.success === false
 
-                ) {
-
-                    throw new Error(
-
-                        response.error ||
-
-                        "Registration failed."
-
-                    );
-
-                }
+                debugLog(
+                    "SERVER RESPONSE RECEIVED"
+                );
 
 
                 showSuccess(
@@ -1040,42 +665,23 @@
                 );
 
 
-                debugLog(
-
-                    "REGISTRATION COMPLETED SUCCESSFULLY"
-
-                );
-
-
                 form.reset();
 
 
                 setMethod(
-
                     "email"
-
                 );
 
 
                 updatePasswordStrength();
 
 
-            }
-
-            catch (error) {
+            } catch (error) {
 
 
                 debugLog(
-
-                    "REGISTRATION ERROR"
-
-                );
-
-
-                debugLog(
-
+                    "REGISTRATION ERROR\n" +
                     error.message
-
                 );
 
 
@@ -1087,9 +693,8 @@
 
                 );
 
-            }
 
-            finally {
+            } finally {
 
 
                 submitButton.disabled =
@@ -1097,13 +702,11 @@
 
 
                 submitButton.textContent =
-
                     "Create REMADEF Account";
 
             }
 
         }
-
     );
 
 
@@ -1112,20 +715,11 @@
     ======================================================== */
 
     setMethod(
-
         "email"
-
     );
 
 
     updatePasswordStrength();
-
-
-    debugReplace(
-
-        "REMADEF REGISTRATION READY"
-
-    );
 
 
 })();
