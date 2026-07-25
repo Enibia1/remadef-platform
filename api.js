@@ -1,200 +1,119 @@
 /* ============================================================
    REMADEF PLATFORM API CLIENT
-   MINIMAL WORKING VERSION
+   Appwrite Web SDK
 ============================================================ */
 
-const REMADEF_API =
-    "https://6a6380f50016f677984e.fra.appwrite.run";
+const PROJECT_ID =
+    "6a634fdc00148a907132";
+
+const FUNCTION_ID =
+    "6a6380f40035f4b76305";
+
+
+/*
+ * Appwrite client
+ */
+
+const client =
+    new Appwrite.Client();
+
+
+client
+    .setEndpoint(
+        "https://fra.cloud.appwrite.io/v1"
+    )
+    .setProject(
+        PROJECT_ID
+    );
+
+
+const functions =
+    new Appwrite.Functions();
 
 
 const RemadefAPI = {
 
 
-    /* ========================================================
-       GENERIC REQUEST
-    ======================================================== */
+    /*
+     * DEBUG HELPER
+     */
 
-    async request(path = "/", options = {}) {
-
-
-        const url =
-            `${REMADEF_API}${path}`;
-
+    debug(message) {
 
         const debug =
-            document.getElementById("debug");
+            document.getElementById(
+                "debug"
+            );
 
 
-        if (debug) {
+        if (!debug) return;
 
-            debug.textContent =
-                "REQUEST STARTED\n\n" +
 
-                "URL: " +
-                url +
+        debug.textContent +=
+            "\n" + message;
 
-                "\n\nMETHOD: " +
+    },
 
-                (options.method || "GET");
 
-        }
+    /*
+     * ACCOUNT REGISTRATION
+     */
+
+    async register(payload) {
+
+
+        this.debug(
+            "EXECUTING REMADEF REGISTRATION FUNCTION..."
+        );
 
 
         try {
 
 
-            const response =
-                await fetch(
-
-                    url,
-
+            const execution =
+                await functions.createExecution(
+                    FUNCTION_ID,
+                    JSON.stringify(payload),
+                    false,
+                    "/api/register",
+                    "POST",
                     {
-
-                        method:
-                            options.method || "GET",
-
-
-                        headers: {
-
-                            "Content-Type":
-                                "application/json",
-
-                            ...(options.headers || {})
-
-                        },
-
-
-                        body:
-
-                            options.body !== undefined
-
-                                ? JSON.stringify(
-                                    options.body
-                                )
-
-                                : undefined
-
+                        "Content-Type":
+                            "application/json"
                     }
-
                 );
 
 
-            if (debug) {
-
-                debug.textContent +=
-
-                    "\n\nHTTP RESPONSE RECEIVED" +
-
-                    "\n\nSTATUS: " +
-
-                    response.status;
-
-            }
+            this.debug(
+                "EXECUTION CREATED"
+            );
 
 
-            let data;
+            this.debug(
+                "ID: " +
+                execution.$id
+            );
 
 
-            try {
-
-                data =
-                    await response.json();
-
-            } catch {
-
-                throw new Error(
-                    "Server returned invalid JSON."
-                );
-
-            }
-
-
-            if (!response.ok) {
-
-                throw new Error(
-
-                    data.error ||
-
-                    data.message ||
-
-                    `API request failed with status ${response.status}`
-
-                );
-
-            }
-
-
-            return data;
+            return execution;
 
 
         } catch (error) {
 
 
-            if (debug) {
+            this.debug(
+                "EXECUTION ERROR"
+            );
 
-                debug.textContent +=
 
-                    "\n\nFETCH ERROR\n\n" +
-
-                    error.message;
-
-            }
+            this.debug(
+                error.message
+            );
 
 
             throw error;
 
         }
-
-    },
-
-
-    /* ========================================================
-       API STATUS
-    ======================================================== */
-
-    async status() {
-
-        return await this.request(
-            "/"
-        );
-
-    },
-
-
-    /* ========================================================
-       API HEALTH
-    ======================================================== */
-
-    async health() {
-
-        return await this.request(
-            "/api/health"
-        );
-
-    },
-
-
-    /* ========================================================
-       ACCOUNT REGISTRATION
-    ======================================================== */
-
-    async register(payload) {
-
-        return await this.request(
-
-            "/api/register",
-
-            {
-
-                method:
-                    "POST",
-
-                body:
-                    payload
-
-            }
-
-        );
 
     }
 
@@ -203,7 +122,3 @@ const RemadefAPI = {
 
 window.RemadefAPI =
     RemadefAPI;
-
-
-window.REMADEF_API =
-    REMADEF_API;
