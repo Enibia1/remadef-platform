@@ -1,195 +1,86 @@
 /* ============================================================
    REMADEF PLATFORM API CLIENT
-   FINAL DEBUG VERSION
+   Appwrite Function Execution API
 ============================================================ */
 
-(function () {
+const APPWRITE_ENDPOINT = "https://fra.cloud.appwrite.io/v1";
+const PROJECT_ID = "6a634fdc00148a907132";
+const FUNCTION_ID = "6a6380f40035f4b76305";
 
-    "use strict";
+const RemadefAPI = {
+    async register(payload) {
+        const debug = document.getElementById("debug");
+        const url = `${APPWRITE_ENDPOINT}/functions/${FUNCTION_ID}/executions`;
 
-    /* --------------------------------------------------------
-       CONFIGURATION
-    -------------------------------------------------------- */
-
-    const API_URL =
-        "https://6a6380f50016f677984e.fra.appwrite.run";
-
-    const debug = () =>
-        document.getElementById("debug");
-
-
-    /* --------------------------------------------------------
-       DEBUG LOGGER
-    -------------------------------------------------------- */
-
-    function log(message) {
-
-        const box = debug();
-
-        if (!box) return;
-
-        box.textContent += "\n\n" + message;
-
-    }
-
-
-    /* --------------------------------------------------------
-       API CLIENT
-    -------------------------------------------------------- */
-
-    const RemadefAPI = {
-
-        async register(payload) {
-
-            log("API REQUEST STARTED");
-
-            log(
-                "URL:\n" +
-                API_URL +
-                "/api/register"
-            );
-
-            log(
-                "METHOD:\nPOST"
-            );
-
-            log(
-                "BODY:\n" +
-                JSON.stringify(payload, null, 2)
-            );
-
-
-            let response;
-
-
-            try {
-
-                response = await fetch(
-
-                    API_URL + "/api/register",
-
+        if (debug) {
+            debug.textContent +=
+                "\n\nAPI REQUEST STARTED" +
+                "\nURL: " + url +
+                "\nMETHOD: POST" +
+                "\nBODY: " +
+                JSON.stringify(
                     {
-
-                        method: "POST",
-
-                        headers: {
-
-                            "Content-Type":
-                                "application/json"
-
-                        },
-
-                        body:
-                            JSON.stringify(payload)
-
-                    }
-
+                        ...payload,
+                        password: "[HIDDEN]"
+                    },
+                    null,
+                    2
                 );
-
-            }
-
-            catch (error) {
-
-                log(
-                    "FETCH ERROR:\n" +
-                    error.message
-                );
-
-                throw error;
-
-            }
-
-
-            log(
-
-                "HTTP RESPONSE RECEIVED\n" +
-
-                "STATUS: " +
-
-                response.status
-
-            );
-
-
-            const text =
-                await response.text();
-
-
-            log(
-
-                "RAW RESPONSE:\n" +
-
-                text
-
-            );
-
-
-            let data;
-
-
-            try {
-
-                data =
-                    text
-                        ? JSON.parse(text)
-                        : {};
-
-            }
-
-            catch {
-
-                data = {
-
-                    raw: text
-
-                };
-
-            }
-
-
-            if (!response.ok) {
-
-                throw new Error(
-
-                    data.message ||
-
-                    data.error ||
-
-                    "Registration request failed. HTTP " +
-
-                    response.status
-
-                );
-
-            }
-
-
-            return data;
-
         }
 
-    };
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Appwrite-Project": PROJECT_ID
+                },
+                body: JSON.stringify({
+                    // Appwrite expects the function's internal body payload as a string
+                    body: JSON.stringify(payload),
+                    async: true
+                })
+            });
 
+            if (debug) {
+                debug.textContent +=
+                    "\n\nHTTP RESPONSE RECEIVED" +
+                    "\nSTATUS: " + response.status;
+            }
 
-    /* --------------------------------------------------------
-       EXPOSE GLOBALLY
-    -------------------------------------------------------- */
+            const text = await response.text();
+            let data;
 
-    window.RemadefAPI =
-        RemadefAPI;
+            try {
+                data = JSON.parse(text);
+            } catch {
+                data = { raw: text };
+            }
 
+            if (!response.ok) {
+                throw new Error(
+                    data.message ||
+                    data.error ||
+                    `Appwrite request failed: ${response.status}`
+                );
+            }
 
-    window.REMADEF_API =
-        API_URL;
+            if (debug) {
+                debug.textContent +=
+                    "\n\nEXECUTION CREATED" +
+                    "\nID: " + (data.$id || data.id || "UNKNOWN");
+            }
 
+            return data;
+        } catch (error) {
+            if (debug) {
+                debug.textContent += "\n\nFETCH ERROR: " + error.message;
+            }
+            throw error;
+        }
+    }
+};
 
-    /* --------------------------------------------------------
-       CONFIRM LOADING
-    -------------------------------------------------------- */
-
-    console.log(
-        "REMADEF API CLIENT LOADED"
-    );
-
-
-})();
+window.RemadefAPI = RemadefAPI;
+window.REMADEF_API = APPWRITE_ENDPOINT;
+console.log("REMADEF API CLIENT LOADED");
