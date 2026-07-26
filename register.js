@@ -769,6 +769,10 @@
                 );
 
 
+                /* ----------------------------------------
+                   SHOW SUCCESS MESSAGE
+                ---------------------------------------- */
+
                 showSuccess(
 
                     result.message ||
@@ -778,32 +782,51 @@
                 );
 
 
-                form.reset();
+                /* ----------------------------------------
+                   SAVE ACCOUNT INFORMATION
+                   FOR PROFILE PAGE
+                ---------------------------------------- */
 
+                if (
 
-                strengthBar.style.width =
-                    "0%";
+                    result.account
 
+                ) {
 
-                strengthText.textContent =
-                    "";
+                    localStorage.setItem(
 
+                        "remadef_account",
 
-                document
-                    .querySelectorAll(
-                        ".requirements span"
-                    )
-                    .forEach(
+                        JSON.stringify(
 
-                        function (element) {
+                            result.account
 
-                            element.classList.remove(
-                                "met"
-                            );
-
-                        }
+                        )
 
                     );
+
+                }
+
+
+                /* ----------------------------------------
+                   REDIRECT TO PROFILE
+                ---------------------------------------- */
+
+                setTimeout(
+
+                    function () {
+
+                        window.location.href =
+
+                            result.next?.path ||
+
+                            "profile.html";
+
+                    },
+
+                    1000
+
+                );
 
 
             }
