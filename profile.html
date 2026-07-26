@@ -22,6 +22,7 @@
 
     <title>REMADEF — Profile</title>
 
+
     <style>
 
         :root {
@@ -38,6 +39,7 @@
 
             --gold: #B8892D;
             --green: #198754;
+            --red: #D92D20;
 
         }
 
@@ -45,6 +47,13 @@
         * {
 
             box-sizing: border-box;
+
+        }
+
+
+        html {
+
+            scroll-behavior: smooth;
 
         }
 
@@ -118,10 +127,16 @@
 
             font-weight: 800;
 
+            letter-spacing: -0.5px;
+
         }
 
 
         .back-button {
+
+            min-width: 50px;
+
+            padding: 8px 0;
 
             border: 0;
 
@@ -216,6 +231,8 @@
 
             font-size: 22px;
 
+            line-height: 1.2;
+
         }
 
 
@@ -226,6 +243,8 @@
             color: var(--muted);
 
             font-size: 12px;
+
+            word-break: break-all;
 
         }
 
@@ -397,6 +416,8 @@
 
             justify-content: space-between;
 
+            gap: 15px;
+
             padding: 12px 0;
 
             border-bottom: 1px solid var(--border);
@@ -424,11 +445,17 @@
 
         .identity-value {
 
+            max-width: 65%;
+
             color: var(--text);
 
             font-size: 12px;
 
             font-weight: 700;
+
+            text-align: right;
+
+            word-break: break-word;
 
         }
 
@@ -525,6 +552,8 @@
 
             background: var(--navy);
 
+            transition: width 0.3s ease;
+
         }
 
 
@@ -547,6 +576,13 @@
             font-size: 13px;
 
             font-weight: 700;
+
+        }
+
+
+        .complete-profile:hover {
+
+            background: var(--navy-light);
 
         }
 
@@ -620,7 +656,20 @@
         }
 
 
+        /* =========================
+           LOADING
+        ========================= */
+
+
+        .loading {
+
+            opacity: 0.6;
+
+        }
+
+
         @media (min-width: 768px) {
+
 
             body {
 
@@ -652,6 +701,11 @@
 <body>
 
 
+    <!-- =========================
+         TOP BAR
+    ========================= -->
+
+
     <header class="topbar">
 
 
@@ -679,7 +733,15 @@
     </header>
 
 
+    <!-- =========================
+         MAIN CONTENT
+    ========================= -->
+
+
     <main class="main">
+
+
+        <!-- PROFILE CARD -->
 
 
         <section class="profile-card">
@@ -688,7 +750,10 @@
             <div class="profile-header">
 
 
-                <div class="avatar">
+                <div
+                    class="avatar"
+                    id="avatar"
+                >
 
                     U
 
@@ -698,14 +763,20 @@
                 <div>
 
 
-                    <h1 class="profile-name">
+                    <h1
+                        class="profile-name"
+                        id="profile-name"
+                    >
 
                         REMADEF Member
 
                     </h1>
 
 
-                    <div class="profile-id">
+                    <div
+                        class="profile-id"
+                        id="profile-id"
+                    >
 
                         REM-XXXXXXXX
 
@@ -735,6 +806,7 @@
 
             <button
                 class="edit-button"
+                id="edit-profile"
                 type="button"
             >
 
@@ -748,11 +820,16 @@
 
                 <div class="stat">
 
-                    <div class="stat-number">
+
+                    <div
+                        class="stat-number"
+                        id="connections-count"
+                    >
 
                         0
 
                     </div>
+
 
                     <div class="stat-label">
 
@@ -760,16 +837,22 @@
 
                     </div>
 
+
                 </div>
 
 
                 <div class="stat">
 
-                    <div class="stat-number">
+
+                    <div
+                        class="stat-number"
+                        id="following-count"
+                    >
 
                         0
 
                     </div>
+
 
                     <div class="stat-label">
 
@@ -777,22 +860,29 @@
 
                     </div>
 
+
                 </div>
 
 
                 <div class="stat">
 
-                    <div class="stat-number">
+
+                    <div
+                        class="stat-number"
+                        id="posts-count"
+                    >
 
                         0
 
                     </div>
+
 
                     <div class="stat-label">
 
                         Posts
 
                     </div>
+
 
                 </div>
 
@@ -801,6 +891,9 @@
 
 
         </section>
+
+
+        <!-- IDENTITY -->
 
 
         <section class="section">
@@ -843,7 +936,10 @@
                 </span>
 
 
-                <span class="identity-value">
+                <span
+                    class="identity-value"
+                    id="identity-id"
+                >
 
                     REM-XXXXXXXX
 
@@ -863,7 +959,10 @@
                 </span>
 
 
-                <span class="identity-value">
+                <span
+                    class="identity-value"
+                    id="identity-email"
+                >
 
                     Not added
 
@@ -883,7 +982,10 @@
                 </span>
 
 
-                <span class="identity-value">
+                <span
+                    class="identity-value"
+                    id="identity-phone"
+                >
 
                     Not added
 
@@ -894,6 +996,9 @@
 
 
         </section>
+
+
+        <!-- ROLES -->
 
 
         <section class="section">
@@ -918,6 +1023,7 @@
 
                 <button
                     class="role add"
+                    id="add-branch"
                     type="button"
                 >
 
@@ -932,6 +1038,9 @@
         </section>
 
 
+        <!-- OPPORTUNITY PROFILE -->
+
+
         <section class="section">
 
 
@@ -942,7 +1051,10 @@
             </h2>
 
 
-            <div class="completion">
+            <div
+                class="completion"
+                id="completion-text"
+            >
 
                 Profile completion: 35%
 
@@ -952,7 +1064,10 @@
             <div class="progress">
 
 
-                <div class="progress-bar"></div>
+                <div
+                    class="progress-bar"
+                    id="progress-bar"
+                ></div>
 
 
             </div>
@@ -960,6 +1075,7 @@
 
             <button
                 class="complete-profile"
+                id="complete-profile"
                 type="button"
             >
 
@@ -972,6 +1088,11 @@
 
 
     </main>
+
+
+    <!-- =========================
+         BOTTOM NAVIGATION
+    ========================= -->
 
 
     <nav
@@ -996,6 +1117,7 @@
         <button
             class="nav-item"
             type="button"
+            onclick="alert('Explore will be available soon.')"
         >
 
             <span>◉</span>
@@ -1008,6 +1130,7 @@
         <button
             class="nav-item"
             type="button"
+            onclick="alert('Create will be available soon.')"
         >
 
             <span>＋</span>
@@ -1020,6 +1143,7 @@
         <button
             class="nav-item"
             type="button"
+            onclick="alert('Messages will be available soon.')"
         >
 
             <span>✉</span>
@@ -1042,6 +1166,347 @@
 
 
     </nav>
+
+
+    <!-- =========================
+         PROFILE JAVASCRIPT
+    ========================= -->
+
+
+    <script>
+
+
+        "use strict";
+
+
+        /*
+        ============================================================
+        LOAD ACCOUNT DATA
+        ============================================================
+        */
+
+
+        function loadAccountData() {
+
+
+            let account = null;
+
+
+            /*
+            The registration page should save the account
+            returned by the API under "remadef_account".
+            */
+
+
+            try {
+
+
+                account = JSON.parse(
+
+                    localStorage.getItem(
+                        "remadef_account"
+                    )
+
+                );
+
+
+            } catch (error) {
+
+
+                console.warn(
+                    "Could not read saved REMADEF account."
+                );
+
+
+            }
+
+
+            /*
+            Fallback:
+            If the account was saved under another key,
+            try the common alternative.
+            */
+
+
+            if (
+                !account
+                ||
+                !account.id
+            ) {
+
+
+                try {
+
+
+                    account = JSON.parse(
+
+                        localStorage.getItem(
+                            "account"
+                        )
+
+                    );
+
+
+                } catch (error) {
+
+
+                    console.warn(
+                        "No alternative account data found."
+                    );
+
+
+                }
+
+            }
+
+
+            /*
+            If no account data is available,
+            keep the page usable.
+            */
+
+
+            if (
+                !account
+                ||
+                !account.id
+            ) {
+
+
+                console.warn(
+                    "No REMADEF account found in localStorage."
+                );
+
+
+                return;
+
+
+            }
+
+
+            updateProfile(account);
+
+
+        }
+
+
+        /*
+        ============================================================
+        UPDATE PROFILE
+        ============================================================
+        */
+
+
+        function updateProfile(account) {
+
+
+            const accountId =
+                account.id
+                ||
+                "XXXXXXXX";
+
+
+            const email =
+                account.email
+                ||
+                "Not added";
+
+
+            const phone =
+                account.phone
+                ||
+                "Not added";
+
+
+            /*
+            Create a short REMADEF identity ID
+            from the Appwrite account ID.
+            */
+
+
+            const remadefId =
+
+                "REM-"
+                +
+                accountId
+                    .replace(
+                        /[^a-zA-Z0-9]/g,
+                        ""
+                    )
+                    .slice(
+                        -8
+                    )
+                    .toUpperCase();
+
+
+            /*
+            Avatar initial
+            */
+
+
+            let initial = "U";
+
+
+            if (
+                email
+                &&
+                email !== "Not added"
+            ) {
+
+
+                initial = email
+                    .charAt(0)
+                    .toUpperCase();
+
+
+            }
+
+
+            /*
+            Update avatar
+            */
+
+
+            document
+                .getElementById(
+                    "avatar"
+                )
+                .textContent = initial;
+
+
+            /*
+            Update profile name
+            */
+
+
+            document
+                .getElementById(
+                    "profile-name"
+                )
+                .textContent =
+                    "REMADEF Member";
+
+
+            /*
+            Update REMADEF ID
+            */
+
+
+            document
+                .getElementById(
+                    "profile-id"
+                )
+                .textContent =
+                    remadefId;
+
+
+            document
+                .getElementById(
+                    "identity-id"
+                )
+                .textContent =
+                    remadefId;
+
+
+            /*
+            Update email
+            */
+
+
+            document
+                .getElementById(
+                    "identity-email"
+                )
+                .textContent =
+                    email;
+
+
+            /*
+            Update phone
+            */
+
+
+            document
+                .getElementById(
+                    "identity-phone"
+                )
+                .textContent =
+                    phone;
+
+
+        }
+
+
+        /*
+        ============================================================
+        BUTTON ACTIONS
+        ============================================================
+        */
+
+
+        document
+            .getElementById(
+                "edit-profile"
+            )
+            .addEventListener(
+                "click",
+                function () {
+
+
+                    location.href =
+                        "complete-profile.html";
+
+
+                }
+            );
+
+
+        document
+            .getElementById(
+                "complete-profile"
+            )
+            .addEventListener(
+                "click",
+                function () {
+
+
+                    location.href =
+                        "complete-profile.html";
+
+
+                }
+            );
+
+
+        document
+            .getElementById(
+                "add-branch"
+            )
+            .addEventListener(
+                "click",
+                function () {
+
+
+                    alert(
+                        "Branch registration will be available soon."
+                    );
+
+
+                }
+            );
+
+
+        /*
+        ============================================================
+        START
+        ============================================================
+        */
+
+
+        loadAccountData();
+
+
+    </script>
 
 
 </body>
