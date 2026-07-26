@@ -37,6 +37,7 @@
             --text: #172033;
             --muted: #667085;
 
+            --gold: #B8892D;
             --green: #198754;
 
         }
@@ -83,7 +84,6 @@
         /* =========================
            TOP BAR
         ========================= */
-
 
         .topbar {
 
@@ -140,7 +140,6 @@
            MAIN
         ========================= */
 
-
         .main {
 
             width: 100%;
@@ -155,9 +154,8 @@
 
 
         /* =========================
-           PROFILE CARD
+           PROFILE HEADER
         ========================= */
-
 
         .profile-card {
 
@@ -219,6 +217,17 @@
         }
 
 
+        .headline {
+
+            margin-top: 6px;
+
+            color: var(--muted);
+
+            font-size: 13px;
+
+        }
+
+
         .profile-id {
 
             margin-top: 5px;
@@ -226,8 +235,6 @@
             color: var(--muted);
 
             font-size: 12px;
-
-            word-break: break-all;
 
         }
 
@@ -300,7 +307,6 @@
            STATS
         ========================= */
 
-
         .stats {
 
             display: grid;
@@ -359,7 +365,6 @@
            SECTIONS
         ========================= */
 
-
         .section {
 
             margin-top: 18px;
@@ -387,9 +392,25 @@
 
 
         /* =========================
-           IDENTITY
+           ABOUT
         ========================= */
 
+        .about-text {
+
+            margin: 0;
+
+            color: var(--muted);
+
+            font-size: 13px;
+
+            line-height: 1.6;
+
+        }
+
+
+        /* =========================
+           IDENTITY
+        ========================= */
 
         .identity-row {
 
@@ -399,7 +420,7 @@
 
             justify-content: space-between;
 
-            gap: 15px;
+            gap: 20px;
 
             padding: 12px 0;
 
@@ -428,8 +449,6 @@
 
         .identity-value {
 
-            max-width: 65%;
-
             color: var(--text);
 
             font-size: 12px;
@@ -437,8 +456,6 @@
             font-weight: 700;
 
             text-align: right;
-
-            word-break: break-word;
 
         }
 
@@ -451,9 +468,95 @@
 
 
         /* =========================
-           ROLES
+           SKILLS
         ========================= */
 
+        .skills {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 8px;
+
+        }
+
+
+        .skill {
+
+            padding: 8px 11px;
+
+            border-radius: 8px;
+
+            background: #EEF2F7;
+
+            color: var(--navy);
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+        }
+
+
+        /* =========================
+           EDUCATION
+        ========================= */
+
+        .education-card {
+
+            padding: 13px 0;
+
+            border-bottom: 1px solid var(--border);
+
+        }
+
+
+        .education-card:last-child {
+
+            padding-bottom: 0;
+
+            border-bottom: 0;
+
+        }
+
+
+        .education-school {
+
+            color: var(--navy);
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+        }
+
+
+        .education-course {
+
+            margin-top: 5px;
+
+            color: var(--text);
+
+            font-size: 12px;
+
+        }
+
+
+        .education-years {
+
+            margin-top: 5px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+        }
+
+
+        /* =========================
+           ROLES
+        ========================= */
 
         .roles {
 
@@ -500,7 +603,6 @@
            OPPORTUNITY PROFILE
         ========================= */
 
-
         .completion {
 
             margin-bottom: 8px;
@@ -527,13 +629,13 @@
 
         .progress-bar {
 
-            width: 35%;
-
             height: 100%;
 
             border-radius: inherit;
 
             background: var(--navy);
+
+            transition: width 0.3s ease;
 
         }
 
@@ -564,7 +666,6 @@
         /* =========================
            BOTTOM NAVIGATION
         ========================= */
-
 
         .bottom-nav {
 
@@ -666,13 +767,9 @@
 
 
         <button
-
             class="back-button"
-
             type="button"
-
             onclick="history.back()"
-
         >
 
             ← Back
@@ -708,11 +805,8 @@
 
 
                 <div
-
                     class="avatar"
-
                     id="avatar"
-
                 >
 
                     U
@@ -724,11 +818,8 @@
 
 
                     <h1
-
                         class="profile-name"
-
                         id="profile-name"
-
                     >
 
                         REMADEF Member
@@ -737,11 +828,18 @@
 
 
                     <div
+                        class="headline"
+                        id="headline"
+                    >
 
+                        Complete your profile
+
+                    </div>
+
+
+                    <div
                         class="profile-id"
-
                         id="profile-id"
-
                     >
 
                         REM-XXXXXXXX
@@ -755,29 +853,28 @@
 
                     </span>
 
+
                 </div>
 
 
             </div>
 
 
-            <p class="profile-bio">
+            <p
+                class="profile-bio"
+                id="profile-bio"
+            >
 
                 Complete your REMADEF identity to unlock
-
                 more opportunities across the ecosystem.
 
             </p>
 
 
             <button
-
                 class="edit-button"
-
                 type="button"
-
-                id="edit-profile"
-
+                onclick="location.href='profile-completion.html'"
             >
 
                 Edit Profile
@@ -790,13 +887,11 @@
 
                 <div class="stat">
 
-
                     <div class="stat-number">
 
                         0
 
                     </div>
-
 
                     <div class="stat-label">
 
@@ -804,19 +899,16 @@
 
                     </div>
 
-
                 </div>
 
 
                 <div class="stat">
-
 
                     <div class="stat-number">
 
                         0
 
                     </div>
-
 
                     <div class="stat-label">
 
@@ -824,12 +916,10 @@
 
                     </div>
 
-
                 </div>
 
 
                 <div class="stat">
-
 
                     <div class="stat-number">
 
@@ -837,18 +927,44 @@
 
                     </div>
 
-
                     <div class="stat-label">
 
                         Posts
 
                     </div>
 
-
                 </div>
 
 
             </div>
+
+
+        </section>
+
+
+        <!-- =========================
+             ABOUT ME
+        ========================= -->
+
+
+        <section class="section">
+
+
+            <h2 class="section-title">
+
+                About Me
+
+            </h2>
+
+
+            <p
+                class="about-text"
+                id="about-me"
+            >
+
+                Tell the REMADEF ecosystem about yourself.
+
+            </p>
 
 
         </section>
@@ -900,11 +1016,8 @@
 
 
                 <span
-
                     class="identity-value"
-
                     id="identity-id"
-
                 >
 
                     REM-XXXXXXXX
@@ -926,11 +1039,8 @@
 
 
                 <span
-
                     class="identity-value"
-
                     id="identity-email"
-
                 >
 
                     Not added
@@ -952,16 +1062,112 @@
 
 
                 <span
-
                     class="identity-value"
-
                     id="identity-phone"
-
                 >
 
                     Not added
 
                 </span>
+
+
+            </div>
+
+
+            <div class="identity-row">
+
+
+                <span class="identity-label">
+
+                    Location
+
+                </span>
+
+
+                <span
+                    class="identity-value"
+                    id="identity-location"
+                >
+
+                    Not added
+
+                </span>
+
+
+            </div>
+
+
+        </section>
+
+
+        <!-- =========================
+             SKILLS
+        ========================= -->
+
+
+        <section class="section">
+
+
+            <h2 class="section-title">
+
+                Skills
+
+            </h2>
+
+
+            <div
+                class="skills"
+                id="skills"
+            >
+
+                <span class="skill">
+
+                    Add your skills
+
+                </span>
+
+            </div>
+
+
+        </section>
+
+
+        <!-- =========================
+             EDUCATION
+        ========================= -->
+
+
+        <section class="section">
+
+
+            <h2 class="section-title">
+
+                Education
+
+            </h2>
+
+
+            <div id="education">
+
+
+                <div class="education-card">
+
+
+                    <div class="education-school">
+
+                        No education added
+
+                    </div>
+
+
+                    <div class="education-course">
+
+                        Add your education history
+
+                    </div>
+
+
+                </div>
 
 
             </div>
@@ -996,13 +1202,8 @@
 
 
                 <button
-
                     class="role add"
-
                     type="button"
-
-                    id="add-branch"
-
                 >
 
                     + Add Branch
@@ -1031,7 +1232,10 @@
             </h2>
 
 
-            <div class="completion">
+            <div
+                class="completion"
+                id="completion-text"
+            >
 
                 Profile completion: 35%
 
@@ -1041,19 +1245,21 @@
             <div class="progress">
 
 
-                <div class="progress-bar"></div>
+                <div
+                    class="progress-bar"
+                    id="progress-bar"
+                >
+
+                </div>
+
 
             </div>
 
 
             <button
-
                 class="complete-profile"
-
                 type="button"
-
-                id="complete-profile"
-
+                onclick="location.href='profile-completion.html'"
             >
 
                 Complete My Profile
@@ -1073,22 +1279,15 @@
 
 
     <nav
-
         class="bottom-nav"
-
         aria-label="Main navigation"
-
     >
 
 
         <button
-
             class="nav-item"
-
             type="button"
-
             onclick="location.href='home.html'"
-
         >
 
             <span>⌂</span>
@@ -1099,11 +1298,8 @@
 
 
         <button
-
             class="nav-item"
-
             type="button"
-
         >
 
             <span>◉</span>
@@ -1114,11 +1310,8 @@
 
 
         <button
-
             class="nav-item"
-
             type="button"
-
         >
 
             <span>＋</span>
@@ -1129,11 +1322,8 @@
 
 
         <button
-
             class="nav-item"
-
             type="button"
-
         >
 
             <span>✉</span>
@@ -1144,11 +1334,8 @@
 
 
         <button
-
             class="nav-item active"
-
             type="button"
-
         >
 
             <span>●</span>
@@ -1162,332 +1349,656 @@
 
 
     <!-- =========================
-         PROFILE LOGIC
+         PROFILE DATA SCRIPT
     ========================= -->
 
 
     <script>
 
-        (function () {
 
-            "use strict";
+        "use strict";
 
 
-            /*
-            ------------------------------------------------
-            GET ACCOUNT CREATED DURING REGISTRATION
-            ------------------------------------------------
-            */
+        /*
+        --------------------------------------------------------
+        READ SAVED ACCOUNT
+        --------------------------------------------------------
+        */
 
-            const savedAccount =
+
+        const accountData =
+
+            JSON.parse(
 
                 localStorage.getItem(
 
                     "remadef_account"
 
-                );
+                ) || "{}"
+
+            );
 
 
-            if (!savedAccount) {
+        /*
+        --------------------------------------------------------
+        READ SAVED PROFILE
+        --------------------------------------------------------
+        */
 
 
-                console.warn(
+        const profileData =
 
-                    "No REMADEF account found."
+            JSON.parse(
 
-                );
+                localStorage.getItem(
 
+                    "remadef_profile"
 
-                return;
+                ) || "{}"
 
-            }
-
-
-            let account;
+            );
 
 
-            try {
+        /*
+        --------------------------------------------------------
+        ACCOUNT DATA
+        --------------------------------------------------------
+        */
 
 
-                account =
+        const accountId =
 
-                    JSON.parse(
+            accountData.id ||
 
-                        savedAccount
+            "REM-XXXXXXXX";
+
+
+        const accountEmail =
+
+            accountData.email ||
+
+            "Not added";
+
+
+        const accountPhone =
+
+            accountData.phone ||
+
+            "Not added";
+
+
+        /*
+        --------------------------------------------------------
+        PROFILE DATA
+        --------------------------------------------------------
+        */
+
+
+        const firstName =
+
+            profileData.firstName ||
+
+            "";
+
+
+        const lastName =
+
+            profileData.lastName ||
+
+            "";
+
+
+        const fullName =
+
+            `${firstName} ${lastName}`.trim();
+
+
+        const headline =
+
+            profileData.headline ||
+
+            "Complete your profile";
+
+
+        const aboutMe =
+
+            profileData.aboutMe ||
+
+            "Complete your REMADEF identity to unlock more opportunities across the ecosystem.";
+
+
+        const location =
+
+            profileData.location ||
+
+            "Not added";
+
+
+        const skills =
+
+            profileData.skills || [];
+
+
+        const education =
+
+            profileData.education || [];
+
+
+        /*
+        --------------------------------------------------------
+        DISPLAY NAME
+        --------------------------------------------------------
+        */
+
+
+        const displayName =
+
+            fullName ||
+
+            "REMADEF Member";
+
+
+        document.getElementById(
+
+            "profile-name"
+
+        ).textContent =
+
+            displayName;
+
+
+        /*
+        --------------------------------------------------------
+        AVATAR INITIAL
+        --------------------------------------------------------
+        */
+
+
+        document.getElementById(
+
+            "avatar"
+
+        ).textContent =
+
+
+            firstName
+
+                ? firstName
+
+                    .charAt(0)
+
+                    .toUpperCase()
+
+                : "U";
+
+
+        /*
+        --------------------------------------------------------
+        HEADLINE
+        --------------------------------------------------------
+        */
+
+
+        document.getElementById(
+
+            "headline"
+
+        ).textContent =
+
+            headline;
+
+
+        /*
+        --------------------------------------------------------
+        ABOUT ME
+        --------------------------------------------------------
+        */
+
+
+        document.getElementById(
+
+            "profile-bio"
+
+        ).textContent =
+
+            aboutMe;
+
+
+        document.getElementById(
+
+            "about-me"
+
+        ).textContent =
+
+            aboutMe;
+
+
+        /*
+        --------------------------------------------------------
+        ACCOUNT ID
+        --------------------------------------------------------
+        */
+
+
+        document.getElementById(
+
+            "profile-id"
+
+        ).textContent =
+
+            accountId;
+
+
+        document.getElementById(
+
+            "identity-id"
+
+        ).textContent =
+
+            accountId;
+
+
+        /*
+        --------------------------------------------------------
+        EMAIL
+        --------------------------------------------------------
+        */
+
+
+        document.getElementById(
+
+            "identity-email"
+
+        ).textContent =
+
+            accountEmail;
+
+
+        /*
+        --------------------------------------------------------
+        PHONE
+        --------------------------------------------------------
+        */
+
+
+        document.getElementById(
+
+            "identity-phone"
+
+        ).textContent =
+
+            accountPhone;
+
+
+        /*
+        --------------------------------------------------------
+        LOCATION
+        --------------------------------------------------------
+        */
+
+
+        document.getElementById(
+
+            "identity-location"
+
+        ).textContent =
+
+            location;
+
+
+        /*
+        --------------------------------------------------------
+        SKILLS
+        --------------------------------------------------------
+        */
+
+
+        const skillsContainer =
+
+            document.getElementById(
+
+                "skills"
+
+            );
+
+
+        skillsContainer.innerHTML = "";
+
+
+        if (
+
+            Array.isArray(skills) &&
+
+            skills.length > 0
+
+        ) {
+
+
+            skills.forEach(
+
+                function (skill) {
+
+
+                    const element =
+
+                        document.createElement(
+
+                            "span"
+
+                        );
+
+
+                    element.className =
+
+                        "skill";
+
+
+                    element.textContent =
+
+                        skill;
+
+
+                    skillsContainer.appendChild(
+
+                        element
 
                     );
 
+                }
 
-            }
+            );
 
-            catch (error) {
+        }
 
+        else {
 
-                console.error(
 
-                    "Invalid saved REMADEF account.",
+            skillsContainer.innerHTML =
 
-                    error
+                `
 
-                );
+                <span class="skill">
 
+                    Add your skills
 
-                return;
+                </span>
 
-            }
+                `;
 
+        }
 
-            /*
-            ------------------------------------------------
-            ACCOUNT DATA
-            ------------------------------------------------
-            */
 
+        /*
+        --------------------------------------------------------
+        EDUCATION
+        --------------------------------------------------------
+        */
 
-            const accountId =
 
-                account.id ||
+        const educationContainer =
 
-                "unknown";
+            document.getElementById(
 
+                "education"
 
-            const email =
+            );
 
-                account.email ||
 
-                "Not added";
+        educationContainer.innerHTML = "";
 
 
-            const phone =
+        if (
 
-                account.phone ||
+            Array.isArray(education) &&
 
-                "Not added";
+            education.length > 0
 
+        ) {
 
-            /*
-            ------------------------------------------------
-            CREATE DISPLAY REMADEF ID
-            ------------------------------------------------
-            */
 
+            education.forEach(
 
-            const remadefId =
+                function (item) {
 
-                "REM-" +
 
-                accountId
+                    const educationCard =
 
-                    .substring(
+                        document.createElement(
 
-                        0,
-
-                        8
-
-                    )
-
-                    .toUpperCase();
-
-
-            /*
-            ------------------------------------------------
-            CREATE INITIAL
-            ------------------------------------------------
-            */
-
-
-            const initial =
-
-                email !== "Not added"
-
-                    ? email
-
-                        .charAt(
-
-                            0
-
-                        )
-
-                        .toUpperCase()
-
-                    : "U";
-
-
-            /*
-            ------------------------------------------------
-            UPDATE PROFILE HEADER
-            ------------------------------------------------
-            */
-
-
-            document
-
-                .getElementById(
-
-                    "avatar"
-
-                )
-
-                .textContent =
-
-                initial;
-
-
-            document
-
-                .getElementById(
-
-                    "profile-id"
-
-                )
-
-                .textContent =
-
-                remadefId;
-
-
-            document
-
-                .getElementById(
-
-                    "identity-id"
-
-                )
-
-                .textContent =
-
-                remadefId;
-
-
-            document
-
-                .getElementById(
-
-                    "identity-email"
-
-                )
-
-                .textContent =
-
-                email;
-
-
-            document
-
-                .getElementById(
-
-                    "identity-phone"
-
-                )
-
-                .textContent =
-
-                phone;
-
-
-            /*
-            ------------------------------------------------
-            COMPLETE PROFILE BUTTON
-            ------------------------------------------------
-            */
-
-
-            document
-
-                .getElementById(
-
-                    "complete-profile"
-
-                )
-
-                .addEventListener(
-
-                    "click",
-
-                    function () {
-
-
-                        alert(
-
-                            "Profile completion is coming next."
+                            "div"
 
                         );
 
 
-                    }
+                    educationCard.className =
 
-                );
-
-
-            /*
-            ------------------------------------------------
-            EDIT PROFILE BUTTON
-            ------------------------------------------------
-            */
+                        "education-card";
 
 
-            document
+                    educationCard.innerHTML =
 
-                .getElementById(
 
-                    "edit-profile"
+                        `
+
+                        <div class="education-school">
+
+                            ${escapeHTML(
+
+                                item.school ||
+
+                                "Institution"
+
+                            )}
+
+                        </div>
+
+
+                        <div class="education-course">
+
+                            ${escapeHTML(
+
+                                item.course ||
+
+                                "Education"
+
+                            )}
+
+                        </div>
+
+
+                        <div class="education-years">
+
+                            ${escapeHTML(
+
+                                item.years ||
+
+                                ""
+
+                            )}
+
+                        </div>
+
+                        `;
+
+
+                    educationContainer.appendChild(
+
+                        educationCard
+
+                    );
+
+                }
+
+            );
+
+        }
+
+        else {
+
+
+            educationContainer.innerHTML =
+
+
+                `
+
+                <div class="education-card">
+
+
+                    <div class="education-school">
+
+                        No education added
+
+                    </div>
+
+
+                    <div class="education-course">
+
+                        Add your education history
+
+                    </div>
+
+
+                </div>
+
+                `;
+
+        }
+
+
+        /*
+        --------------------------------------------------------
+        PROFILE COMPLETION
+        --------------------------------------------------------
+        */
+
+
+        let completion = 35;
+
+
+        if (firstName)
+
+            completion += 10;
+
+
+        if (lastName)
+
+            completion += 10;
+
+
+        if (headline)
+
+            completion += 10;
+
+
+        if (aboutMe)
+
+            completion += 10;
+
+
+        if (
+
+            Array.isArray(skills) &&
+
+            skills.length > 0
+
+        )
+
+            completion += 10;
+
+
+        if (location !== "Not added")
+
+            completion += 5;
+
+
+        if (
+
+            Array.isArray(education) &&
+
+            education.length > 0
+
+        )
+
+            completion += 10;
+
+
+        if (completion > 100)
+
+            completion = 100;
+
+
+        document.getElementById(
+
+            "completion-text"
+
+        ).textContent =
+
+            `Profile completion: ${completion}%`;
+
+
+        document.getElementById(
+
+            "progress-bar"
+
+        ).style.width =
+
+            `${completion}%`;
+
+
+        /*
+        --------------------------------------------------------
+        HTML ESCAPE
+        --------------------------------------------------------
+        */
+
+
+        function escapeHTML(value) {
+
+
+            return String(value)
+
+                .replace(
+
+                    /&/g,
+
+                    "&amp;"
 
                 )
 
-                .addEventListener(
+                .replace(
 
-                    "click",
+                    /</g,
 
-                    function () {
-
-
-                        alert(
-
-                            "Profile editing is coming next."
-
-                        );
-
-
-                    }
-
-                );
-
-
-            /*
-            ------------------------------------------------
-            ADD BRANCH BUTTON
-            ------------------------------------------------
-            */
-
-
-            document
-
-                .getElementById(
-
-                    "add-branch"
+                    "&lt;"
 
                 )
 
-                .addEventListener(
+                .replace(
 
-                    "click",
+                    />/g,
 
-                    function () {
+                    "&gt;"
 
+                )
 
-                        alert(
+                .replace(
 
-                            "Branch selection is coming next."
+                    /"/g,
 
-                        );
+                    "&quot;"
 
+                )
 
-                    }
+                .replace(
+
+                    /'/g,
+
+                    "&#039;"
 
                 );
 
+        }
 
-        })();
 
     </script>
 
