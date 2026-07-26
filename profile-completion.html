@@ -1,0 +1,2490 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <meta
+        name="theme-color"
+        content="#0B1F3A"
+    >
+
+    <meta
+        name="description"
+        content="Complete your REMADEF opportunity profile."
+    >
+
+    <title>REMADEF — Complete Profile</title>
+
+
+    <style>
+
+        :root {
+
+            --navy: #0B1F3A;
+            --navy-light: #16385F;
+
+            --white: #FFFFFF;
+            --surface: #F5F7FA;
+            --border: #E1E6ED;
+
+            --text: #172033;
+            --muted: #667085;
+
+            --green: #198754;
+            --red: #C62828;
+
+        }
+
+
+        * {
+
+            box-sizing: border-box;
+
+        }
+
+
+        body {
+
+            margin: 0;
+
+            min-height: 100vh;
+
+            padding-bottom: 30px;
+
+            background: var(--surface);
+
+            color: var(--text);
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            -webkit-font-smoothing: antialiased;
+
+        }
+
+
+        button,
+        input,
+        select,
+        textarea {
+
+            font: inherit;
+
+        }
+
+
+        button {
+
+            cursor: pointer;
+
+        }
+
+
+        /* =========================
+           TOP BAR
+        ========================= */
+
+
+        .topbar {
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 10;
+
+            height: 62px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 0 16px;
+
+            background: var(--white);
+
+            border-bottom: 1px solid var(--border);
+
+        }
+
+
+        .back-button {
+
+            border: 0;
+
+            background: transparent;
+
+            color: var(--navy);
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+        }
+
+
+        .logo {
+
+            color: var(--navy);
+
+            font-size: 22px;
+
+            font-weight: 800;
+
+        }
+
+
+        .top-spacer {
+
+            width: 50px;
+
+        }
+
+
+        /* =========================
+           MAIN
+        ========================= */
+
+
+        .main {
+
+            width: 100%;
+
+            max-width: 700px;
+
+            margin: auto;
+
+            padding: 18px 14px;
+
+        }
+
+
+        .intro {
+
+            margin-bottom: 18px;
+
+        }
+
+
+        .intro h1 {
+
+            margin: 0;
+
+            color: var(--navy);
+
+            font-size: 24px;
+
+        }
+
+
+        .intro p {
+
+            margin: 8px 0 0;
+
+            color: var(--muted);
+
+            font-size: 13px;
+
+            line-height: 1.55;
+
+        }
+
+
+        /* =========================
+           PROGRESS
+        ========================= */
+
+
+        .progress-card {
+
+            margin-bottom: 18px;
+
+            padding: 16px;
+
+            background: var(--white);
+
+            border: 1px solid var(--border);
+
+            border-radius: 14px;
+
+        }
+
+
+        .progress-top {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 8px;
+
+        }
+
+
+        .progress-label {
+
+            color: var(--navy);
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+        }
+
+
+        .progress-percent {
+
+            color: var(--muted);
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+        }
+
+
+        .progress {
+
+            height: 7px;
+
+            overflow: hidden;
+
+            border-radius: 999px;
+
+            background: #E9EDF2;
+
+        }
+
+
+        .progress-bar {
+
+            width: 35%;
+
+            height: 100%;
+
+            border-radius: inherit;
+
+            background: var(--navy);
+
+            transition: width .2s ease;
+
+        }
+
+
+        /* =========================
+           FORM CARD
+        ========================= */
+
+
+        .form-card {
+
+            padding: 20px 18px;
+
+            background: var(--white);
+
+            border: 1px solid var(--border);
+
+            border-radius: 16px;
+
+        }
+
+
+        .section-title {
+
+            margin: 0 0 16px;
+
+            color: var(--navy);
+
+            font-size: 17px;
+
+        }
+
+
+        .form-section {
+
+            margin-bottom: 24px;
+
+            padding-bottom: 22px;
+
+            border-bottom: 1px solid var(--border);
+
+        }
+
+
+        .form-section:last-of-type {
+
+            margin-bottom: 0;
+
+            padding-bottom: 0;
+
+            border-bottom: 0;
+
+        }
+
+
+        .field-group {
+
+            margin-bottom: 15px;
+
+        }
+
+
+        .field-group:last-child {
+
+            margin-bottom: 0;
+
+        }
+
+
+        .field-row {
+
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 12px;
+
+        }
+
+
+        label {
+
+            display: block;
+
+            margin-bottom: 7px;
+
+            color: var(--text);
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+        }
+
+
+        .required {
+
+            color: var(--red);
+
+        }
+
+
+        input,
+        select,
+        textarea {
+
+            width: 100%;
+
+            min-height: 44px;
+
+            padding: 11px 12px;
+
+            border: 1px solid var(--border);
+
+            border-radius: 9px;
+
+            outline: none;
+
+            background: var(--white);
+
+            color: var(--text);
+
+            font-size: 13px;
+
+        }
+
+
+        textarea {
+
+            min-height: 110px;
+
+            resize: vertical;
+
+            line-height: 1.5;
+
+        }
+
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+
+            border-color: var(--navy);
+
+            box-shadow: 0 0 0 3px rgba(11, 31, 58, .08);
+
+        }
+
+
+        .readonly {
+
+            background: var(--surface);
+
+            color: var(--muted);
+
+        }
+
+
+        .field-help {
+
+            margin-top: 5px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+            line-height: 1.4;
+
+        }
+
+
+        /* =========================
+           SKILLS
+        ========================= */
+
+
+        .skills-input-row {
+
+            display: flex;
+
+            gap: 8px;
+
+        }
+
+
+        .skills-input-row input {
+
+            flex: 1;
+
+        }
+
+
+        .add-skill {
+
+            min-width: 75px;
+
+            border: 0;
+
+            border-radius: 9px;
+
+            background: var(--navy);
+
+            color: var(--white);
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+        }
+
+
+        .skills-list {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 8px;
+
+            margin-top: 10px;
+
+        }
+
+
+        .skill-tag {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            padding: 8px 10px;
+
+            border-radius: 8px;
+
+            background: #EEF2F7;
+
+            color: var(--navy);
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+        }
+
+
+        .remove-skill {
+
+            padding: 0;
+
+            border: 0;
+
+            background: transparent;
+
+            color: var(--muted);
+
+            font-size: 14px;
+
+            line-height: 1;
+
+        }
+
+
+        /* =========================
+           MESSAGES
+        ========================= */
+
+
+        .message {
+
+            display: none;
+
+            margin-bottom: 15px;
+
+            padding: 12px;
+
+            border-radius: 9px;
+
+            font-size: 12px;
+
+            line-height: 1.5;
+
+        }
+
+
+        .error {
+
+            background: #FEF2F2;
+
+            color: var(--red);
+
+        }
+
+
+        .success {
+
+            background: #ECFDF3;
+
+            color: var(--green);
+
+        }
+
+
+        /* =========================
+           ACTIONS
+        ========================= */
+
+
+        .actions {
+
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 10px;
+
+            margin-top: 22px;
+
+        }
+
+
+        .cancel-button,
+        .save-button {
+
+            min-height: 46px;
+
+            border-radius: 9px;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+        }
+
+
+        .cancel-button {
+
+            border: 1px solid var(--navy);
+
+            background: var(--white);
+
+            color: var(--navy);
+
+        }
+
+
+        .save-button {
+
+            border: 0;
+
+            background: var(--navy);
+
+            color: var(--white);
+
+        }
+
+
+        .save-button:disabled {
+
+            opacity: .65;
+
+            cursor: not-allowed;
+
+        }
+
+
+        @media (max-width: 480px) {
+
+            .field-row {
+
+                grid-template-columns: 1fr;
+
+                gap: 0;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <header class="topbar">
+
+
+        <button
+
+            class="back-button"
+
+            type="button"
+
+            onclick="history.back()"
+
+        >
+
+            ← Back
+
+        </button>
+
+
+        <div class="logo">
+
+            REMADEF
+
+        </div>
+
+
+        <div class="top-spacer"></div>
+
+
+    </header>
+
+
+    <main class="main">
+
+
+        <div class="intro">
+
+            <h1>
+
+                Complete your profile
+
+            </h1>
+
+
+            <p>
+
+                Build your REMADEF identity so you can connect
+
+                with education, apprenticeship, skills, jobs,
+
+                business and other opportunities.
+
+            </p>
+
+        </div>
+
+
+        <section class="progress-card">
+
+
+            <div class="progress-top">
+
+
+                <span class="progress-label">
+
+                    Profile completion
+
+                </span>
+
+
+                <span
+
+                    class="progress-percent"
+
+                    id="progress-percent"
+
+                >
+
+                    35%
+
+                </span>
+
+
+            </div>
+
+
+            <div class="progress">
+
+
+                <div
+
+                    class="progress-bar"
+
+                    id="progress-bar"
+
+                ></div>
+
+            </div>
+
+
+        </section>
+
+
+        <form
+
+            class="form-card"
+
+            id="profile-form"
+
+        >
+
+
+            <div
+
+                class="message error"
+
+                id="error"
+
+            ></div>
+
+
+            <div
+
+                class="message success"
+
+                id="success"
+
+            ></div>
+
+
+            <!-- =========================
+                 BASIC INFORMATION
+            ========================== -->
+
+
+            <section class="form-section">
+
+
+                <h2 class="section-title">
+
+                    Basic information
+
+                </h2>
+
+
+                <div class="field-row">
+
+
+                    <div class="field-group">
+
+
+                        <label for="first-name">
+
+                            First name
+
+                            <span class="required">*</span>
+
+                        </label>
+
+
+                        <input
+
+                            id="first-name"
+
+                            name="first_name"
+
+                            type="text"
+
+                            autocomplete="given-name"
+
+                            placeholder="Enter your first name"
+
+                            required
+
+                        >
+
+                    </div>
+
+
+                    <div class="field-group">
+
+
+                        <label for="last-name">
+
+                            Last name
+
+                            <span class="required">*</span>
+
+                        </label>
+
+
+                        <input
+
+                            id="last-name"
+
+                            name="last_name"
+
+                            type="text"
+
+                            autocomplete="family-name"
+
+                            placeholder="Enter your last name"
+
+                            required
+
+                        >
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="field-group">
+
+
+                    <label for="display-name">
+
+                        Display name
+
+                    </label>
+
+
+                    <input
+
+                        id="display-name"
+
+                        name="display_name"
+
+                        type="text"
+
+                        placeholder="How should people know you?"
+
+                    >
+
+
+                    <div class="field-help">
+
+                        This can be your preferred public name.
+
+                    </div>
+
+                </div>
+
+
+                <div class="field-row">
+
+
+                    <div class="field-group">
+
+
+                        <label for="date-of-birth">
+
+                            Date of birth
+
+                        </label>
+
+
+                        <input
+
+                            id="date-of-birth"
+
+                            name="date_of_birth"
+
+                            type="date"
+
+                        >
+
+                    </div>
+
+
+                    <div class="field-group">
+
+
+                        <label for="gender">
+
+                            Gender
+
+                        </label>
+
+
+                        <select
+
+                            id="gender"
+
+                            name="gender"
+
+                        >
+
+                            <option value="">
+
+                                Select gender
+
+                            </option>
+
+
+                            <option value="male">
+
+                                Male
+
+                            </option>
+
+
+                            <option value="female">
+
+                                Female
+
+                            </option>
+
+
+                            <option value="prefer_not_to_say">
+
+                                Prefer not to say
+
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =========================
+                 LOCATION
+            ========================== -->
+
+
+            <section class="form-section">
+
+
+                <h2 class="section-title">
+
+                    Location
+
+                </h2>
+
+
+                <div class="field-row">
+
+
+                    <div class="field-group">
+
+
+                        <label for="country">
+
+                            Country
+
+                        </label>
+
+
+                        <input
+
+                            id="country"
+
+                            name="country"
+
+                            type="text"
+
+                            autocomplete="country-name"
+
+                            placeholder="e.g. Nigeria"
+
+                        >
+
+                    </div>
+
+
+                    <div class="field-group">
+
+
+                        <label for="state">
+
+                            State / Province
+
+                        </label>
+
+
+                        <input
+
+                            id="state"
+
+                            name="state"
+
+                            type="text"
+
+                            placeholder="e.g. Lagos"
+
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="field-group">
+
+
+                    <label for="city">
+
+                        City
+
+                    </label>
+
+
+                    <input
+
+                        id="city"
+
+                        name="city"
+
+                        type="text"
+
+                        autocomplete="address-level2"
+
+                        placeholder="Enter your city"
+
+                    >
+
+                </div>
+
+            </section>
+
+
+            <!-- =========================
+                 CONTACT
+            ========================== -->
+
+
+            <section class="form-section">
+
+
+                <h2 class="section-title">
+
+                    Contact information
+
+                </h2>
+
+
+                <div class="field-group">
+
+
+                    <label for="email">
+
+                        Email
+
+                    </label>
+
+
+                    <input
+
+                        id="email"
+
+                        type="email"
+
+                        class="readonly"
+
+                        readonly
+
+                    >
+
+                </div>
+
+
+                <div class="field-group">
+
+
+                    <label for="phone">
+
+                        Phone number
+
+                    </label>
+
+
+                    <input
+
+                        id="phone"
+
+                        name="phone"
+
+                        type="tel"
+
+                        autocomplete="tel"
+
+                        placeholder="Enter your phone number"
+
+                    >
+
+                </div>
+
+            </section>
+
+
+            <!-- =========================
+                 PROFESSIONAL PROFILE
+            ========================== -->
+
+
+            <section class="form-section">
+
+
+                <h2 class="section-title">
+
+                    Opportunity profile
+
+                </h2>
+
+
+                <div class="field-group">
+
+
+                    <label for="headline">
+
+                        Professional headline
+
+                    </label>
+
+
+                    <input
+
+                        id="headline"
+
+                        name="headline"
+
+                        type="text"
+
+                        maxlength="120"
+
+                        placeholder="e.g. Aspiring software developer"
+
+                    >
+
+                </div>
+
+
+                <div class="field-group">
+
+
+                    <label for="about">
+
+                        About me
+
+                    </label>
+
+
+                    <textarea
+
+                        id="about"
+
+                        name="about"
+
+                        maxlength="1000"
+
+                        placeholder="Tell the REMADEF ecosystem about yourself, your interests and your goals."
+
+                    ></textarea>
+
+                </div>
+
+
+                <div class="field-group">
+
+
+                    <label for="skills-input">
+
+                        Skills
+
+                    </label>
+
+
+                    <div class="skills-input-row">
+
+
+                        <input
+
+                            id="skills-input"
+
+                            type="text"
+
+                            placeholder="e.g. Web Development"
+
+                        >
+
+
+                        <button
+
+                            class="add-skill"
+
+                            type="button"
+
+                            id="add-skill"
+
+                        >
+
+                            Add
+
+                        </button>
+
+                    </div>
+
+
+                    <div
+
+                        class="skills-list"
+
+                        id="skills-list"
+
+                    ></div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =========================
+                 EDUCATION
+            ========================== -->
+
+
+            <section class="form-section">
+
+
+                <h2 class="section-title">
+
+                    Education
+
+                </h2>
+
+
+                <div class="field-group">
+
+
+                    <label for="education-level">
+
+                        Highest education level
+
+                    </label>
+
+
+                    <select
+
+                        id="education-level"
+
+                        name="education_level"
+
+                    >
+
+                        <option value="">
+
+                            Select education level
+
+                        </option>
+
+
+                        <option value="none">
+
+                            No formal education
+
+                        </option>
+
+
+                        <option value="primary">
+
+                            Primary education
+
+                        </option>
+
+
+                        <option value="secondary">
+
+                            Secondary education
+
+                        </option>
+
+
+                        <option value="tertiary">
+
+                            Tertiary education
+
+                        </option>
+
+
+                        <option value="vocational">
+
+                            Vocational / Technical training
+
+                        </option>
+
+
+                        <option value="other">
+
+                            Other
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="field-group">
+
+
+                    <label for="institution">
+
+                        Institution
+
+                    </label>
+
+
+                    <input
+
+                        id="institution"
+
+                        name="institution"
+
+                        type="text"
+
+                        placeholder="School, university or training institution"
+
+                    >
+
+                </div>
+
+            </section>
+
+
+            <!-- =========================
+                 ACTIONS
+            ========================== -->
+
+
+            <div class="actions">
+
+
+                <button
+
+                    class="cancel-button"
+
+                    type="button"
+
+                    onclick="location.href='profile.html'"
+
+                >
+
+                    Cancel
+
+                </button>
+
+
+                <button
+
+                    class="save-button"
+
+                    type="submit"
+
+                    id="save-profile"
+
+                >
+
+                    Save Profile
+
+                </button>
+
+            </div>
+
+
+        </form>
+
+
+    </main>
+
+
+    <script>
+
+        (function () {
+
+            "use strict";
+
+
+            /* =================================================
+               ACCOUNT
+            ================================================= */
+
+
+            const savedAccount =
+
+                localStorage.getItem(
+
+                    "remadef_account"
+
+                );
+
+
+            if (!savedAccount) {
+
+                window.location.href =
+
+                    "index.html";
+
+                return;
+
+            }
+
+
+            let account;
+
+
+            try {
+
+                account =
+
+                    JSON.parse(
+
+                        savedAccount
+
+                    );
+
+            }
+
+            catch (error) {
+
+                window.location.href =
+
+                    "index.html";
+
+                return;
+
+            }
+
+
+            /* =================================================
+               ELEMENTS
+            ================================================= */
+
+
+            const form =
+
+                document.getElementById(
+
+                    "profile-form"
+
+                );
+
+
+            const errorBox =
+
+                document.getElementById(
+
+                    "error"
+
+                );
+
+
+            const successBox =
+
+                document.getElementById(
+
+                    "success"
+
+                );
+
+
+            const emailInput =
+
+                document.getElementById(
+
+                    "email"
+
+                );
+
+
+            const phoneInput =
+
+                document.getElementById(
+
+                    "phone"
+
+                );
+
+
+            const skillsInput =
+
+                document.getElementById(
+
+                    "skills-input"
+
+                );
+
+
+            const addSkillButton =
+
+                document.getElementById(
+
+                    "add-skill"
+
+                );
+
+
+            const skillsList =
+
+                document.getElementById(
+
+                    "skills-list"
+
+                );
+
+
+            const progressBar =
+
+                document.getElementById(
+
+                    "progress-bar"
+
+                );
+
+
+            const progressPercent =
+
+                document.getElementById(
+
+                    "progress-percent"
+
+                );
+
+
+            const saveButton =
+
+                document.getElementById(
+
+                    "save-profile"
+
+                );
+
+
+            let skills = [];
+
+
+            /* =================================================
+               LOAD ACCOUNT CONTACT
+            ================================================= */
+
+
+            emailInput.value =
+
+                account.email ||
+
+                "";
+
+
+            phoneInput.value =
+
+                account.phone ||
+
+                "";
+
+
+            /* =================================================
+               LOAD PREVIOUS PROFILE
+            ================================================= */
+
+
+            const savedProfile =
+
+                localStorage.getItem(
+
+                    "remadef_profile"
+
+                );
+
+
+            if (savedProfile) {
+
+
+                try {
+
+
+                    const profile =
+
+                        JSON.parse(
+
+                            savedProfile
+
+                        );
+
+
+                    const fields = [
+
+                        "first-name",
+
+                        "last-name",
+
+                        "display-name",
+
+                        "date-of-birth",
+
+                        "gender",
+
+                        "country",
+
+                        "state",
+
+                        "city",
+
+                        "phone",
+
+                        "headline",
+
+                        "about",
+
+                        "education-level",
+
+                        "institution"
+
+                    ];
+
+
+                    fields.forEach(
+
+                        function (id) {
+
+
+                            const element =
+
+                                document.getElementById(
+
+                                    id
+
+                                );
+
+
+                            const key =
+
+                                element.name;
+
+
+                            if (
+
+                                profile[key] !==
+
+                                undefined
+
+                            ) {
+
+                                element.value =
+
+                                    profile[key];
+
+                            }
+
+                        }
+
+                    );
+
+
+                    skills =
+
+                        Array.isArray(
+
+                            profile.skills
+
+                        )
+
+                            ? profile.skills
+
+                            : [];
+
+
+                    renderSkills();
+
+
+                    updateProgress();
+
+
+                }
+
+                catch (error) {
+
+                    console.warn(
+
+                        "Could not load saved profile."
+
+                    );
+
+                }
+
+            }
+
+
+            /* =================================================
+               SKILLS
+            ================================================= */
+
+
+            function addSkill() {
+
+
+                const value =
+
+                    skillsInput.value.trim();
+
+
+                if (!value) return;
+
+
+                if (
+
+                    skills.includes(
+
+                        value
+
+                    )
+
+                ) {
+
+                    skillsInput.value = "";
+
+                    return;
+
+                }
+
+
+                if (skills.length >= 20) {
+
+                    return;
+
+                }
+
+
+                skills.push(value);
+
+
+                skillsInput.value = "";
+
+
+                renderSkills();
+
+
+                updateProgress();
+
+            }
+
+
+            function renderSkills() {
+
+
+                skillsList.innerHTML = "";
+
+
+                skills.forEach(
+
+                    function (skill, index) {
+
+
+                        const tag =
+
+                            document.createElement(
+
+                                "div"
+
+                            );
+
+
+                        tag.className =
+
+                            "skill-tag";
+
+
+                        tag.innerHTML =
+
+                            `
+
+                            <span>
+
+                                ${escapeHtml(skill)}
+
+                            </span>
+
+
+                            <button
+
+                                type="button"
+
+                                class="remove-skill"
+
+                                data-index="${index}"
+
+                                aria-label="Remove ${escapeHtml(skill)}"
+
+                            >
+
+                                ×
+
+                            </button>
+
+                            `;
+
+
+                        skillsList.appendChild(
+
+                            tag
+
+                        );
+
+                    }
+
+                );
+
+
+                document
+
+                    .querySelectorAll(
+
+                        ".remove-skill"
+
+                    )
+
+                    .forEach(
+
+                        function (button) {
+
+
+                            button.addEventListener(
+
+                                "click",
+
+                                function () {
+
+
+                                    skills.splice(
+
+                                        Number(
+
+                                            button.dataset.index
+
+                                        ),
+
+                                        1
+
+                                    );
+
+
+                                    renderSkills();
+
+
+                                    updateProgress();
+
+                                }
+
+                            );
+
+                        }
+
+                    );
+
+            }
+
+
+            function escapeHtml(value) {
+
+
+                return String(value)
+
+                    .replace(
+
+                        /&/g,
+
+                        "&amp;"
+
+                    )
+
+                    .replace(
+
+                        /</g,
+
+                        "&lt;"
+
+                    )
+
+                    .replace(
+
+                        />/g,
+
+                        "&gt;"
+
+                    )
+
+                    .replace(
+
+                        /"/g,
+
+                        "&quot;"
+
+                    )
+
+                    .replace(
+
+                        /'/g,
+
+                        "&#039;"
+
+                    );
+
+            }
+
+
+            addSkillButton.addEventListener(
+
+                "click",
+
+                addSkill
+
+            );
+
+
+            skillsInput.addEventListener(
+
+                "keydown",
+
+                function (event) {
+
+
+                    if (
+
+                        event.key ===
+
+                        "Enter"
+
+                    ) {
+
+                        event.preventDefault();
+
+
+                        addSkill();
+
+                    }
+
+                }
+
+            );
+
+
+            /* =================================================
+               PROFILE COMPLETION
+            ================================================= */
+
+
+            function updateProgress() {
+
+
+                const fields = [
+
+                    "first-name",
+
+                    "last-name",
+
+                    "display-name",
+
+                    "date-of-birth",
+
+                    "gender",
+
+                    "country",
+
+                    "state",
+
+                    "city",
+
+                    "phone",
+
+                    "headline",
+
+                    "about",
+
+                    "education-level",
+
+                    "institution"
+
+                ];
+
+
+                let completed = 0;
+
+
+                fields.forEach(
+
+                    function (id) {
+
+
+                        const element =
+
+                            document.getElementById(
+
+                                id
+
+                            );
+
+
+                        if (
+
+                            element.value.trim()
+
+                        ) {
+
+                            completed++;
+
+                        }
+
+                    }
+
+                );
+
+
+                if (skills.length > 0) {
+
+                    completed++;
+
+                }
+
+
+                const percentage =
+
+                    Math.round(
+
+                        (
+
+                            completed /
+
+                            (
+
+                                fields.length +
+
+                                1
+
+                            )
+
+                        ) *
+
+                        65
+
+                    ) + 35;
+
+
+                const finalPercentage =
+
+                    Math.min(
+
+                        percentage,
+
+                        100
+
+                    );
+
+
+                progressBar.style.width =
+
+                    finalPercentage +
+
+                    "%";
+
+
+                progressPercent.textContent =
+
+                    finalPercentage +
+
+                    "%";
+
+            }
+
+
+            form.addEventListener(
+
+                "input",
+
+                updateProgress
+
+            );
+
+
+            /* =================================================
+               FORM SUBMISSION
+            ================================================= */
+
+
+            form.addEventListener(
+
+                "submit",
+
+                function (event) {
+
+
+                    event.preventDefault();
+
+
+                    errorBox.style.display =
+
+                        "none";
+
+
+                    successBox.style.display =
+
+                        "none";
+
+
+                    const firstName =
+
+                        document
+
+                            .getElementById(
+
+                                "first-name"
+
+                            )
+
+                            .value
+
+                            .trim();
+
+
+                    const lastName =
+
+                        document
+
+                            .getElementById(
+
+                                "last-name"
+
+                            )
+
+                            .value
+
+                            .trim();
+
+
+                    if (!firstName) {
+
+
+                        errorBox.textContent =
+
+                            "Please enter your first name.";
+
+
+                        errorBox.style.display =
+
+                            "block";
+
+
+                        return;
+
+                    }
+
+
+                    if (!lastName) {
+
+
+                        errorBox.textContent =
+
+                            "Please enter your last name.";
+
+
+                        errorBox.style.display =
+
+                            "block";
+
+
+                        return;
+
+                    }
+
+
+                    const data = {
+
+                        account_id:
+
+                            account.id ||
+
+                            null,
+
+
+                        email:
+
+                            account.email ||
+
+                            null,
+
+
+                        first_name:
+
+                            firstName,
+
+
+                        last_name:
+
+                            lastName,
+
+
+                        display_name:
+
+                            document
+
+                                .getElementById(
+
+                                    "display-name"
+
+                                )
+
+                                .value
+
+                                .trim(),
+
+
+                        date_of_birth:
+
+                            document
+
+                                .getElementById(
+
+                                    "date-of-birth"
+
+                                )
+
+                                .value,
+
+
+                        gender:
+
+                            document
+
+                                .getElementById(
+
+                                    "gender"
+
+                                )
+
+                                .value,
+
+
+                        country:
+
+                            document
+
+                                .getElementById(
+
+                                    "country"
+
+                                )
+
+                                .value
+
+                                .trim(),
+
+
+                        state:
+
+                            document
+
+                                .getElementById(
+
+                                    "state"
+
+                                )
+
+                                .value
+
+                                .trim(),
+
+
+                        city:
+
+                            document
+
+                                .getElementById(
+
+                                    "city"
+
+                                )
+
+                                .value
+
+                                .trim(),
+
+
+                        phone:
+
+                            phoneInput.value
+
+                                .trim(),
+
+
+                        headline:
+
+                            document
+
+                                .getElementById(
+
+                                    "headline"
+
+                                )
+
+                                .value
+
+                                .trim(),
+
+
+                        about:
+
+                            document
+
+                                .getElementById(
+
+                                    "about"
+
+                                )
+
+                                .value
+
+                                .trim(),
+
+
+                        skills:
+
+
+                            skills,
+
+
+                        education_level:
+
+                            document
+
+                                .getElementById(
+
+                                    "education-level"
+
+                                )
+
+                                .value,
+
+
+                        institution:
+
+                            document
+
+                                .getElementById(
+
+                                    "institution"
+
+                                )
+
+                                .value
+
+                                .trim()
+
+                    };
+
+
+                    saveButton.disabled =
+
+                        true;
+
+
+                    saveButton.textContent =
+
+                        "Saving...";
+
+
+                    localStorage.setItem(
+
+                        "remadef_profile",
+
+                        JSON.stringify(
+
+                            data
+
+                        )
+
+                    );
+
+
+                    successBox.textContent =
+
+                        "Your profile has been saved successfully.";
+
+
+                    successBox.style.display =
+
+                        "block";
+
+
+                    setTimeout(
+
+                        function () {
+
+
+                            window.location.href =
+
+                                "profile.html";
+
+
+                        },
+
+                        1000
+
+                    );
+
+                }
+
+            );
+
+
+            updateProgress();
+
+
+        })();
+
+    </script>
+
+
+</body>
+
+</html>
