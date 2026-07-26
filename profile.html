@@ -37,8 +37,8 @@
             --text: #172033;
             --muted: #667085;
 
-            --gold: #B8892D;
             --green: #198754;
+            --gold: #B8892D;
 
         }
 
@@ -81,9 +81,10 @@
         }
 
 
-        /* =========================
+        /* =================================================
            TOP BAR
-        ========================= */
+        ================================================= */
+
 
         .topbar {
 
@@ -136,9 +137,17 @@
         }
 
 
-        /* =========================
+        .top-spacer {
+
+            width: 50px;
+
+        }
+
+
+        /* =================================================
            MAIN
-        ========================= */
+        ================================================= */
+
 
         .main {
 
@@ -153,9 +162,10 @@
         }
 
 
-        /* =========================
+        /* =================================================
            PROFILE HEADER
-        ========================= */
+        ================================================= */
+
 
         .profile-card {
 
@@ -217,9 +227,9 @@
         }
 
 
-        .headline {
+        .profile-headline {
 
-            margin-top: 6px;
+            margin-top: 5px;
 
             color: var(--muted);
 
@@ -230,11 +240,11 @@
 
         .profile-id {
 
-            margin-top: 5px;
+            margin-top: 6px;
 
             color: var(--muted);
 
-            font-size: 12px;
+            font-size: 11px;
 
         }
 
@@ -273,6 +283,13 @@
         }
 
 
+        .empty-bio {
+
+            font-style: italic;
+
+        }
+
+
         .edit-button {
 
             width: 100%;
@@ -303,9 +320,10 @@
         }
 
 
-        /* =========================
+        /* =================================================
            STATS
-        ========================= */
+        ================================================= */
+
 
         .stats {
 
@@ -361,9 +379,10 @@
         }
 
 
-        /* =========================
+        /* =================================================
            SECTIONS
-        ========================= */
+        ================================================= */
+
 
         .section {
 
@@ -391,9 +410,10 @@
         }
 
 
-        /* =========================
+        /* =================================================
            ABOUT
-        ========================= */
+        ================================================= */
+
 
         .about-text {
 
@@ -408,9 +428,21 @@
         }
 
 
-        /* =========================
+        .empty-text {
+
+            color: var(--muted);
+
+            font-size: 13px;
+
+            font-style: italic;
+
+        }
+
+
+        /* =================================================
            IDENTITY
-        ========================= */
+        ================================================= */
+
 
         .identity-row {
 
@@ -420,7 +452,7 @@
 
             justify-content: space-between;
 
-            gap: 20px;
+            gap: 15px;
 
             padding: 12px 0;
 
@@ -431,9 +463,9 @@
 
         .identity-row:last-child {
 
-            border-bottom: 0;
-
             padding-bottom: 0;
+
+            border-bottom: 0;
 
         }
 
@@ -449,6 +481,8 @@
 
         .identity-value {
 
+            max-width: 65%;
+
             color: var(--text);
 
             font-size: 12px;
@@ -456,6 +490,8 @@
             font-weight: 700;
 
             text-align: right;
+
+            word-break: break-word;
 
         }
 
@@ -467,9 +503,10 @@
         }
 
 
-        /* =========================
+        /* =================================================
            SKILLS
-        ========================= */
+        ================================================= */
+
 
         .skills {
 
@@ -484,7 +521,7 @@
 
         .skill {
 
-            padding: 8px 11px;
+            padding: 8px 10px;
 
             border-radius: 8px;
 
@@ -499,109 +536,10 @@
         }
 
 
-        /* =========================
-           EDUCATION
-        ========================= */
-
-        .education-card {
-
-            padding: 13px 0;
-
-            border-bottom: 1px solid var(--border);
-
-        }
-
-
-        .education-card:last-child {
-
-            padding-bottom: 0;
-
-            border-bottom: 0;
-
-        }
-
-
-        .education-school {
-
-            color: var(--navy);
-
-            font-size: 14px;
-
-            font-weight: 700;
-
-        }
-
-
-        .education-course {
-
-            margin-top: 5px;
-
-            color: var(--text);
-
-            font-size: 12px;
-
-        }
-
-
-        .education-years {
-
-            margin-top: 5px;
-
-            color: var(--muted);
-
-            font-size: 11px;
-
-        }
-
-
-        /* =========================
-           ROLES
-        ========================= */
-
-        .roles {
-
-            display: flex;
-
-            flex-wrap: wrap;
-
-            gap: 8px;
-
-        }
-
-
-        .role {
-
-            padding: 9px 12px;
-
-            border: 1px solid var(--border);
-
-            border-radius: 8px;
-
-            background: var(--surface);
-
-            color: var(--navy);
-
-            font-size: 12px;
-
-            font-weight: 700;
-
-        }
-
-
-        .role.add {
-
-            border-color: var(--navy);
-
-            background: var(--navy);
-
-            color: var(--white);
-
-        }
-
-
-        /* =========================
+        /* =================================================
            OPPORTUNITY PROFILE
-        ========================= */
+        ================================================= */
+
 
         .completion {
 
@@ -629,13 +567,13 @@
 
         .progress-bar {
 
+            width: 35%;
+
             height: 100%;
 
             border-radius: inherit;
 
             background: var(--navy);
-
-            transition: width 0.3s ease;
 
         }
 
@@ -663,9 +601,10 @@
         }
 
 
-        /* =========================
+        /* =================================================
            BOTTOM NAVIGATION
-        ========================= */
+        ================================================= */
+
 
         .bottom-nav {
 
@@ -767,9 +706,13 @@
 
 
         <button
+
             class="back-button"
+
             type="button"
+
             onclick="history.back()"
+
         >
 
             ← Back
@@ -784,7 +727,7 @@
         </div>
 
 
-        <div style="width: 50px;"></div>
+        <div class="top-spacer"></div>
 
 
     </header>
@@ -793,9 +736,9 @@
     <main class="main">
 
 
-        <!-- =========================
+        <!-- =================================================
              PROFILE HEADER
-        ========================= -->
+        ================================================= -->
 
 
         <section class="profile-card">
@@ -805,8 +748,11 @@
 
 
                 <div
+
                     class="avatar"
+
                     id="avatar"
+
                 >
 
                     U
@@ -818,8 +764,11 @@
 
 
                     <h1
+
                         class="profile-name"
+
                         id="profile-name"
+
                     >
 
                         REMADEF Member
@@ -828,18 +777,24 @@
 
 
                     <div
-                        class="headline"
-                        id="headline"
+
+                        class="profile-headline"
+
+                        id="profile-headline"
+
                     >
 
-                        Complete your profile
+                        REMADEF Member
 
                     </div>
 
 
                     <div
+
                         class="profile-id"
+
                         id="profile-id"
+
                     >
 
                         REM-XXXXXXXX
@@ -853,28 +808,34 @@
 
                     </span>
 
-
                 </div>
-
 
             </div>
 
 
             <p
+
                 class="profile-bio"
+
                 id="profile-bio"
+
             >
 
                 Complete your REMADEF identity to unlock
+
                 more opportunities across the ecosystem.
 
             </p>
 
 
             <button
+
                 class="edit-button"
+
                 type="button"
+
                 onclick="location.href='profile-completion.html'"
+
             >
 
                 Edit Profile
@@ -887,11 +848,13 @@
 
                 <div class="stat">
 
+
                     <div class="stat-number">
 
                         0
 
                     </div>
+
 
                     <div class="stat-label">
 
@@ -904,11 +867,13 @@
 
                 <div class="stat">
 
+
                     <div class="stat-number">
 
                         0
 
                     </div>
+
 
                     <div class="stat-label">
 
@@ -921,11 +886,13 @@
 
                 <div class="stat">
 
+
                     <div class="stat-number">
 
                         0
 
                     </div>
+
 
                     <div class="stat-label">
 
@@ -935,16 +902,14 @@
 
                 </div>
 
-
             </div>
-
 
         </section>
 
 
-        <!-- =========================
+        <!-- =================================================
              ABOUT ME
-        ========================= -->
+        ================================================= -->
 
 
         <section class="section">
@@ -958,21 +923,23 @@
 
 
             <p
+
                 class="about-text"
-                id="about-me"
+
+                id="about-text"
+
             >
 
-                Tell the REMADEF ecosystem about yourself.
+                Your personal introduction will appear here.
 
             </p>
-
 
         </section>
 
 
-        <!-- =========================
+        <!-- =================================================
              IDENTITY
-        ========================= -->
+        ================================================= -->
 
 
         <section class="section">
@@ -1001,7 +968,6 @@
 
                 </span>
 
-
             </div>
 
 
@@ -1016,14 +982,16 @@
 
 
                 <span
+
                     class="identity-value"
+
                     id="identity-id"
+
                 >
 
                     REM-XXXXXXXX
 
                 </span>
-
 
             </div>
 
@@ -1039,14 +1007,16 @@
 
 
                 <span
+
                     class="identity-value"
+
                     id="identity-email"
+
                 >
 
                     Not added
 
                 </span>
-
 
             </div>
 
@@ -1062,14 +1032,16 @@
 
 
                 <span
+
                     class="identity-value"
+
                     id="identity-phone"
+
                 >
 
                     Not added
 
                 </span>
-
 
             </div>
 
@@ -1085,24 +1057,25 @@
 
 
                 <span
+
                     class="identity-value"
+
                     id="identity-location"
+
                 >
 
                     Not added
 
                 </span>
 
-
             </div>
-
 
         </section>
 
 
-        <!-- =========================
+        <!-- =================================================
              SKILLS
-        ========================= -->
+        ================================================= -->
 
 
         <section class="section">
@@ -1116,25 +1089,27 @@
 
 
             <div
+
                 class="skills"
+
                 id="skills"
+
             >
 
-                <span class="skill">
+                <span class="empty-text">
 
-                    Add your skills
+                    Add your skills to show what you can do.
 
                 </span>
 
             </div>
 
-
         </section>
 
 
-        <!-- =========================
+        <!-- =================================================
              EDUCATION
-        ========================= -->
+        ================================================= -->
 
 
         <section class="section">
@@ -1147,79 +1122,61 @@
             </h2>
 
 
-            <div id="education">
+            <div class="identity-row">
 
 
-                <div class="education-card">
+                <span class="identity-label">
+
+                    Education level
+
+                </span>
 
 
-                    <div class="education-school">
+                <span
 
-                        No education added
+                    class="identity-value"
 
-                    </div>
+                    id="education-level"
 
-
-                    <div class="education-course">
-
-                        Add your education history
-
-                    </div>
-
-
-                </div>
-
-
-            </div>
-
-
-        </section>
-
-
-        <!-- =========================
-             ROLES
-        ========================= -->
-
-
-        <section class="section">
-
-
-            <h2 class="section-title">
-
-                My REMADEF Roles
-
-            </h2>
-
-
-            <div class="roles">
-
-
-                <div class="role">
-
-                    REMADEF Member
-
-                </div>
-
-
-                <button
-                    class="role add"
-                    type="button"
                 >
 
-                    + Add Branch
+                    Not added
 
-                </button>
-
+                </span>
 
             </div>
 
 
+            <div class="identity-row">
+
+
+                <span class="identity-label">
+
+                    Institution
+
+                </span>
+
+
+                <span
+
+                    class="identity-value"
+
+                    id="institution"
+
+                >
+
+                    Not added
+
+                </span>
+
+            </div>
+
         </section>
 
 
-        <!-- =========================
+        <!-- =================================================
              OPPORTUNITY PROFILE
-        ========================= -->
+        ================================================= -->
 
 
         <section class="section">
@@ -1233,8 +1190,11 @@
 
 
             <div
+
                 class="completion"
-                id="completion-text"
+
+                id="completion"
+
             >
 
                 Profile completion: 35%
@@ -1246,26 +1206,29 @@
 
 
                 <div
+
                     class="progress-bar"
+
                     id="progress-bar"
-                >
 
-                </div>
-
+                ></div>
 
             </div>
 
 
             <button
+
                 class="complete-profile"
+
                 type="button"
+
                 onclick="location.href='profile-completion.html'"
+
             >
 
                 Complete My Profile
 
             </button>
-
 
         </section>
 
@@ -1273,21 +1236,28 @@
     </main>
 
 
-    <!-- =========================
+    <!-- =================================================
          BOTTOM NAVIGATION
-    ========================= -->
+    ================================================= -->
 
 
     <nav
+
         class="bottom-nav"
+
         aria-label="Main navigation"
+
     >
 
 
         <button
+
             class="nav-item"
+
             type="button"
+
             onclick="location.href='home.html'"
+
         >
 
             <span>⌂</span>
@@ -1298,8 +1268,11 @@
 
 
         <button
+
             class="nav-item"
+
             type="button"
+
         >
 
             <span>◉</span>
@@ -1310,8 +1283,11 @@
 
 
         <button
+
             class="nav-item"
+
             type="button"
+
         >
 
             <span>＋</span>
@@ -1322,8 +1298,11 @@
 
 
         <button
+
             class="nav-item"
+
             type="button"
+
         >
 
             <span>✉</span>
@@ -1334,8 +1313,11 @@
 
 
         <button
+
             class="nav-item active"
+
             type="button"
+
         >
 
             <span>●</span>
@@ -1348,656 +1330,719 @@
     </nav>
 
 
-    <!-- =========================
-         PROFILE DATA SCRIPT
-    ========================= -->
-
-
     <script>
 
 
-        "use strict";
+        (function () {
 
 
-        /*
-        --------------------------------------------------------
-        READ SAVED ACCOUNT
-        --------------------------------------------------------
-        */
+            "use strict";
 
 
-        const accountData =
+            /* =================================================
+               LOAD ACCOUNT
+            ================================================= */
 
-            JSON.parse(
+
+            const savedAccount =
 
                 localStorage.getItem(
 
                     "remadef_account"
 
-                ) || "{}"
-
-            );
+                );
 
 
-        /*
-        --------------------------------------------------------
-        READ SAVED PROFILE
-        --------------------------------------------------------
-        */
+            if (!savedAccount) {
+
+                window.location.href =
+
+                    "index.html";
+
+                return;
+
+            }
 
 
-        const profileData =
+            let account;
 
-            JSON.parse(
+
+            try {
+
+
+                account =
+
+                    JSON.parse(
+
+                        savedAccount
+
+                    );
+
+
+            }
+
+            catch (error) {
+
+
+                window.location.href =
+
+                    "index.html";
+
+                return;
+
+            }
+
+
+            /* =================================================
+               LOAD PROFILE
+            ================================================= */
+
+
+            let profile = {};
+
+
+            const savedProfile =
 
                 localStorage.getItem(
 
                     "remadef_profile"
 
-                ) || "{}"
+                );
 
-            );
 
+            if (savedProfile) {
 
-        /*
-        --------------------------------------------------------
-        ACCOUNT DATA
-        --------------------------------------------------------
-        */
 
+                try {
 
-        const accountId =
 
-            accountData.id ||
+                    profile =
 
-            "REM-XXXXXXXX";
+                        JSON.parse(
 
-
-        const accountEmail =
-
-            accountData.email ||
-
-            "Not added";
-
-
-        const accountPhone =
-
-            accountData.phone ||
-
-            "Not added";
-
-
-        /*
-        --------------------------------------------------------
-        PROFILE DATA
-        --------------------------------------------------------
-        */
-
-
-        const firstName =
-
-            profileData.firstName ||
-
-            "";
-
-
-        const lastName =
-
-            profileData.lastName ||
-
-            "";
-
-
-        const fullName =
-
-            `${firstName} ${lastName}`.trim();
-
-
-        const headline =
-
-            profileData.headline ||
-
-            "Complete your profile";
-
-
-        const aboutMe =
-
-            profileData.aboutMe ||
-
-            "Complete your REMADEF identity to unlock more opportunities across the ecosystem.";
-
-
-        const location =
-
-            profileData.location ||
-
-            "Not added";
-
-
-        const skills =
-
-            profileData.skills || [];
-
-
-        const education =
-
-            profileData.education || [];
-
-
-        /*
-        --------------------------------------------------------
-        DISPLAY NAME
-        --------------------------------------------------------
-        */
-
-
-        const displayName =
-
-            fullName ||
-
-            "REMADEF Member";
-
-
-        document.getElementById(
-
-            "profile-name"
-
-        ).textContent =
-
-            displayName;
-
-
-        /*
-        --------------------------------------------------------
-        AVATAR INITIAL
-        --------------------------------------------------------
-        */
-
-
-        document.getElementById(
-
-            "avatar"
-
-        ).textContent =
-
-
-            firstName
-
-                ? firstName
-
-                    .charAt(0)
-
-                    .toUpperCase()
-
-                : "U";
-
-
-        /*
-        --------------------------------------------------------
-        HEADLINE
-        --------------------------------------------------------
-        */
-
-
-        document.getElementById(
-
-            "headline"
-
-        ).textContent =
-
-            headline;
-
-
-        /*
-        --------------------------------------------------------
-        ABOUT ME
-        --------------------------------------------------------
-        */
-
-
-        document.getElementById(
-
-            "profile-bio"
-
-        ).textContent =
-
-            aboutMe;
-
-
-        document.getElementById(
-
-            "about-me"
-
-        ).textContent =
-
-            aboutMe;
-
-
-        /*
-        --------------------------------------------------------
-        ACCOUNT ID
-        --------------------------------------------------------
-        */
-
-
-        document.getElementById(
-
-            "profile-id"
-
-        ).textContent =
-
-            accountId;
-
-
-        document.getElementById(
-
-            "identity-id"
-
-        ).textContent =
-
-            accountId;
-
-
-        /*
-        --------------------------------------------------------
-        EMAIL
-        --------------------------------------------------------
-        */
-
-
-        document.getElementById(
-
-            "identity-email"
-
-        ).textContent =
-
-            accountEmail;
-
-
-        /*
-        --------------------------------------------------------
-        PHONE
-        --------------------------------------------------------
-        */
-
-
-        document.getElementById(
-
-            "identity-phone"
-
-        ).textContent =
-
-            accountPhone;
-
-
-        /*
-        --------------------------------------------------------
-        LOCATION
-        --------------------------------------------------------
-        */
-
-
-        document.getElementById(
-
-            "identity-location"
-
-        ).textContent =
-
-            location;
-
-
-        /*
-        --------------------------------------------------------
-        SKILLS
-        --------------------------------------------------------
-        */
-
-
-        const skillsContainer =
-
-            document.getElementById(
-
-                "skills"
-
-            );
-
-
-        skillsContainer.innerHTML = "";
-
-
-        if (
-
-            Array.isArray(skills) &&
-
-            skills.length > 0
-
-        ) {
-
-
-            skills.forEach(
-
-                function (skill) {
-
-
-                    const element =
-
-                        document.createElement(
-
-                            "span"
+                            savedProfile
 
                         );
 
-
-                    element.className =
-
-                        "skill";
+                }
 
 
-                    element.textContent =
-
-                        skill;
+                catch (error) {
 
 
-                    skillsContainer.appendChild(
+                    console.warn(
 
-                        element
+                        "Could not read saved profile."
 
                     );
 
                 }
 
-            );
+            }
 
-        }
 
-        else {
+            /* =================================================
+               SAFE TEXT HELPER
+            ================================================= */
 
 
-            skillsContainer.innerHTML =
+            function valueOrDefault(
 
-                `
+                value,
 
-                <span class="skill">
+                fallback
 
-                    Add your skills
+            ) {
 
-                </span>
 
-                `;
+                if (
 
-        }
+                    value ===
 
+                    null ||
 
-        /*
-        --------------------------------------------------------
-        EDUCATION
-        --------------------------------------------------------
-        */
+                    value ===
 
+                    undefined ||
 
-        const educationContainer =
+                    String(value).trim() === ""
 
-            document.getElementById(
+                ) {
 
-                "education"
 
-            );
-
-
-        educationContainer.innerHTML = "";
-
-
-        if (
-
-            Array.isArray(education) &&
-
-            education.length > 0
-
-        ) {
-
-
-            education.forEach(
-
-                function (item) {
-
-
-                    const educationCard =
-
-                        document.createElement(
-
-                            "div"
-
-                        );
-
-
-                    educationCard.className =
-
-                        "education-card";
-
-
-                    educationCard.innerHTML =
-
-
-                        `
-
-                        <div class="education-school">
-
-                            ${escapeHTML(
-
-                                item.school ||
-
-                                "Institution"
-
-                            )}
-
-                        </div>
-
-
-                        <div class="education-course">
-
-                            ${escapeHTML(
-
-                                item.course ||
-
-                                "Education"
-
-                            )}
-
-                        </div>
-
-
-                        <div class="education-years">
-
-                            ${escapeHTML(
-
-                                item.years ||
-
-                                ""
-
-                            )}
-
-                        </div>
-
-                        `;
-
-
-                    educationContainer.appendChild(
-
-                        educationCard
-
-                    );
+                    return fallback;
 
                 }
 
-            );
 
-        }
+                return String(value).trim();
 
-        else {
+            }
 
 
-            educationContainer.innerHTML =
+            /* =================================================
+               BASIC PROFILE DATA
+            ================================================= */
 
 
-                `
+            const firstName =
 
-                <div class="education-card">
+                valueOrDefault(
 
+                    profile.first_name,
 
-                    <div class="education-school">
-
-                        No education added
-
-                    </div>
-
-
-                    <div class="education-course">
-
-                        Add your education history
-
-                    </div>
-
-
-                </div>
-
-                `;
-
-        }
-
-
-        /*
-        --------------------------------------------------------
-        PROFILE COMPLETION
-        --------------------------------------------------------
-        */
-
-
-        let completion = 35;
-
-
-        if (firstName)
-
-            completion += 10;
-
-
-        if (lastName)
-
-            completion += 10;
-
-
-        if (headline)
-
-            completion += 10;
-
-
-        if (aboutMe)
-
-            completion += 10;
-
-
-        if (
-
-            Array.isArray(skills) &&
-
-            skills.length > 0
-
-        )
-
-            completion += 10;
-
-
-        if (location !== "Not added")
-
-            completion += 5;
-
-
-        if (
-
-            Array.isArray(education) &&
-
-            education.length > 0
-
-        )
-
-            completion += 10;
-
-
-        if (completion > 100)
-
-            completion = 100;
-
-
-        document.getElementById(
-
-            "completion-text"
-
-        ).textContent =
-
-            `Profile completion: ${completion}%`;
-
-
-        document.getElementById(
-
-            "progress-bar"
-
-        ).style.width =
-
-            `${completion}%`;
-
-
-        /*
-        --------------------------------------------------------
-        HTML ESCAPE
-        --------------------------------------------------------
-        */
-
-
-        function escapeHTML(value) {
-
-
-            return String(value)
-
-                .replace(
-
-                    /&/g,
-
-                    "&amp;"
-
-                )
-
-                .replace(
-
-                    /</g,
-
-                    "&lt;"
-
-                )
-
-                .replace(
-
-                    />/g,
-
-                    "&gt;"
-
-                )
-
-                .replace(
-
-                    /"/g,
-
-                    "&quot;"
-
-                )
-
-                .replace(
-
-                    /'/g,
-
-                    "&#039;"
+                    ""
 
                 );
 
-        }
+
+            const lastName =
+
+                valueOrDefault(
+
+                    profile.last_name,
+
+                    ""
+
+                );
+
+
+            const fullName =
+
+                (
+
+                    firstName +
+
+                    " " +
+
+                    lastName
+
+                ).trim();
+
+
+            const displayName =
+
+                valueOrDefault(
+
+                    profile.display_name,
+
+                    fullName ||
+
+                    "REMADEF Member"
+
+                );
+
+
+            const headline =
+
+                valueOrDefault(
+
+                    profile.headline,
+
+                    "REMADEF Member"
+
+                );
+
+
+            const about =
+
+                valueOrDefault(
+
+                    profile.about,
+
+                    "Complete your REMADEF identity to unlock more opportunities across the ecosystem."
+
+                );
+
+
+            const accountId =
+
+                valueOrDefault(
+
+                    account.id,
+
+                    "REM-XXXXXXXX"
+
+                );
+
+
+            const email =
+
+                valueOrDefault(
+
+                    account.email ||
+
+                    profile.email,
+
+                    "Not added"
+
+                );
+
+
+            const phone =
+
+                valueOrDefault(
+
+                    profile.phone ||
+
+                    account.phone,
+
+                    "Not added"
+
+                );
+
+
+            /* =================================================
+               LOCATION
+            ================================================= */
+
+
+            const locationParts = [
+
+                profile.city,
+
+                profile.state,
+
+                profile.country
+
+            ];
+
+
+            const location =
+
+                locationParts
+
+                    .filter(
+
+                        function (item) {
+
+
+                            return (
+
+                                item &&
+
+                                String(item).trim()
+
+                            );
+
+                        }
+
+                    )
+
+                    .join(
+
+                        ", "
+
+                    );
+
+
+            /* =================================================
+               EDUCATION
+            ================================================= */
+
+
+            const educationLevel =
+
+                valueOrDefault(
+
+                    profile.education_level,
+
+                    "Not added"
+
+                );
+
+
+            const institution =
+
+                valueOrDefault(
+
+                    profile.institution,
+
+                    "Not added"
+
+                );
+
+
+            /* =================================================
+               DISPLAY PROFILE
+            ================================================= */
+
+
+            document
+
+                .getElementById(
+
+                    "profile-name"
+
+                )
+
+                .textContent =
+
+                displayName;
+
+
+            document
+
+                .getElementById(
+
+                    "profile-headline"
+
+                )
+
+                .textContent =
+
+                headline;
+
+
+            document
+
+                .getElementById(
+
+                    "profile-id"
+
+                )
+
+                .textContent =
+
+                accountId;
+
+
+            document
+
+                .getElementById(
+
+                    "identity-id"
+
+                )
+
+                .textContent =
+
+                accountId;
+
+
+            document
+
+                .getElementById(
+
+                    "identity-email"
+
+                )
+
+                .textContent =
+
+                email;
+
+
+            document
+
+                .getElementById(
+
+                    "identity-phone"
+
+                )
+
+                .textContent =
+
+                phone;
+
+
+            document
+
+                .getElementById(
+
+                    "identity-location"
+
+                )
+
+                .textContent =
+
+                location ||
+
+                "Not added";
+
+
+            document
+
+                .getElementById(
+
+                    "about-text"
+
+                )
+
+                .textContent =
+
+                about;
+
+
+            document
+
+                .getElementById(
+
+                    "education-level"
+
+                )
+
+                .textContent =
+
+                educationLevel;
+
+
+            document
+
+                .getElementById(
+
+                    "institution"
+
+                )
+
+                .textContent =
+
+                institution;
+
+
+            /* =================================================
+               AVATAR
+            ================================================= */
+
+
+            const avatarLetter =
+
+                (
+
+                    firstName ||
+
+                    displayName ||
+
+                    "U"
+
+                )
+
+                    .charAt(0)
+
+                    .toUpperCase();
+
+
+            document
+
+                .getElementById(
+
+                    "avatar"
+
+                )
+
+                .textContent =
+
+                avatarLetter;
+
+
+            /* =================================================
+               SKILLS
+            ================================================= */
+
+
+            const skillsContainer =
+
+                document
+
+                    .getElementById(
+
+                        "skills"
+
+                    );
+
+
+            const skills =
+
+                Array.isArray(
+
+                    profile.skills
+
+                )
+
+                    ? profile.skills
+
+                    : [];
+
+
+            if (skills.length > 0) {
+
+
+                skillsContainer.innerHTML = "";
+
+
+                skills.forEach(
+
+                    function (skill) {
+
+
+                        const element =
+
+                            document
+
+                                .createElement(
+
+                                    "span"
+
+                                );
+
+
+                        element.className =
+
+                            "skill";
+
+
+                        element.textContent =
+
+                            skill;
+
+
+                        skillsContainer
+
+                            .appendChild(
+
+                                element
+
+                            );
+
+                    }
+
+                );
+
+            }
+
+
+            /* =================================================
+               PROFILE COMPLETION
+            ================================================= */
+
+
+            const completionFields = [
+
+                profile.first_name,
+
+                profile.last_name,
+
+                profile.display_name,
+
+                profile.date_of_birth,
+
+                profile.gender,
+
+                profile.country,
+
+                profile.state,
+
+                profile.city,
+
+                profile.phone,
+
+                profile.headline,
+
+                profile.about,
+
+                profile.education_level,
+
+                profile.institution
+
+            ];
+
+
+            let completed =
+
+                completionFields
+
+                    .filter(
+
+                        function (value) {
+
+
+                            return (
+
+                                value &&
+
+                                String(value).trim()
+
+                            );
+
+                        }
+
+                    )
+
+                    .length;
+
+
+            if (skills.length > 0) {
+
+                completed++;
+
+            }
+
+
+            const total =
+
+                completionFields.length +
+
+                1;
+
+
+            const completion =
+
+                Math.min(
+
+                    100,
+
+                    Math.round(
+
+                        (
+
+                            completed /
+
+                            total
+
+                        ) *
+
+                        65
+
+                    ) +
+
+                    35
+
+                );
+
+
+            document
+
+                .getElementById(
+
+                    "progress-bar"
+
+                )
+
+                .style.width =
+
+                completion +
+
+                "%";
+
+
+            document
+
+                .getElementById(
+
+                    "completion"
+
+                )
+
+                .textContent =
+
+                "Profile completion: " +
+
+                completion +
+
+                "%";
+
+
+        })();
 
 
     </script>
