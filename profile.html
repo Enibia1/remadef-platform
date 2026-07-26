@@ -37,9 +37,7 @@
             --text: #172033;
             --muted: #667085;
 
-            --gold: #B8892D;
             --green: #198754;
-            --red: #D92D20;
 
         }
 
@@ -47,13 +45,6 @@
         * {
 
             box-sizing: border-box;
-
-        }
-
-
-        html {
-
-            scroll-behavior: smooth;
 
         }
 
@@ -127,16 +118,10 @@
 
             font-weight: 800;
 
-            letter-spacing: -0.5px;
-
         }
 
 
         .back-button {
-
-            min-width: 50px;
-
-            padding: 8px 0;
 
             border: 0;
 
@@ -170,7 +155,7 @@
 
 
         /* =========================
-           PROFILE HEADER
+           PROFILE CARD
         ========================= */
 
 
@@ -230,8 +215,6 @@
             color: var(--navy);
 
             font-size: 22px;
-
-            line-height: 1.2;
 
         }
 
@@ -404,7 +387,7 @@
 
 
         /* =========================
-           IDENTITY STATUS
+           IDENTITY
         ========================= */
 
 
@@ -552,8 +535,6 @@
 
             background: var(--navy);
 
-            transition: width 0.3s ease;
-
         }
 
 
@@ -576,13 +557,6 @@
             font-size: 13px;
 
             font-weight: 700;
-
-        }
-
-
-        .complete-profile:hover {
-
-            background: var(--navy-light);
 
         }
 
@@ -656,20 +630,7 @@
         }
 
 
-        /* =========================
-           LOADING
-        ========================= */
-
-
-        .loading {
-
-            opacity: 0.6;
-
-        }
-
-
         @media (min-width: 768px) {
-
 
             body {
 
@@ -701,18 +662,17 @@
 <body>
 
 
-    <!-- =========================
-         TOP BAR
-    ========================= -->
-
-
     <header class="topbar">
 
 
         <button
+
             class="back-button"
+
             type="button"
+
             onclick="history.back()"
+
         >
 
             ← Back
@@ -733,15 +693,12 @@
     </header>
 
 
-    <!-- =========================
-         MAIN CONTENT
-    ========================= -->
-
-
     <main class="main">
 
 
-        <!-- PROFILE CARD -->
+        <!-- =========================
+             PROFILE HEADER
+        ========================= -->
 
 
         <section class="profile-card">
@@ -751,8 +708,11 @@
 
 
                 <div
+
                     class="avatar"
+
                     id="avatar"
+
                 >
 
                     U
@@ -764,8 +724,11 @@
 
 
                     <h1
+
                         class="profile-name"
+
                         id="profile-name"
+
                     >
 
                         REMADEF Member
@@ -774,8 +737,11 @@
 
 
                     <div
+
                         class="profile-id"
+
                         id="profile-id"
+
                     >
 
                         REM-XXXXXXXX
@@ -789,7 +755,6 @@
 
                     </span>
 
-
                 </div>
 
 
@@ -799,15 +764,20 @@
             <p class="profile-bio">
 
                 Complete your REMADEF identity to unlock
+
                 more opportunities across the ecosystem.
 
             </p>
 
 
             <button
+
                 class="edit-button"
-                id="edit-profile"
+
                 type="button"
+
+                id="edit-profile"
+
             >
 
                 Edit Profile
@@ -821,10 +791,7 @@
                 <div class="stat">
 
 
-                    <div
-                        class="stat-number"
-                        id="connections-count"
-                    >
+                    <div class="stat-number">
 
                         0
 
@@ -844,10 +811,7 @@
                 <div class="stat">
 
 
-                    <div
-                        class="stat-number"
-                        id="following-count"
-                    >
+                    <div class="stat-number">
 
                         0
 
@@ -867,10 +831,7 @@
                 <div class="stat">
 
 
-                    <div
-                        class="stat-number"
-                        id="posts-count"
-                    >
+                    <div class="stat-number">
 
                         0
 
@@ -893,7 +854,9 @@
         </section>
 
 
-        <!-- IDENTITY -->
+        <!-- =========================
+             IDENTITY
+        ========================= -->
 
 
         <section class="section">
@@ -937,8 +900,11 @@
 
 
                 <span
+
                     class="identity-value"
+
                     id="identity-id"
+
                 >
 
                     REM-XXXXXXXX
@@ -960,8 +926,11 @@
 
 
                 <span
+
                     class="identity-value"
+
                     id="identity-email"
+
                 >
 
                     Not added
@@ -983,8 +952,11 @@
 
 
                 <span
+
                     class="identity-value"
+
                     id="identity-phone"
+
                 >
 
                     Not added
@@ -998,7 +970,9 @@
         </section>
 
 
-        <!-- ROLES -->
+        <!-- =========================
+             ROLES
+        ========================= -->
 
 
         <section class="section">
@@ -1022,9 +996,13 @@
 
 
                 <button
+
                     class="role add"
-                    id="add-branch"
+
                     type="button"
+
+                    id="add-branch"
+
                 >
 
                     + Add Branch
@@ -1038,7 +1016,9 @@
         </section>
 
 
-        <!-- OPPORTUNITY PROFILE -->
+        <!-- =========================
+             OPPORTUNITY PROFILE
+        ========================= -->
 
 
         <section class="section">
@@ -1051,10 +1031,7 @@
             </h2>
 
 
-            <div
-                class="completion"
-                id="completion-text"
-            >
+            <div class="completion">
 
                 Profile completion: 35%
 
@@ -1064,19 +1041,19 @@
             <div class="progress">
 
 
-                <div
-                    class="progress-bar"
-                    id="progress-bar"
-                ></div>
-
+                <div class="progress-bar"></div>
 
             </div>
 
 
             <button
+
                 class="complete-profile"
-                id="complete-profile"
+
                 type="button"
+
+                id="complete-profile"
+
             >
 
                 Complete My Profile
@@ -1096,15 +1073,22 @@
 
 
     <nav
+
         class="bottom-nav"
+
         aria-label="Main navigation"
+
     >
 
 
         <button
+
             class="nav-item"
+
             type="button"
+
             onclick="location.href='home.html'"
+
         >
 
             <span>⌂</span>
@@ -1115,9 +1099,11 @@
 
 
         <button
+
             class="nav-item"
+
             type="button"
-            onclick="alert('Explore will be available soon.')"
+
         >
 
             <span>◉</span>
@@ -1128,9 +1114,11 @@
 
 
         <button
+
             class="nav-item"
+
             type="button"
-            onclick="alert('Create will be available soon.')"
+
         >
 
             <span>＋</span>
@@ -1141,9 +1129,11 @@
 
 
         <button
+
             class="nav-item"
+
             type="button"
-            onclick="alert('Messages will be available soon.')"
+
         >
 
             <span>✉</span>
@@ -1154,8 +1144,11 @@
 
 
         <button
+
             class="nav-item active"
+
             type="button"
+
         >
 
             <span>●</span>
@@ -1169,342 +1162,332 @@
 
 
     <!-- =========================
-         PROFILE JAVASCRIPT
+         PROFILE LOGIC
     ========================= -->
 
 
     <script>
 
+        (function () {
 
-        "use strict";
-
-
-        /*
-        ============================================================
-        LOAD ACCOUNT DATA
-        ============================================================
-        */
-
-
-        function loadAccountData() {
-
-
-            let account = null;
+            "use strict";
 
 
             /*
-            The registration page should save the account
-            returned by the API under "remadef_account".
+            ------------------------------------------------
+            GET ACCOUNT CREATED DURING REGISTRATION
+            ------------------------------------------------
             */
 
+            const savedAccount =
 
-            try {
+                localStorage.getItem(
 
-
-                account = JSON.parse(
-
-                    localStorage.getItem(
-                        "remadef_account"
-                    )
+                    "remadef_account"
 
                 );
 
 
-            } catch (error) {
+            if (!savedAccount) {
 
 
                 console.warn(
-                    "Could not read saved REMADEF account."
-                );
 
+                    "No REMADEF account found."
 
-            }
-
-
-            /*
-            Fallback:
-            If the account was saved under another key,
-            try the common alternative.
-            */
-
-
-            if (
-                !account
-                ||
-                !account.id
-            ) {
-
-
-                try {
-
-
-                    account = JSON.parse(
-
-                        localStorage.getItem(
-                            "account"
-                        )
-
-                    );
-
-
-                } catch (error) {
-
-
-                    console.warn(
-                        "No alternative account data found."
-                    );
-
-
-                }
-
-            }
-
-
-            /*
-            If no account data is available,
-            keep the page usable.
-            */
-
-
-            if (
-                !account
-                ||
-                !account.id
-            ) {
-
-
-                console.warn(
-                    "No REMADEF account found in localStorage."
                 );
 
 
                 return;
 
+            }
+
+
+            let account;
+
+
+            try {
+
+
+                account =
+
+                    JSON.parse(
+
+                        savedAccount
+
+                    );
+
+
+            }
+
+            catch (error) {
+
+
+                console.error(
+
+                    "Invalid saved REMADEF account.",
+
+                    error
+
+                );
+
+
+                return;
 
             }
 
 
-            updateProfile(account);
-
-
-        }
-
-
-        /*
-        ============================================================
-        UPDATE PROFILE
-        ============================================================
-        */
-
-
-        function updateProfile(account) {
+            /*
+            ------------------------------------------------
+            ACCOUNT DATA
+            ------------------------------------------------
+            */
 
 
             const accountId =
-                account.id
-                ||
-                "XXXXXXXX";
+
+                account.id ||
+
+                "unknown";
 
 
             const email =
-                account.email
-                ||
+
+                account.email ||
+
                 "Not added";
 
 
             const phone =
-                account.phone
-                ||
+
+                account.phone ||
+
                 "Not added";
 
 
             /*
-            Create a short REMADEF identity ID
-            from the Appwrite account ID.
+            ------------------------------------------------
+            CREATE DISPLAY REMADEF ID
+            ------------------------------------------------
             */
 
 
             const remadefId =
 
-                "REM-"
-                +
+                "REM-" +
+
                 accountId
-                    .replace(
-                        /[^a-zA-Z0-9]/g,
-                        ""
+
+                    .substring(
+
+                        0,
+
+                        8
+
                     )
-                    .slice(
-                        -8
-                    )
+
                     .toUpperCase();
 
 
             /*
-            Avatar initial
+            ------------------------------------------------
+            CREATE INITIAL
+            ------------------------------------------------
             */
 
 
-            let initial = "U";
+            const initial =
 
-
-            if (
-                email
-                &&
                 email !== "Not added"
-            ) {
 
+                    ? email
 
-                initial = email
-                    .charAt(0)
-                    .toUpperCase();
+                        .charAt(
 
+                            0
 
-            }
+                        )
+
+                        .toUpperCase()
+
+                    : "U";
 
 
             /*
-            Update avatar
+            ------------------------------------------------
+            UPDATE PROFILE HEADER
+            ------------------------------------------------
             */
 
 
             document
+
                 .getElementById(
+
                     "avatar"
+
                 )
-                .textContent = initial;
 
-
-            /*
-            Update profile name
-            */
-
-
-            document
-                .getElementById(
-                    "profile-name"
-                )
                 .textContent =
-                    "REMADEF Member";
 
-
-            /*
-            Update REMADEF ID
-            */
+                initial;
 
 
             document
+
                 .getElementById(
+
                     "profile-id"
+
                 )
+
                 .textContent =
-                    remadefId;
+
+                remadefId;
 
 
             document
+
                 .getElementById(
+
                     "identity-id"
+
                 )
+
                 .textContent =
-                    remadefId;
 
-
-            /*
-            Update email
-            */
+                remadefId;
 
 
             document
+
                 .getElementById(
+
                     "identity-email"
+
                 )
+
                 .textContent =
-                    email;
+
+                email;
+
+
+            document
+
+                .getElementById(
+
+                    "identity-phone"
+
+                )
+
+                .textContent =
+
+                phone;
 
 
             /*
-            Update phone
+            ------------------------------------------------
+            COMPLETE PROFILE BUTTON
+            ------------------------------------------------
             */
 
 
             document
+
                 .getElementById(
-                    "identity-phone"
+
+                    "complete-profile"
+
                 )
-                .textContent =
-                    phone;
+
+                .addEventListener(
+
+                    "click",
+
+                    function () {
 
 
-        }
+                        alert(
+
+                            "Profile completion is coming next."
+
+                        );
 
 
-        /*
-        ============================================================
-        BUTTON ACTIONS
-        ============================================================
-        */
+                    }
+
+                );
 
 
-        document
-            .getElementById(
-                "edit-profile"
-            )
-            .addEventListener(
-                "click",
-                function () {
+            /*
+            ------------------------------------------------
+            EDIT PROFILE BUTTON
+            ------------------------------------------------
+            */
 
 
-                    location.href =
-                        "complete-profile.html";
+            document
+
+                .getElementById(
+
+                    "edit-profile"
+
+                )
+
+                .addEventListener(
+
+                    "click",
+
+                    function () {
 
 
-                }
-            );
+                        alert(
+
+                            "Profile editing is coming next."
+
+                        );
 
 
-        document
-            .getElementById(
-                "complete-profile"
-            )
-            .addEventListener(
-                "click",
-                function () {
+                    }
+
+                );
 
 
-                    location.href =
-                        "complete-profile.html";
+            /*
+            ------------------------------------------------
+            ADD BRANCH BUTTON
+            ------------------------------------------------
+            */
 
 
-                }
-            );
+            document
+
+                .getElementById(
+
+                    "add-branch"
+
+                )
+
+                .addEventListener(
+
+                    "click",
+
+                    function () {
 
 
-        document
-            .getElementById(
-                "add-branch"
-            )
-            .addEventListener(
-                "click",
-                function () {
+                        alert(
+
+                            "Branch selection is coming next."
+
+                        );
 
 
-                    alert(
-                        "Branch registration will be available soon."
-                    );
+                    }
+
+                );
 
 
-                }
-            );
-
-
-        /*
-        ============================================================
-        START
-        ============================================================
-        */
-
-
-        loadAccountData();
-
+        })();
 
     </script>
 
