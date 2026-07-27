@@ -792,6 +792,20 @@ def register_user(
 
     except Exception as exc:
 
+        # ====================================================
+        # SAFE ACCOUNT CREATION ERROR LOGGING
+        # ====================================================
+        # The actual Appwrite error is logged for debugging.
+        # The password and API key are never logged.
+        # ====================================================
+
+        context.error(
+
+            f"Account creation failed: "
+            f"{type(exc).__name__}: {str(exc)}"
+
+        )
+
         message = str(
 
             exc
@@ -947,7 +961,9 @@ def login_user(
 
     return error(
 
-        "Login requires a client session implementation. Use Appwrite Account.createEmailPasswordSession or createPhoneSession from the frontend.",
+        "Login requires a client session implementation. "
+        "Use Appwrite Account.createEmailPasswordSession "
+        "or createPhoneSession from the frontend.",
 
         501
 
