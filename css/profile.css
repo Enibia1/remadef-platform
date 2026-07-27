@@ -1,1 +1,419 @@
+/* ============================================================
+   REMADEF PROFILE
+============================================================ */
 
+:root{
+    --navy:#0B1F3A;
+    --navy-light:#16385F;
+
+    --white:#FFFFFF;
+    --surface:#F5F7FA;
+    --border:#E1E6ED;
+
+    --text:#172033;
+    --muted:#667085;
+
+    --green:#198754;
+    --gold:#B8892D;
+
+    --shadow:0 4px 18px rgba(11,31,58,.08);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    min-height:100vh;
+    background:var(--surface);
+    color:var(--text);
+    font-family:Arial,Helvetica,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:80px;
+}
+
+button{
+    font:inherit;
+    cursor:pointer;
+    transition:.25s ease;
+}
+
+button:hover{
+    transform:translateY(-1px);
+}
+
+/* =========================
+   TOP BAR
+========================= */
+
+.topbar{
+    position:sticky;
+    top:0;
+    z-index:100;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    height:64px;
+    padding:0 16px;
+    background:var(--white);
+    border-bottom:1px solid var(--border);
+    box-shadow:0 2px 8px rgba(0,0,0,.03);
+}
+
+.logo{
+    color:var(--navy);
+    font-size:22px;
+    font-weight:800;
+    letter-spacing:.5px;
+}
+
+.back-button{
+    border:none;
+    background:none;
+    color:var(--navy);
+    font-weight:700;
+}
+
+.top-spacer{
+    width:55px;
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.main{
+    width:100%;
+    max-width:720px;
+    margin:auto;
+    padding:20px 16px;
+}
+
+/* =========================
+   CARD
+========================= */
+
+.profile-card,
+.section{
+    background:var(--white);
+    border:1px solid var(--border);
+    border-radius:18px;
+    box-shadow:var(--shadow);
+}
+
+.profile-card{
+    padding:22px;
+}
+
+.section{
+    margin-top:20px;
+    padding:20px;
+}
+
+/* =========================
+   PROFILE HEADER
+========================= */
+
+.profile-header{
+    display:flex;
+    align-items:center;
+    gap:16px;
+}
+
+.avatar{
+    width:82px;
+    height:82px;
+    border-radius:50%;
+    background:var(--navy);
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+    font-weight:700;
+    flex-shrink:0;
+}
+
+.profile-name{
+    color:var(--navy);
+    font-size:24px;
+    margin-bottom:6px;
+}
+
+.profile-headline{
+    color:var(--muted);
+    font-size:14px;
+}
+
+.profile-id{
+    margin-top:6px;
+    color:var(--muted);
+    font-size:12px;
+}
+
+.verified{
+    display:inline-block;
+    margin-top:10px;
+    padding:5px 10px;
+    border-radius:999px;
+    background:#ECFDF3;
+    color:var(--green);
+    font-size:11px;
+    font-weight:700;
+}
+
+.profile-bio{
+    margin-top:20px;
+    color:var(--muted);
+    line-height:1.7;
+    font-size:14px;
+}
+
+.empty-bio{
+    font-style:italic;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.edit-button,
+.complete-profile{
+    width:100%;
+    height:46px;
+    margin-top:18px;
+    border-radius:10px;
+    font-weight:700;
+}
+
+.edit-button{
+    border:1px solid var(--navy);
+    background:white;
+    color:var(--navy);
+}
+
+.edit-button:hover{
+    background:var(--surface);
+}
+
+.complete-profile{
+    border:none;
+    background:var(--navy);
+    color:white;
+}
+
+.complete-profile:hover{
+    background:var(--navy-light);
+}
+
+/* =========================
+   STATS
+========================= */
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    margin-top:20px;
+    overflow:hidden;
+    border-radius:14px;
+    border:1px solid var(--border);
+}
+
+.stat{
+    padding:18px 10px;
+    text-align:center;
+    background:white;
+}
+
+.stat+.stat{
+    border-left:1px solid var(--border);
+}
+
+.stat-number{
+    color:var(--navy);
+    font-size:20px;
+    font-weight:800;
+}
+
+.stat-label{
+    margin-top:6px;
+    color:var(--muted);
+    font-size:11px;
+}
+
+/* =========================
+   SECTION
+========================= */
+
+.section-title{
+    margin-bottom:16px;
+    color:var(--navy);
+    font-size:17px;
+}
+
+.about-text,
+.empty-text{
+    color:var(--muted);
+    line-height:1.7;
+    font-size:14px;
+}
+
+.empty-text{
+    font-style:italic;
+}
+
+/* =========================
+   IDENTITY
+========================= */
+
+.identity-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
+    padding:14px 0;
+    border-bottom:1px solid var(--border);
+}
+
+.identity-row:last-child{
+    border-bottom:none;
+    padding-bottom:0;
+}
+
+.identity-label{
+    color:var(--muted);
+    font-size:13px;
+}
+
+.identity-value{
+    max-width:60%;
+    text-align:right;
+    word-break:break-word;
+    font-weight:700;
+    font-size:13px;
+}
+
+.status{
+    color:var(--green);
+}
+
+/* =========================
+   SKILLS
+========================= */
+
+.skills{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.skill{
+    padding:8px 12px;
+    border-radius:999px;
+    background:#EEF2F7;
+    color:var(--navy);
+    font-size:12px;
+    font-weight:700;
+}
+
+/* =========================
+   PROGRESS
+========================= */
+
+.completion{
+    color:var(--muted);
+    font-size:13px;
+    margin-bottom:10px;
+}
+
+.progress{
+    height:8px;
+    border-radius:999px;
+    overflow:hidden;
+    background:#E8EDF5;
+}
+
+.progress-bar{
+    width:35%;
+    height:100%;
+    background:linear-gradient(90deg,var(--navy),var(--navy-light));
+}
+
+/* =========================
+   BOTTOM NAV
+========================= */
+
+.bottom-nav{
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    height:68px;
+    background:white;
+    border-top:1px solid var(--border);
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    z-index:200;
+}
+
+.nav-item{
+    border:none;
+    background:none;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    color:var(--muted);
+    font-size:11px;
+}
+
+.nav-item span{
+    font-size:20px;
+}
+
+.nav-item.active{
+    color:var(--navy);
+    font-weight:700;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width:480px){
+
+    .profile-header{
+        flex-direction:column;
+        text-align:center;
+    }
+
+    .identity-row{
+        flex-direction:column;
+        gap:6px;
+    }
+
+    .identity-value{
+        max-width:100%;
+        text-align:left;
+    }
+
+}
+
+@media (min-width:768px){
+
+    body{
+        padding-bottom:20px;
+    }
+
+    .bottom-nav{
+        display:none;
+    }
+
+    .main{
+        padding-top:28px;
+    }
+
+}
