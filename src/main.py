@@ -1,131 +1,92 @@
 # ============================================================
 # REMADEF PLATFORM API
-# PROFILE MANAGEMENT API
+# Account Registration
+# Login
+# Profile Management
+# Appwrite Cloud Function - Python 3.14
 # ============================================================
 
 import os
 import json
 import re
+import secrets
+import hashlib
 from datetime import datetime, timezone
 
 from appwrite.client import Client
 from appwrite.services.tables_db import TablesDB
+from appwrite.services.users import Users
+from appwrite.query import Query
 
 
 # ============================================================
 # CONFIGURATION
 # ============================================================
 
-DATABASE_ID = os.environ.get(
-    "APPWRITE_DATABASE_ID",
-    "6a66577c000d17565b18"
-)
-
-TABLE_ID = os.environ.get(
-    "APPWRITE_PROFILES_TABLE_ID",
-    "profiles"
-)
-
 PROJECT_ID = os.environ.get(
     "APPWRITE_PROJECT_ID",
     "6a634fdc00148a907132"
 )
 
-APPWRITE_ENDPOINT = os.environ.get(
-    "APPWRITE_FUNCTION_ENDPOINT",
-    "https://fra.cloud.appwrite.io/v1"
+DATABASE_ID = os.environ.get(
+    "APPWRITE_DATABASE_ID",
+    "6a66577c000d17565b18"
+)
+
+PROFILES_TABLE_ID = os.environ.get(
+    "APPWRITE_PROFILES_TABLE_ID",
+    "profiles"
 )
 
 
 # ============================================================
-# HTTP RESPONSE HELPERS
+# RESPONSE HELPERS
 # ============================================================
 
-def response(
-    body,
+def json_response(
+    res,
+    data,
     status_code=200
 ):
 
-    return {
+    return res.json(
 
-        "statusCode":
-            status_code,
+        data,
 
-        "headers": {
+        status_code
 
-            "Content-Type":
-                "application/json",
+    )
 
-            "Access-Control-Allow-Origin":
-                "*",
 
-            "Access-Control-Allow-Methods":
-                "GET, POST, PUT, OPTIONS",
+def error_response(
+    res,
+    message,
+    status_code=400
+):
 
-            "Access-Control-Allow-Headers":
-                "Content-Type, X-Appwrite-Project"
+    return res.json(
 
+        {
+            "success": False,
+            "message": message
         },
 
-        "body":
-            json.dumps(
-                body,
-                ensure_ascii=False
-            )
-
-    }
-
-
-def success(
-    data=None,
-    message="Success",
-    status_code=200
-):
-
-    result = {
-
-        "success":
-            True,
-
-        "message":
-            message
-
-    }
-
-    if data is not None:
-
-        result["data"] = data
-
-    return response(
-        result,
         status_code
+
     )
 
 
-def error(
-    message,
-    status_code=400,
-    details=None
-):
+# ============================================================
+# TIME
+# ============================================================
 
-    result = {
+def now_iso():
 
-        "success":
-            False,
+    return datetime.now(
 
-        "message":
-            message
+        timezone.utc
 
-    }
-
-    if details is not None:
-
-        result["details"] = details
-
-    return response(
-        result,
-        status_code
-    )
+    ).isoformat()
 
 
 # ============================================================
@@ -137,566 +98,341 @@ def get_client():
     client = Client()
 
     client.set_endpoint(
-        APPWRITE_ENDPOINT
+
+        os.environ.get(
+
+            "APPWRITE_FUNCTION_ENDPOINT",
+
+            "https://fra.cloud.appwrite.io/v1"
+
+        )
+
     )
 
     client.set_project(
+
         PROJECT_ID
+
     )
 
-    dynamic_key = os.environ.get(
+    api_key = os.environ.get(
+
         "APPWRITE_FUNCTION_API_KEY"
+
     )
 
-    if not dynamic_key:
+    if not api_key:
 
         raise RuntimeError(
+
             "APPWRITE_FUNCTION_API_KEY is missing."
+
         )
 
     client.set_key(
-        dynamic_key
+
+        api_key
+
     )
 
     return client
 
 
 # ============================================================
-# TABLES DATABASE
+# APPWRITE SERVICES
 # ============================================================
 
 def get_tables_db():
 
     return TablesDB(
+
         get_client()
+
+    )
+
+
+def get_users():
+
+    return Users(
+
+        get_client()
+
     )
 
 
 # ============================================================
-# UTILITIES
+# REQUEST BODY
 # ============================================================
 
-def now_iso():
+def parse_body(req):
 
-    return datetime.now(
-        timezone.utc
-    ).isoformat()
+    body = getattr(
 
+        req,
 
-def clean_string(
-    value,
-    default=""
-):
+        "body",
 
-    if value is None:
+        None
 
-        return default
-
-    return str(
-        value
-    ).strip()
-
-
-def parse_json_body(
-    req
-):
-
-    body = req.get(
-        "body"
     )
+
 
     if not body:
 
         return {}
 
+
     if isinstance(
+
         body,
+
         dict
+
     ):
 
         return body
 
-    try:
-
-        return json.loads(
-            body
-        )
-
-    except Exception:
-
-        raise ValueError(
-            "Request body must contain valid JSON."
-        )
-
-
-def get_query_parameter(
-    req,
-    name
-):
-
-    query = req.get(
-        "query",
-        {}
-    )
-
-    if not query:
-
-        return None
-
-    return query.get(
-        name
-    )
-
-
-def normalize_skills(
-    skills
-):
-
-    if skills is None:
-
-        return []
 
     if isinstance(
-        skills,
-        list
+
+        body,
+
+        bytes
+
     ):
 
-        result = []
+        body = body.decode(
 
-        for skill in skills:
+            "utf-8"
 
-            value = clean_string(
-                skill
-            )
+        )
 
-            if value and value not in result:
-
-                result.append(
-                    value
-                )
-
-        return result[:20]
 
     if isinstance(
-        skills,
+
+        body,
+
         str
+
     ):
-
-        value = skills.strip()
-
-        if not value:
-
-            return []
 
         try:
 
-            parsed = json.loads(
-                value
+            return json.loads(
+
+                body
+
             )
 
-            if isinstance(
-                parsed,
-                list
-            ):
+        except json.JSONDecodeError:
 
-                return normalize_skills(
-                    parsed
-                )
-
-        except Exception:
-
-            pass
-
-        return [
-
-            item.strip()
-
-            for item in value.split(",")
-
-            if item.strip()
-
-        ][:20]
-
-    return []
+            return {}
 
 
-def serialize_skills(
-    skills
+    return {}
+
+
+# ============================================================
+# VALIDATION
+# ============================================================
+
+def clean_string(
+
+    value,
+
+    maximum=10000
+
 ):
 
-    return json.dumps(
-        normalize_skills(
-            skills
-        ),
-        ensure_ascii=False
-    )
+    if value is None:
+
+        return ""
 
 
-def deserialize_skills(
-    value
-):
+    value = str(
 
-    return normalize_skills(
         value
+
+    ).strip()
+
+
+    return value[:maximum]
+
+
+def valid_email(
+
+    email
+
+):
+
+    pattern = (
+
+        r"^[^@\s]+@[^@\s]+\.[^@\s]+$"
+
     )
+
+
+    return bool(
+
+        re.match(
+
+            pattern,
+
+            email
+
+        )
+
+    )
+
+
+def valid_password(
+
+    password
+
+):
+
+    if not isinstance(
+
+        password,
+
+        str
+
+    ):
+
+        return False
+
+
+    return len(
+
+        password
+
+    ) >= 8
+
+
+# ============================================================
+# PASSWORD HASHING
+# ============================================================
+
+def hash_password(
+
+    password
+
+):
+
+    salt = secrets.token_hex(
+
+        16
+
+    )
+
+
+    password_hash = hashlib.pbkdf2_hmac(
+
+        "sha256",
+
+        password.encode(
+
+            "utf-8"
+
+        ),
+
+        salt.encode(
+
+            "utf-8"
+
+        ),
+
+        120000
+
+    ).hex()
+
+
+    return (
+
+        salt +
+
+        ":" +
+
+        password_hash
+
+    )
+
+
+def verify_password(
+
+    password,
+
+    stored_hash
+
+):
+
+    try:
+
+        salt,
+
+        password_hash = (
+
+            stored_hash.split(
+
+                ":",
+
+                1
+
+            )
+
+        )
+
+
+        calculated_hash = (
+
+            hashlib.pbkdf2_hmac(
+
+                "sha256",
+
+                password.encode(
+
+                    "utf-8"
+
+                ),
+
+                salt.encode(
+
+                    "utf-8"
+
+                ),
+
+                120000
+
+            ).hex()
+
+        )
+
+
+        return secrets.compare_digest(
+
+            calculated_hash,
+
+            password_hash
+
+        )
+
+
+    except Exception:
+
+        return False
 
 
 # ============================================================
 # PROFILE COMPLETION
 # ============================================================
 
-PROFILE_COMPLETION_FIELDS = [
-
-    "first_name",
-
-    "last_name",
-
-    "display_name",
-
-    "date_of_birth",
-
-    "gender",
-
-    "country",
-
-    "state",
-
-    "city",
-
-    "phone",
-
-    "headline",
-
-    "about",
-
-    "education_level",
-
-    "institution"
-
-]
-
-
 def calculate_profile_completion(
+
     profile
+
 ):
 
-    completed = 0
-
-    for field in PROFILE_COMPLETION_FIELDS:
-
-        value = profile.get(
-            field
-        )
-
-        if (
-
-            value is not None
-
-            and str(
-                value
-            ).strip()
-
-        ):
-
-            completed += 1
-
-    skills = normalize_skills(
-        profile.get(
-            "skills"
-        )
-    )
-
-    if skills:
-
-        completed += 1
-
-    total = (
-
-        len(
-            PROFILE_COMPLETION_FIELDS
-        )
-
-        + 1
-
-    )
-
-    return round(
-
-        (
-
-            completed /
-
-            total
-
-        ) * 100
-
-    )
-
-
-# ============================================================
-# PROFILE DATA NORMALIZATION
-# ============================================================
-
-def normalize_profile(
-    profile
-):
-
-    if not profile:
-
-        return {}
-
-    result = dict(
-        profile
-    )
-
-    result["skills"] = normalize_skills(
-        profile.get(
-            "skills"
-        )
-    )
-
-    result["profile_completion"] = (
-
-        profile.get(
-            "profile_completion"
-        )
-
-        if profile.get(
-            "profile_completion"
-        ) is not None
-
-        else calculate_profile_completion(
-            result
-        )
-
-    )
-
-    return result
-
-
-# ============================================================
-# FIND PROFILE BY ACCOUNT ID
-# ============================================================
-
-def get_profile_by_account_id(
-    account_id
-):
-
-    account_id = clean_string(
-        account_id
-    )
-
-    if not account_id:
-
-        return None
-
-    tables_db = get_tables_db()
-
-    result = tables_db.list_rows(
-
-        database_id=
-            DATABASE_ID,
-
-        table_id=
-            TABLE_ID,
-
-        queries=[
-
-            f'equal("account_id", "{account_id}")'
-
-        ]
-
-    )
-
-    rows = result.get(
-        "rows",
-        []
-    )
-
-    if not rows:
-
-        return None
-
-    return normalize_profile(
-        rows[0]
-    )
-
-
-# ============================================================
-# CREATE PROFILE
-# ============================================================
-
-def create_profile(
-    account_id,
-    email="",
-    phone=""
-):
-
-    account_id = clean_string(
-        account_id
-    )
-
-    if not account_id:
-
-        raise ValueError(
-            "account_id is required."
-        )
-
-    existing_profile = (
-
-        get_profile_by_account_id(
-            account_id
-        )
-
-    )
-
-    if existing_profile:
-
-        return existing_profile
-
-    now = now_iso()
-
-    profile_data = {
-
-        "account_id":
-            account_id,
-
-        "email":
-            clean_string(
-                email
-            ),
-
-        "first_name":
-            "",
-
-        "last_name":
-            "",
-
-        "display_name":
-            "",
-
-        "date_of_birth":
-            "",
-
-        "gender":
-            "",
-
-        "country":
-            "",
-
-        "state":
-            "",
-
-        "city":
-            "",
-
-        "phone":
-            clean_string(
-                phone
-            ),
-
-        "headline":
-            "",
-
-        "about":
-            "",
-
-        "skills":
-            "[]",
-
-        "education_level":
-            "",
-
-        "institution":
-            "",
-
-        "profile_completion":
-            0,
-
-        "created_at":
-            now,
-
-        "updated_at":
-            now
-
-    }
-
-    tables_db = get_tables_db()
-
-    created = tables_db.create_row(
-
-        database_id=
-            DATABASE_ID,
-
-        table_id=
-            TABLE_ID,
-
-        row_id=
-            "unique()",
-
-        data=
-            profile_data
-
-    )
-
-    return normalize_profile(
-        created
-    )
-
-
-# ============================================================
-# UPDATE PROFILE
-# ============================================================
-
-def update_profile(
-    account_id,
-    profile_data
-):
-
-    account_id = clean_string(
-        account_id
-    )
-
-    if not account_id:
-
-        raise ValueError(
-            "account_id is required."
-        )
-
-    if not isinstance(
-        profile_data,
-        dict
-    ):
-
-        raise ValueError(
-            "Profile data must be an object."
-        )
-
-    existing_profile = (
-
-        get_profile_by_account_id(
-            account_id
-        )
-
-    )
-
-    if not existing_profile:
-
-        create_profile(
-            account_id
-        )
-
-        existing_profile = (
-
-            get_profile_by_account_id(
-                account_id
-            )
-
-        )
-
-    allowed_fields = [
-
-        "email",
+    fields = [
 
         "first_name",
 
@@ -720,503 +456,1743 @@ def update_profile(
 
         "about",
 
-        "skills",
-
         "education_level",
 
         "institution"
 
     ]
 
-    update_data = {}
 
-    for field in allowed_fields:
+    completed = 0
 
-        if field not in profile_data:
+
+    for field in fields:
+
+        value = profile.get(
+
+            field
+
+        )
+
+
+        if value is not None and str(
+
+            value
+
+        ).strip():
+
+            completed += 1
+
+
+    skills = profile.get(
+
+        "skills"
+
+    )
+
+
+    if isinstance(
+
+        skills,
+
+        list
+
+    ):
+
+        if len(
+
+            skills
+
+        ) > 0:
+
+            completed += 1
+
+
+    elif skills:
+
+        completed += 1
+
+
+    total = len(
+
+        fields
+
+    ) + 1
+
+
+    return round(
+
+        (
+
+            completed /
+
+            total
+
+        ) * 100
+
+    )
+
+
+# ============================================================
+# SKILLS NORMALIZATION
+# ============================================================
+
+def normalize_skills(
+
+    skills
+
+):
+
+    if skills is None:
+
+        return []
+
+
+    if isinstance(
+
+        skills,
+
+        str
+
+    ):
+
+        try:
+
+            decoded = json.loads(
+
+                skills
+
+            )
+
+
+            if isinstance(
+
+                decoded,
+
+                list
+
+            ):
+
+                skills = decoded
+
+            else:
+
+                skills = [
+
+                    skills
+
+                ]
+
+        except json.JSONDecodeError:
+
+            skills = [
+
+                item.strip()
+
+                for item in skills.split(
+
+                    ","
+
+                )
+
+                if item.strip()
+
+            ]
+
+
+    if not isinstance(
+
+        skills,
+
+        list
+
+    ):
+
+        return []
+
+
+    cleaned = []
+
+
+    for skill in skills:
+
+        skill = clean_string(
+
+            skill,
+
+            100
+
+        )
+
+
+        if skill and skill not in cleaned:
+
+            cleaned.append(
+
+                skill
+
+            )
+
+
+    return cleaned[:20]
+
+
+# ============================================================
+# PROFILE DATA
+# ============================================================
+
+PROFILE_FIELDS = [
+
+    "email",
+
+    "first_name",
+
+    "last_name",
+
+    "display_name",
+
+    "date_of_birth",
+
+    "gender",
+
+    "country",
+
+    "state",
+
+    "city",
+
+    "phone",
+
+    "headline",
+
+    "about",
+
+    "skills",
+
+    "education_level",
+
+    "institution"
+
+]
+
+
+def sanitize_profile_data(
+
+    data
+
+):
+
+    profile = {}
+
+
+    for field in PROFILE_FIELDS:
+
+        if field not in data:
 
             continue
 
-        value = profile_data[field]
+
+        value = data.get(
+
+            field
+
+        )
+
 
         if field == "skills":
 
-            value = serialize_skills(
-                value
-            )
+            profile[field] = (
 
-        else:
+                normalize_skills(
 
-            value = clean_string(
-                value
-            )
-
-        update_data[field] = value
-
-    merged_profile = dict(
-        existing_profile
-    )
-
-    for field in update_data:
-
-        value = update_data[field]
-
-        if field == "skills":
-
-            merged_profile[field] = (
-
-                deserialize_skills(
                     value
+
                 )
 
             )
 
         else:
 
-            merged_profile[field] = value
+            profile[field] = clean_string(
 
-    update_data[
-        "profile_completion"
-    ] = calculate_profile_completion(
-        merged_profile
-    )
+                value
 
-    update_data[
-        "updated_at"
-    ] = now_iso()
+            )
+
+
+    return profile
+
+
+# ============================================================
+# FIND PROFILE
+# ============================================================
+
+def get_profile_by_account_id(
+
+    account_id
+
+):
 
     tables_db = get_tables_db()
 
-    updated = tables_db.update_row(
 
-        database_id=
-            DATABASE_ID,
+    result = tables_db.list_rows(
 
-        table_id=
-            TABLE_ID,
+        database_id=DATABASE_ID,
 
-        row_id=
-            existing_profile["$id"],
+        table_id=PROFILES_TABLE_ID,
 
-        data=
-            update_data
+        queries=[
 
-    )
+            Query.equal(
 
-    return normalize_profile(
-        updated
-    )
+                "account_id",
 
+                account_id
 
-# ============================================================
-# REQUEST HANDLERS
-# ============================================================
-
-def handle_health():
-
-    return success(
-
-        {
-
-            "service":
-                "REMADEF Platform API",
-
-            "status":
-                "healthy",
-
-            "database":
-                DATABASE_ID,
-
-            "table":
-                TABLE_ID
-
-        },
-
-        "REMADEF Platform API is healthy."
-
-    )
-
-
-def handle_get_profile(
-    req
-):
-
-    account_id = get_query_parameter(
-
-        req,
-
-        "account_id"
-
-    )
-
-    if not account_id:
-
-        return error(
-
-            "account_id is required.",
-
-            400
-
-        )
-
-    profile = (
-
-        get_profile_by_account_id(
-            account_id
-        )
-
-    )
-
-    if not profile:
-
-        return error(
-
-            "Profile not found.",
-
-            404
-
-        )
-
-    return success(
-
-        profile,
-
-        "Profile retrieved successfully."
-
-    )
-
-
-def handle_create_profile(
-    req
-):
-
-    body = parse_json_body(
-        req
-    )
-
-    account_id = clean_string(
-        body.get(
-            "account_id"
-        )
-    )
-
-    if not account_id:
-
-        return error(
-
-            "account_id is required.",
-
-            400
-
-        )
-
-    profile = create_profile(
-
-        account_id=
-
-            account_id,
-
-        email=
-
-            body.get(
-                "email",
-                ""
             ),
 
-        phone=
+            Query.limit(
 
-            body.get(
-                "phone",
-                ""
+                1
+
             )
 
-    )
-
-    return success(
-
-        profile,
-
-        "Profile created successfully.",
-
-        201
+        ]
 
     )
 
 
-def handle_update_profile(
-    req
+    rows = result.get(
+
+        "rows",
+
+        []
+
+    )
+
+
+    if not rows:
+
+        return None
+
+
+    return rows[0]
+
+
+# ============================================================
+# CREATE PROFILE
+# ============================================================
+
+def create_profile(
+
+    account_id,
+
+    profile_data=None
+
 ):
 
-    body = parse_json_body(
-        req
-    )
+    tables_db = get_tables_db()
 
-    account_id = clean_string(
 
-        body.get(
-            "account_id"
-        )
+    profile_data = (
+
+        profile_data or {}
 
     )
 
-    if not account_id:
 
-        return error(
+    profile = {
 
-            "account_id is required.",
-
-            400
-
-        )
-
-    profile_data = body.get(
-        "profile"
-    )
-
-    if profile_data is None:
-
-        profile_data = {
-
-            key:
-                value
-
-            for key, value in body.items()
-
-            if key != "account_id"
-
-        }
-
-    profile = update_profile(
-
-        account_id=
+        "account_id":
 
             account_id,
 
-        profile_data=
+        "email":
+
+            clean_string(
+
+                profile_data.get(
+
+                    "email",
+
+                    ""
+
+                )
+
+            ),
+
+        "first_name":
+
+            clean_string(
+
+                profile_data.get(
+
+                    "first_name",
+
+                    ""
+
+                )
+
+            ),
+
+        "last_name":
+
+            clean_string(
+
+                profile_data.get(
+
+                    "last_name",
+
+                    ""
+
+                )
+
+            ),
+
+        "display_name":
+
+            clean_string(
+
+                profile_data.get(
+
+                    "display_name",
+
+                    ""
+
+                )
+
+            ),
+
+        "date_of_birth":
+
+            clean_string(
+
+                profile_data.get(
+
+                    "date_of_birth",
+
+                    ""
+
+                )
+
+            ),
+
+        "gender":
+
+            clean_string(
+
+                profile_data.get(
+
+                    "gender",
+
+                    ""
+
+                )
+
+            ),
+
+        "country":
+
+            clean_string(
+
+                profile_data.get(
+
+                    "country",
+
+                    ""
+
+                )
+
+            ),
+
+        "state":
+
+            clean_string(
+
+                profile_data.get(
+
+                    "state",
+
+                    ""
+
+                )
+
+            ),
+
+        "city":
+
+            clean_string(
+
+                profile_data.get(
+
+                    "city",
+
+                    ""
+
+                )
+
+            ),
+
+        "phone":
+
+            clean_string(
+
+                profile_data.get(
+
+                    "phone",
+
+                    ""
+
+                )
+
+            ),
+
+        "headline":
+
+            clean_string(
+
+                profile_data.get(
+
+                    "headline",
+
+                    ""
+
+                ),
+
+                120
+
+            ),
+
+        "about":
+
+            clean_string(
+
+                profile_data.get(
+
+                    "about",
+
+                    ""
+
+                ),
+
+                1000
+
+            ),
+
+        "skills":
+
+            json.dumps(
+
+                normalize_skills(
+
+                    profile_data.get(
+
+                        "skills",
+
+                        []
+
+                    )
+
+                )
+
+            ),
+
+        "education_level":
+
+            clean_string(
+
+                profile_data.get(
+
+                    "education_level",
+
+                    ""
+
+                )
+
+            ),
+
+        "institution":
+
+            clean_string(
+
+                profile_data.get(
+
+                    "institution",
+
+                    ""
+
+                )
+
+            ),
+
+        "profile_completion":
+
+            0,
+
+        "created_at":
+
+            now_iso(),
+
+        "updated_at":
+
+            now_iso()
+
+    }
+
+
+    profile["profile_completion"] = (
+
+        calculate_profile_completion(
+
+            {
+
+                **profile,
+
+                "skills":
+
+                    json.loads(
+
+                        profile["skills"]
+
+                    )
+
+            }
+
+        )
+
+    )
+
+
+    return tables_db.create_row(
+
+        database_id=DATABASE_ID,
+
+        table_id=PROFILES_TABLE_ID,
+
+        row_id="unique()",
+
+        data=profile
+
+    )
+
+
+# ============================================================
+# UPDATE PROFILE
+# ============================================================
+
+def update_profile(
+
+    account_id,
+
+    profile_data
+
+):
+
+    tables_db = get_tables_db()
+
+
+    existing_profile = (
+
+        get_profile_by_account_id(
+
+            account_id
+
+        )
+
+    )
+
+
+    clean_data = (
+
+        sanitize_profile_data(
 
             profile_data
 
+        )
+
     )
 
-    return success(
 
-        profile,
+    if not existing_profile:
 
-        "Profile updated successfully."
+        return create_profile(
+
+            account_id,
+
+            clean_data
+
+        )
+
+
+    current_profile = dict(
+
+        existing_profile
+
+    )
+
+
+    for key, value in clean_data.items():
+
+        if key == "skills":
+
+            current_profile[key] = value
+
+        else:
+
+            current_profile[key] = value
+
+
+    completion = (
+
+        calculate_profile_completion(
+
+            current_profile
+
+        )
+
+    )
+
+
+    update_data = {}
+
+
+    for key, value in clean_data.items():
+
+        if key == "skills":
+
+            update_data[key] = json.dumps(
+
+                value
+
+            )
+
+        else:
+
+            update_data[key] = value
+
+
+    update_data[
+
+        "profile_completion"
+
+    ] = completion
+
+
+    update_data[
+
+        "updated_at"
+
+    ] = now_iso()
+
+
+    return tables_db.update_row(
+
+        database_id=DATABASE_ID,
+
+        table_id=PROFILES_TABLE_ID,
+
+        row_id=existing_profile["$id"],
+
+        data=update_data
 
     )
 
 
 # ============================================================
-# MAIN FUNCTION
+# REGISTER ACCOUNT
 # ============================================================
 
-def main(
-    context
+def register_account(
+
+    payload
+
 ):
 
-    req = context.req
+    email = clean_string(
+
+        payload.get(
+
+            "email",
+
+            ""
+
+        ),
+
+        320
+
+    ).lower()
+
+
+    phone = clean_string(
+
+        payload.get(
+
+            "phone",
+
+            ""
+
+        ),
+
+        30
+
+    )
+
+
+    password = payload.get(
+
+        "password",
+
+        ""
+
+    )
+
+
+    if not email and not phone:
+
+        return {
+
+            "success": False,
+
+            "message":
+
+                "Email or phone number is required."
+
+        }, 400
+
+
+    if not valid_password(
+
+        password
+
+    ):
+
+        return {
+
+            "success": False,
+
+            "message":
+
+                "Password must be at least 8 characters."
+
+        }, 400
+
+
+    if email and not valid_email(
+
+        email
+
+    ):
+
+        return {
+
+            "success": False,
+
+            "message":
+
+                "Please enter a valid email address."
+
+        }, 400
+
+
+    users = get_users()
+
+
+    try:
+
+        if email:
+
+            user = users.create(
+
+                user_id="unique()",
+
+                email=email,
+
+                password=password
+
+            )
+
+        else:
+
+            user = users.create(
+
+                user_id="unique()",
+
+                phone=phone,
+
+                password=password
+
+            )
+
+
+    except Exception as error:
+
+        message = str(
+
+            error
+
+        )
+
+
+        if (
+
+            "already exists"
+
+            in message.lower()
+
+            or "duplicate"
+
+            in message.lower()
+
+        ):
+
+            return {
+
+                "success": False,
+
+                "message":
+
+                    "An account with these credentials already exists."
+
+            }, 409
+
+
+        raise error
+
+
+    account_id = user.get(
+
+        "$id"
+
+    )
+
+
+    profile = create_profile(
+
+        account_id,
+
+        {
+
+            "email":
+
+                email,
+
+            "phone":
+
+                phone
+
+        }
+
+    )
+
+
+    return {
+
+        "success": True,
+
+        "message":
+
+            "REMADEF account created successfully.",
+
+        "account": {
+
+            "id":
+
+                account_id,
+
+            "email":
+
+                email,
+
+            "phone":
+
+                phone
+
+        },
+
+        "profile": {
+
+            "id":
+
+                profile.get(
+
+                    "$id"
+
+                ),
+
+            "profile_completion":
+
+                profile.get(
+
+                    "profile_completion",
+
+                    0
+
+                )
+
+        }
+
+    }, 201
+
+
+# ============================================================
+# LOGIN
+# ============================================================
+
+def login_account(
+
+    payload
+
+):
+
+    email = clean_string(
+
+        payload.get(
+
+            "email",
+
+            ""
+
+        ),
+
+        320
+
+    ).lower()
+
+
+    phone = clean_string(
+
+        payload.get(
+
+            "phone",
+
+            ""
+
+        ),
+
+        30
+
+    )
+
+
+    password = payload.get(
+
+        "password",
+
+        ""
+
+    )
+
+
+    if not password:
+
+        return {
+
+            "success": False,
+
+            "message":
+
+                "Password is required."
+
+        }, 400
+
+
+    if not email and not phone:
+
+        return {
+
+            "success": False,
+
+            "message":
+
+                "Email or phone number is required."
+
+        }, 400
+
+
+    users = get_users()
+
+
+    user = None
+
+
+    if email:
+
+        result = users.list(
+
+            queries=[
+
+                Query.equal(
+
+                    "email",
+
+                    email
+
+                ),
+
+                Query.limit(
+
+                    1
+
+                )
+
+            ]
+
+        )
+
+
+        users_list = result.get(
+
+            "users",
+
+            []
+
+        )
+
+
+        if users_list:
+
+            user = users_list[0]
+
+
+    else:
+
+        result = users.list(
+
+            queries=[
+
+                Query.equal(
+
+                    "phone",
+
+                    phone
+
+                ),
+
+                Query.limit(
+
+                    1
+
+                )
+
+            ]
+
+        )
+
+
+        users_list = result.get(
+
+            "users",
+
+            []
+
+        )
+
+
+        if users_list:
+
+            user = users_list[0]
+
+
+    if not user:
+
+        return {
+
+            "success": False,
+
+            "message":
+
+                "Invalid email, phone number or password."
+
+        }, 401
+
+
+    account_id = user.get(
+
+        "$id"
+
+    )
+
+
+    profile = get_profile_by_account_id(
+
+        account_id
+
+    )
+
+
+    return {
+
+        "success": True,
+
+        "message":
+
+            "Login successful.",
+
+        "account": {
+
+            "id":
+
+                account_id,
+
+            "email":
+
+                user.get(
+
+                    "email",
+
+                    ""
+
+                ),
+
+            "phone":
+
+                user.get(
+
+                    "phone",
+
+                    ""
+
+                ),
+
+            "name":
+
+                user.get(
+
+                    "name",
+
+                    ""
+
+                )
+
+        },
+
+        "profile":
+
+            profile
+
+    }, 200
+
+
+# ============================================================
+# GET PROFILE
+# ============================================================
+
+def get_profile(
+
+    account_id
+
+):
+
+    profile = get_profile_by_account_id(
+
+        account_id
+
+    )
+
+
+    if not profile:
+
+        return None
+
+
+    if isinstance(
+
+        profile.get(
+
+            "skills"
+
+        ),
+
+        str
+
+    ):
+
+        try:
+
+            profile["skills"] = json.loads(
+
+                profile["skills"]
+
+            )
+
+        except json.JSONDecodeError:
+
+            profile["skills"] = normalize_skills(
+
+                profile["skills"]
+
+            )
+
+
+    return profile
+
+
+# ============================================================
+# ROUTER
+# ============================================================
+
+def route_request(
+
+    req,
+
+    res,
+
+    log
+
+):
 
     method = (
 
-        req.method
+        getattr(
+
+            req,
+
+            "method",
+
+            "GET"
+
+        )
 
         or "GET"
 
     ).upper()
 
+
     path = (
 
-        req.path
+        getattr(
+
+            req,
+
+            "path",
+
+            "/"
+
+        )
 
         or "/"
 
-    ).rstrip("/")
+    )
 
-    try:
 
-        # ----------------------------------------------------
-        # CORS PREFLIGHT
-        # ----------------------------------------------------
+    log(
 
-        if method == "OPTIONS":
+        f"REMADEF API REQUEST: {method} {path}"
 
-            return response(
-                {},
-                204
+    )
+
+
+    # --------------------------------------------------------
+    # HEALTH
+    # --------------------------------------------------------
+
+    if (
+
+        method == "GET"
+
+        and path == "/"
+
+    ):
+
+        return json_response(
+
+            res,
+
+            {
+
+                "success": True,
+
+                "service":
+
+                    "REMADEF Platform API",
+
+                "status":
+
+                    "online"
+
+            }
+
+        )
+
+
+    if (
+
+        method == "GET"
+
+        and path == "/api/health"
+
+    ):
+
+        return json_response(
+
+            res,
+
+            {
+
+                "success": True,
+
+                "status":
+
+                    "healthy",
+
+                "service":
+
+                    "REMADEF Platform API",
+
+                "database":
+
+                    DATABASE_ID,
+
+                "table":
+
+                    PROFILES_TABLE_ID
+
+            }
+
+        )
+
+
+    # --------------------------------------------------------
+    # BODY
+    # --------------------------------------------------------
+
+    payload = parse_body(
+
+        req
+
+    )
+
+
+    # --------------------------------------------------------
+    # REGISTER
+    # --------------------------------------------------------
+
+    if (
+
+        method == "POST"
+
+        and path == "/api/register"
+
+    ):
+
+        try:
+
+            data, status = (
+
+                register_account(
+
+                    payload
+
+                )
+
             )
 
-        # ----------------------------------------------------
-        # ROOT
-        # ----------------------------------------------------
 
-        if (
+            return json_response(
 
-            method == "GET"
+                res,
 
-            and path in [
+                data,
 
-                "",
-
-                "/"
-
-            ]
-
-        ):
-
-            return success(
-
-                {
-
-                    "name":
-                        "REMADEF Platform API",
-
-                    "version":
-                        "1.0.0",
-
-                    "status":
-                        "online",
-
-                    "endpoints": [
-
-                        "GET /",
-
-                        "GET /api/health",
-
-                        "GET /api/profile?account_id=...",
-
-                        "POST /api/profile",
-
-                        "PUT /api/profile",
-
-                        "POST /api/profile/create"
-
-                    ]
-
-                },
-
-                "REMADEF Platform API is online."
+                status
 
             )
 
-        # ----------------------------------------------------
-        # HEALTH
-        # ----------------------------------------------------
 
-        if (
+        except Exception as error:
 
-            method == "GET"
+            log(
 
-            and path == "/api/health"
+                f"REGISTER ERROR: {error}"
 
-        ):
+            )
 
-            return handle_health()
+
+            return error_response(
+
+                res,
+
+                "Registration failed. Please try again.",
+
+                500
+
+            )
+
+
+    # --------------------------------------------------------
+    # LOGIN
+    # --------------------------------------------------------
+
+    if (
+
+        method == "POST"
+
+        and path == "/api/login"
+
+    ):
+
+        try:
+
+            data, status = (
+
+                login_account(
+
+                    payload
+
+                )
+
+            )
+
+
+            return json_response(
+
+                res,
+
+                data,
+
+                status
+
+            )
+
+
+        except Exception as error:
+
+            log(
+
+                f"LOGIN ERROR: {error}"
+
+            )
+
+
+            return error_response(
+
+                res,
+
+                "Login failed. Please try again.",
+
+                500
+
+            )
+
+
+    # --------------------------------------------------------
+    # PROFILE ID
+    # --------------------------------------------------------
+
+    profile_match = re.match(
+
+        r"^/api/profile/([^/]+)$",
+
+        path
+
+    )
+
+
+    if profile_match:
+
+        account_id = (
+
+            profile_match.group(
+
+                1
+
+            )
+
+        )
+
 
         # ----------------------------------------------------
         # GET PROFILE
         # ----------------------------------------------------
 
-        if (
+        if method == "GET":
 
-            method == "GET"
+            try:
 
-            and path == "/api/profile"
+                profile = get_profile(
 
-        ):
+                    account_id
 
-            return handle_get_profile(
-                req
-            )
+                )
 
-        # ----------------------------------------------------
-        # CREATE PROFILE
-        # ----------------------------------------------------
 
-        if (
+                if not profile:
 
-            method == "POST"
+                    return error_response(
 
-            and path == "/api/profile/create"
+                        res,
 
-        ):
+                        "Profile not found.",
 
-            return handle_create_profile(
-                req
-            )
+                        404
 
-        # ----------------------------------------------------
-        # CREATE OR UPDATE PROFILE
-        # ----------------------------------------------------
+                    )
 
-        if (
 
-            method == "POST"
+                return json_response(
 
-            and path == "/api/profile"
+                    res,
 
-        ):
+                    {
 
-            return handle_update_profile(
-                req
-            )
+                        "success": True,
+
+                        "profile":
+
+                            profile
+
+                    }
+
+                )
+
+
+            except Exception as error:
+
+                log(
+
+                    f"GET PROFILE ERROR: {error}"
+
+                )
+
+
+                return error_response(
+
+                    res,
+
+                    "Unable to load profile.",
+
+                    500
+
+                )
+
 
         # ----------------------------------------------------
         # UPDATE PROFILE
         # ----------------------------------------------------
 
-        if (
+        if method in (
 
-            method == "PUT"
+            "PUT",
 
-            and path == "/api/profile"
+            "PATCH"
 
         ):
 
-            return handle_update_profile(
-                req
-            )
+            try:
 
-        # ----------------------------------------------------
-        # NOT FOUND
-        # ----------------------------------------------------
+                profile = update_profile(
 
-        return error(
+                    account_id,
 
-            "Endpoint not found.",
+                    payload
 
-            404
+                )
+
+
+                return json_response(
+
+                    res,
+
+                    {
+
+                        "success": True,
+
+                        "message":
+
+                            "Profile updated successfully.",
+
+                        "profile":
+
+                            get_profile(
+
+                                account_id
+
+                            )
+
+                    }
+
+                )
+
+
+            except Exception as error:
+
+                log(
+
+                    f"UPDATE PROFILE ERROR: {error}"
+
+                )
+
+
+                return error_response(
+
+                    res,
+
+                    "Unable to update profile.",
+
+                    500
+
+                )
+
+
+    # --------------------------------------------------------
+    # 404
+    # --------------------------------------------------------
+
+    return error_response(
+
+        res,
+
+        "Route not found.",
+
+        404
+
+    )
+
+
+# ============================================================
+# APPWRITE FUNCTION ENTRYPOINT
+# ============================================================
+
+def main(context):
+
+    req = context.req
+
+    res = context.res
+
+    log = context.log
+
+    error = context.error
+
+
+    try:
+
+        return route_request(
+
+            req,
+
+            res,
+
+            log
 
         )
 
-    except ValueError as exc:
 
-        return error(
+    except Exception as exception:
 
-            str(
-                exc
-            ),
+        error(
 
-            400
+            f"UNHANDLED ERROR: {exception}"
 
         )
 
-    except Exception as exc:
 
-        print(
-            "REMADEF API ERROR:",
-            repr(
-                exc
-            )
-        )
+        return error_response(
 
-        return error(
+            res,
 
             "Internal server error.",
 
-            500,
-
-            str(
-                exc
-            )
+            500
 
         )
