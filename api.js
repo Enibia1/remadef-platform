@@ -1,10 +1,7 @@
 /* ============================================================
    REMADEF PLATFORM API CLIENT
    Appwrite Function Execution API
-   Synchronous Function Execution
 ============================================================ */
-
-"use strict";
 
 
 /* ============================================================
@@ -12,18 +9,22 @@
 ============================================================ */
 
 const APPWRITE_ENDPOINT =
+
     "https://fra.cloud.appwrite.io/v1";
 
 
 const PROJECT_ID =
+
     "6a634fdc00148a907132";
 
 
 const FUNCTION_ID =
+
     "6a6380f40035f4b76305";
 
 
 const EXECUTION_URL =
+
     `${APPWRITE_ENDPOINT}/functions/${FUNCTION_ID}/executions`;
 
 
@@ -33,13 +34,28 @@ const EXECUTION_URL =
 
 function debugLog(message) {
 
-    const debug =
-        document.getElementById("debug");
 
-    if (debug) {
+    const debug =
+
+        document.getElementById(
+
+            "debug"
+
+        );
+
+
+    if (
+
+        debug
+
+    ) {
+
 
         debug.textContent +=
-            "\n\n" + message;
+
+            "\n\n" +
+
+            message;
 
     }
 
@@ -47,12 +63,14 @@ function debugLog(message) {
 
 
 /* ============================================================
-   SAFE JSON PARSER
+   RESPONSE PARSER
 ============================================================ */
 
 async function parseResponse(response) {
 
+
     const text =
+
         await response.text();
 
 
@@ -61,27 +79,43 @@ async function parseResponse(response) {
 
     try {
 
+
         data =
+
             text
+
                 ? JSON.parse(text)
+
                 : {};
+
 
     }
 
+
     catch {
+
 
         data = {
 
-            raw: text
+
+            raw:
+
+                text
 
         };
 
     }
 
 
-    if (!response.ok) {
+    if (
+
+        !response.ok
+
+    ) {
+
 
         throw new Error(
+
 
             data.message ||
 
@@ -102,7 +136,7 @@ async function parseResponse(response) {
 
 
 /* ============================================================
-   EXECUTE REMADEF FUNCTION
+   EXECUTE FUNCTION
 ============================================================ */
 
 async function executeFunction(
@@ -118,31 +152,60 @@ async function executeFunction(
 
     const requestBody = {
 
-        method,
 
-        path,
+        method:
 
-        headers: {
 
-            "Content-Type":
-                "application/json"
+            method,
 
-        },
 
-        async: false
+        path:
+
+
+            path,
+
+
+        headers:
+
+
+            {
+
+
+                "Content-Type":
+
+                    "application/json"
+
+            },
+
+
+        async:
+
+
+            false
 
     };
 
 
-    if (payload !== null) {
+    if (
+
+        payload !== null
+
+    ) {
+
 
         requestBody.body =
-            JSON.stringify(payload);
+
+            JSON.stringify(
+
+                payload
+
+            );
 
     }
 
 
     debugLog(
+
 
         "API REQUEST STARTED" +
 
@@ -171,23 +234,38 @@ async function executeFunction(
 
             await fetch(
 
+
                 EXECUTION_URL,
+
 
                 {
 
-                    method: "POST",
 
-                    headers: {
+                    method:
 
-                        "Content-Type":
-                            "application/json",
+                        "POST",
 
-                        "X-Appwrite-Project":
-                            PROJECT_ID
 
-                    },
+                    headers:
+
+
+                        {
+
+
+                            "Content-Type":
+
+                                "application/json",
+
+
+                            "X-Appwrite-Project":
+
+                                PROJECT_ID
+
+                        },
+
 
                     body:
+
 
                         JSON.stringify(
 
@@ -202,10 +280,16 @@ async function executeFunction(
 
     }
 
-    catch (error) {
+
+    catch (
+
+        error
+
+    ) {
 
 
         debugLog(
+
 
             "NETWORK ERROR: " +
 
@@ -216,6 +300,7 @@ async function executeFunction(
 
         throw new Error(
 
+
             "Unable to connect to the REMADEF server. Please check your internet connection or try again."
 
         );
@@ -224,6 +309,7 @@ async function executeFunction(
 
 
     debugLog(
+
 
         "HTTP RESPONSE RECEIVED" +
 
@@ -244,6 +330,7 @@ async function executeFunction(
 
 
     debugLog(
+
 
         "FUNCTION EXECUTION COMPLETED" +
 
@@ -283,15 +370,19 @@ const RemadefAPI = {
 
         const maskedPayload = {
 
+
             ...payload,
 
+
             password:
+
                 "[HIDDEN]"
 
         };
 
 
         debugLog(
+
 
             "REGISTER REQUEST" +
 
@@ -312,9 +403,12 @@ const RemadefAPI = {
 
         return executeFunction(
 
+
             "POST",
 
+
             "/api/register",
+
 
             payload
 
@@ -332,15 +426,19 @@ const RemadefAPI = {
 
         const maskedPayload = {
 
+
             ...payload,
 
+
             password:
+
                 "[HIDDEN]"
 
         };
 
 
         debugLog(
+
 
             "LOGIN REQUEST" +
 
@@ -361,11 +459,34 @@ const RemadefAPI = {
 
         return executeFunction(
 
+
             "POST",
+
 
             "/api/login",
 
+
             payload
+
+        );
+
+    },
+
+
+    /* ========================================================
+       HEALTH CHECK
+    ======================================================== */
+
+    async health() {
+
+
+        return executeFunction(
+
+
+            "GET",
+
+
+            "/api/health"
 
         );
 
@@ -381,7 +502,9 @@ const RemadefAPI = {
 
         return executeFunction(
 
+
             "GET",
+
 
             `/api/profile/${encodeURIComponent(accountId)}`
 
@@ -405,29 +528,14 @@ const RemadefAPI = {
 
         return executeFunction(
 
+
             "PUT",
+
 
             `/api/profile/${encodeURIComponent(accountId)}`,
 
+
             profile
-
-        );
-
-    },
-
-
-    /* ========================================================
-       HEALTH CHECK
-    ======================================================== */
-
-    async health() {
-
-
-        return executeFunction(
-
-            "GET",
-
-            "/api/health"
 
         );
 
@@ -437,7 +545,7 @@ const RemadefAPI = {
 
 
 /* ============================================================
-   GLOBAL API
+   GLOBAL EXPORT
 ============================================================ */
 
 window.RemadefAPI =
@@ -446,7 +554,7 @@ window.RemadefAPI =
 
 
 /* ============================================================
-   COMPATIBILITY
+   BACKWARD COMPATIBILITY
 ============================================================ */
 
 window.REMADEF_API =
@@ -455,7 +563,7 @@ window.REMADEF_API =
 
 
 /* ============================================================
-   CONFIRM CLIENT LOADED
+   CONFIRMATION
 ============================================================ */
 
 console.log(
@@ -464,6 +572,7 @@ console.log(
 
 );
 
+
 console.log(
 
     "Function ID:",
@@ -471,6 +580,7 @@ console.log(
     FUNCTION_ID
 
 );
+
 
 console.log(
 
