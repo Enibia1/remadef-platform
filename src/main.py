@@ -4,12 +4,13 @@
 # Appwrite Cloud Function
 # ============================================================
 
-import os
+import json
+import re
 
-from profile import (
-    get_profile,
-    save_profile
-)
+from appwrite.id import ID
+
+from auth import get_users
+from profile import get_profile, save_profile
 
 
 # ============================================================
@@ -52,6 +53,292 @@ def response(
         CORS_HEADERS
 
     )
+
+
+# ============================================================
+# READ REQUEST BODY
+# ============================================================
+
+def get_body(request):
+
+    body = request.body or {}
+
+    if isinstance(body, dict):
+
+        return body
+
+
+    if isinstance(body, str):
+
+        try:
+
+            return json.loads(body)
+
+        except json.JSONDecodeError:
+
+            return None
+
+
+    return None
+
+
+# ============================================================
+# REGISTER ACCOUNT
+# ============================================================
+
+def register_account(context):
+
+    body = get_body(
+
+        context.req
+
+    )
+
+
+    if body is None:
+
+        return response(
+
+            context,
+
+            {
+
+                "success": False,
+
+                "error":
+                    "Invalid request body"
+
+            },
+
+            400
+
+        )
+
+
+    email = str(
+
+        body.get(
+
+            "email",
+
+            ""
+
+        )
+
+    ).strip().lower()
+
+
+    password = str(
+
+        body.get(
+
+            "password",
+
+            ""
+
+        )
+
+    )
+
+
+    # ========================================================
+    # VALIDATE EMAIL
+    # ========================================================
+
+    if not email:
+
+        return response(
+
+            context,
+
+            {
+
+                "success": False,
+
+                "error":
+                    "Email is required"
+
+            },
+
+            400
+
+        )
+
+
+    if not re.match(
+
+        r"^[^@\s]+@[^@\s]+\.[^@\s]+$",
+
+        email
+
+    ):
+
+        return response(
+
+            context,
+
+            {
+
+                "success": False,
+
+                "error":
+                    "Invalid email address"
+
+            },
+
+            400
+
+        )
+
+
+    # ========================================================
+    # VALIDATE PASSWORD
+    # ========================================================
+
+    if len(password) < 8:
+
+        return response(
+
+            context,
+
+            {
+
+                "success": False,
+
+                "error":
+                    "Password must be at least 8 characters"
+
+            },
+
+            400
+
+        )
+
+
+    try:
+
+        users = get_users()
+
+
+        user = users.create(
+
+            user_id=ID.unique(),
+
+            email=email,
+
+            password=password
+
+        )
+
+
+        return response(
+
+            context,
+
+            {
+
+                "success": True,
+
+                "message":
+                    "REMADEF account created successfully",
+
+                "account": {
+
+                    "id":
+                        user.id,
+
+                    "email":
+                        user.email
+
+                },
+
+                "next": {
+
+                    "action":
+                        "login",
+
+                    "path":
+                        "login.html"
+
+                }
+
+            },
+
+            201
+
+        )
+
+
+    except Exception as error:
+
+        error_message = str(
+
+            error
+
+        )
+
+
+        if (
+
+            "already exists"
+
+            in
+
+            error_message.lower()
+
+            or
+
+            "user_already_exists"
+
+            in
+
+            error_message.lower()
+
+        ):
+
+            return response(
+
+                context,
+
+                {
+
+                    "success": False,
+
+                    "error":
+                        "An account with this email already exists"
+
+                },
+
+                409
+
+            )
+
+
+        context.log(
+
+            "REGISTRATION ERROR: "
+
+            + error_message
+
+        )
+
+
+        return response(
+
+            context,
+
+            {
+
+                "success": False,
+
+                "error":
+                    "Unable to create account"
+
+            },
+
+            500
+
+        )
 
 
 # ============================================================
@@ -137,6 +424,27 @@ def main(context):
                     "healthy"
 
             }
+
+        )
+
+
+    # ========================================================
+    # REGISTER
+    # ========================================================
+
+    if (
+
+        method == "POST"
+
+        and
+
+        path == "/api/register"
+
+    ):
+
+        return register_account(
+
+            context
 
         )
 
