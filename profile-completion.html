@@ -50,13 +50,6 @@
         }
 
 
-        html {
-
-            scroll-behavior: smooth;
-
-        }
-
-
         body {
 
             margin: 0;
@@ -96,6 +89,13 @@
         }
 
 
+        button:disabled {
+
+            cursor: not-allowed;
+
+        }
+
+
         /* =================================================
            TOP BAR
         ================================================= */
@@ -128,10 +128,6 @@
 
         .back-button {
 
-            min-width: 50px;
-
-            padding: 8px 0;
-
             border: 0;
 
             background: transparent;
@@ -152,8 +148,6 @@
             font-size: 22px;
 
             font-weight: 800;
-
-            letter-spacing: -.5px;
 
         }
 
@@ -178,14 +172,9 @@
 
             margin: auto;
 
-            padding: 18px 14px 40px;
+            padding: 18px 14px;
 
         }
-
-
-        /* =================================================
-           INTRODUCTION
-        ================================================= */
 
 
         .intro {
@@ -202,8 +191,6 @@
             color: var(--navy);
 
             font-size: 24px;
-
-            line-height: 1.2;
 
         }
 
@@ -305,7 +292,7 @@
 
 
         /* =================================================
-           FORM CARD
+           FORM
         ================================================= */
 
 
@@ -353,11 +340,6 @@
             border-bottom: 0;
 
         }
-
-
-        /* =================================================
-           FIELDS
-        ================================================= */
 
 
         .field-group {
@@ -450,8 +432,20 @@
             border-color: var(--navy);
 
             box-shadow:
+
                 0 0 0 3px
-                rgba(11, 31, 58, .08);
+
+                rgba(
+
+                    11,
+
+                    31,
+
+                    58,
+
+                    .08
+
+                );
 
         }
 
@@ -461,8 +455,6 @@
             background: var(--surface);
 
             color: var(--muted);
-
-            cursor: not-allowed;
 
         }
 
@@ -520,13 +512,6 @@
         }
 
 
-        .add-skill:active {
-
-            transform: scale(.98);
-
-        }
-
-
         .skills-list {
 
             display: flex;
@@ -573,16 +558,9 @@
 
             color: var(--muted);
 
-            font-size: 15px;
+            font-size: 14px;
 
             line-height: 1;
-
-        }
-
-
-        .remove-skill:hover {
-
-            color: var(--red);
 
         }
 
@@ -670,13 +648,6 @@
         }
 
 
-        .cancel-button:hover {
-
-            background: var(--surface);
-
-        }
-
-
         .save-button {
 
             border: 0;
@@ -688,25 +659,11 @@
         }
 
 
-        .save-button:hover {
-
-            background: var(--navy-light);
-
-        }
-
-
         .save-button:disabled {
 
             opacity: .65;
 
-            cursor: not-allowed;
-
         }
-
-
-        /* =================================================
-           MOBILE
-        ================================================= */
 
 
         @media (max-width: 480px) {
@@ -727,43 +684,6 @@
 
             }
 
-
-            .save-button {
-
-                order: -1;
-
-            }
-
-        }
-
-
-        /* =================================================
-           TABLET / DESKTOP
-        ================================================= */
-
-
-        @media (min-width: 768px) {
-
-
-            .main {
-
-                padding-top: 28px;
-
-            }
-
-
-            .topbar {
-
-                padding-left: calc(
-                    50% - 350px
-                );
-
-                padding-right: calc(
-                    50% - 350px
-                );
-
-            }
-
         }
 
     </style>
@@ -772,11 +692,6 @@
 
 
 <body>
-
-
-    <!-- =================================================
-         TOP BAR
-    ================================================= -->
 
 
     <header class="topbar">
@@ -806,25 +721,13 @@
 
         <div class="top-spacer"></div>
 
-
     </header>
-
-
-    <!-- =================================================
-         MAIN CONTENT
-    ================================================= -->
 
 
     <main class="main">
 
 
-        <!-- =================================================
-             INTRODUCTION
-        ================================================= -->
-
-
         <div class="intro">
-
 
             <h1>
 
@@ -843,13 +746,7 @@
 
             </p>
 
-
         </div>
-
-
-        <!-- =================================================
-             PROGRESS
-        ================================================= -->
 
 
         <section class="progress-card">
@@ -877,7 +774,6 @@
 
                 </span>
 
-
             </div>
 
 
@@ -894,13 +790,7 @@
 
             </div>
 
-
         </section>
-
-
-        <!-- =================================================
-             PROFILE FORM
-        ================================================= -->
 
 
         <form
@@ -909,14 +799,7 @@
 
             id="profile-form"
 
-            novalidate
-
         >
-
-
-            <!-- =================================================
-                 MESSAGES
-            ================================================= -->
 
 
             <div
@@ -966,11 +849,7 @@
 
                             First name
 
-                            <span class="required">
-
-                                *
-
-                            </span>
+                            <span class="required">*</span>
 
                         </label>
 
@@ -987,8 +866,6 @@
 
                             placeholder="Enter your first name"
 
-                            maxlength="80"
-
                             required
 
                         >
@@ -1003,11 +880,7 @@
 
                             Last name
 
-                            <span class="required">
-
-                                *
-
-                            </span>
+                            <span class="required">*</span>
 
                         </label>
 
@@ -1024,14 +897,11 @@
 
                             placeholder="Enter your last name"
 
-                            maxlength="80"
-
                             required
 
                         >
 
                     </div>
-
 
                 </div>
 
@@ -1114,7 +984,6 @@
 
                         >
 
-
                             <option value="">
 
                                 Select gender
@@ -1141,7 +1010,6 @@
                                 Prefer not to say
 
                             </option>
-
 
                         </select>
 
@@ -1192,8 +1060,6 @@
 
                             placeholder="e.g. Nigeria"
 
-                            maxlength="100"
-
                         >
 
                     </div>
@@ -1218,8 +1084,6 @@
                             type="text"
 
                             placeholder="e.g. Lagos"
-
-                            maxlength="100"
 
                         >
 
@@ -1250,8 +1114,6 @@
 
                         placeholder="Enter your city"
 
-                        maxlength="100"
-
                     >
 
                 </div>
@@ -1260,7 +1122,7 @@
 
 
             <!-- =================================================
-                 CONTACT INFORMATION
+                 CONTACT
             ================================================= -->
 
 
@@ -1296,13 +1158,6 @@
 
                     >
 
-
-                    <div class="field-help">
-
-                        Your account email cannot be changed here.
-
-                    </div>
-
                 </div>
 
 
@@ -1327,8 +1182,6 @@
                         autocomplete="tel"
 
                         placeholder="Enter your phone number"
-
-                        maxlength="30"
 
                     >
 
@@ -1401,13 +1254,6 @@
 
                     ></textarea>
 
-
-                    <div class="field-help">
-
-                        Maximum 1,000 characters.
-
-                    </div>
-
                 </div>
 
 
@@ -1430,7 +1276,7 @@
 
                             type="text"
 
-                            maxlength="60"
+                            maxlength="80"
 
                             placeholder="e.g. Web Development"
 
@@ -1450,17 +1296,6 @@
                             Add
 
                         </button>
-
-                    </div>
-
-
-                    <div
-
-                        class="field-help"
-
-                    >
-
-                        Add up to 20 skills.
 
                     </div>
 
@@ -1511,7 +1346,6 @@
 
                     >
 
-
                         <option value="">
 
                             Select education level
@@ -1559,7 +1393,6 @@
                             Other
 
                         </option>
-
 
                     </select>
 
@@ -1637,16 +1470,1647 @@
 
         </form>
 
-
     </main>
 
 
-    <!-- =================================================
-         JAVASCRIPT
-    ================================================= -->
+    <script>
 
 
-    <script src="profile-completion.js"></script>
+        (function () {
+
+
+            "use strict";
+
+
+            /* =================================================
+               CONFIGURATION
+            ================================================= */
+
+
+            const API_URL =
+
+                "https://6a6380f50016f677984e.fra.appwrite.run";
+
+
+            const PROFILE_STORAGE_KEY =
+
+                "remadef_profile";
+
+
+            const ACCOUNT_STORAGE_KEY =
+
+                "remadef_account";
+
+
+            const COMPLETION_FIELDS = [
+
+                "first_name",
+
+                "last_name",
+
+                "display_name",
+
+                "date_of_birth",
+
+                "gender",
+
+                "country",
+
+                "state",
+
+                "city",
+
+                "phone",
+
+                "headline",
+
+                "about",
+
+                "education_level",
+
+                "institution"
+
+            ];
+
+
+            /* =================================================
+               DOM
+            ================================================= */
+
+
+            const form =
+
+                document.getElementById(
+
+                    "profile-form"
+
+                );
+
+
+            const errorBox =
+
+                document.getElementById(
+
+                    "error"
+
+                );
+
+
+            const successBox =
+
+                document.getElementById(
+
+                    "success"
+
+                );
+
+
+            const emailInput =
+
+                document.getElementById(
+
+                    "email"
+
+                );
+
+
+            const phoneInput =
+
+                document.getElementById(
+
+                    "phone"
+
+                );
+
+
+            const skillsInput =
+
+                document.getElementById(
+
+                    "skills-input"
+
+                );
+
+
+            const addSkillButton =
+
+                document.getElementById(
+
+                    "add-skill"
+
+                );
+
+
+            const skillsList =
+
+                document.getElementById(
+
+                    "skills-list"
+
+                );
+
+
+            const progressBar =
+
+                document.getElementById(
+
+                    "progress-bar"
+
+                );
+
+
+            const progressPercent =
+
+                document.getElementById(
+
+                    "progress-percent"
+
+                );
+
+
+            const saveButton =
+
+                document.getElementById(
+
+                    "save-profile"
+
+                );
+
+
+            /* =================================================
+               ACCOUNT
+            ================================================= */
+
+
+            const savedAccount =
+
+                localStorage.getItem(
+
+                    ACCOUNT_STORAGE_KEY
+
+                );
+
+
+            if (!savedAccount) {
+
+                window.location.href =
+
+                    "index.html";
+
+                return;
+
+            }
+
+
+            let account;
+
+
+            try {
+
+
+                account =
+
+                    JSON.parse(
+
+                        savedAccount
+
+                    );
+
+
+            }
+
+            catch (error) {
+
+
+                window.location.href =
+
+                    "index.html";
+
+                return;
+
+            }
+
+
+            if (
+
+                !account ||
+
+                !account.id
+
+            ) {
+
+
+                window.location.href =
+
+                    "index.html";
+
+
+                return;
+
+            }
+
+
+            /* =================================================
+               PROFILE STATE
+            ================================================= */
+
+
+            let skills = [];
+
+
+            /* =================================================
+               HELPERS
+            ================================================= */
+
+
+            function showError(message) {
+
+
+                errorBox.textContent =
+
+                    message;
+
+
+                errorBox.style.display =
+
+                    "block";
+
+
+                successBox.style.display =
+
+                    "none";
+
+
+                window.scrollTo({
+
+                    top: 0,
+
+                    behavior: "smooth"
+
+                });
+
+            }
+
+
+            function showSuccess(message) {
+
+
+                successBox.textContent =
+
+                    message;
+
+
+                successBox.style.display =
+
+                    "block";
+
+
+                errorBox.style.display =
+
+                    "none";
+
+            }
+
+
+            function clearMessages() {
+
+
+                errorBox.textContent = "";
+
+                successBox.textContent = "";
+
+                errorBox.style.display =
+
+                    "none";
+
+                successBox.style.display =
+
+                    "none";
+
+            }
+
+
+            function getValue(id) {
+
+
+                const element =
+
+                    document.getElementById(
+
+                        id
+
+                    );
+
+
+                return element
+
+                    ? element.value.trim()
+
+                    : "";
+
+            }
+
+
+            function setValue(id, value) {
+
+
+                const element =
+
+                    document.getElementById(
+
+                        id
+
+                    );
+
+
+                if (element) {
+
+
+                    element.value =
+
+                        value || "";
+
+                }
+
+            }
+
+
+            function normalizeSkills(value) {
+
+
+                if (
+
+                    Array.isArray(value)
+
+                ) {
+
+
+                    return value
+
+                        .map(
+
+                            function (skill) {
+
+
+                                return String(
+
+                                    skill
+
+                                ).trim();
+
+                            }
+
+                        )
+
+                        .filter(Boolean);
+
+                }
+
+
+                if (
+
+                    typeof value ===
+
+                    "string"
+
+                ) {
+
+
+                    try {
+
+
+                        const parsed =
+
+                            JSON.parse(
+
+                                value
+
+                            );
+
+
+                        if (
+
+                            Array.isArray(
+
+                                parsed
+
+                            )
+
+                        ) {
+
+
+                            return parsed
+
+                                .map(
+
+                                    function (
+
+                                        skill
+
+                                    ) {
+
+
+                                        return String(
+
+                                            skill
+
+                                        ).trim();
+
+                                    }
+
+                                )
+
+                                .filter(Boolean);
+
+                        }
+
+                    }
+
+                    catch (error) {
+
+                        /*
+
+                         * Backward compatibility
+                         * with comma-separated
+                         * skill values.
+                         */
+
+                        return value
+
+                            .split(",")
+
+                            .map(
+
+                                function (
+
+                                    skill
+
+                                ) {
+
+
+                                    return skill
+
+                                        .trim();
+
+                                }
+
+                            )
+
+                            .filter(Boolean);
+
+                    }
+
+                }
+
+
+                return [];
+
+            }
+
+
+            /* =================================================
+               LOAD CONTACT
+            ================================================= */
+
+
+            emailInput.value =
+
+                account.email ||
+
+                "";
+
+
+            phoneInput.value =
+
+                account.phone ||
+
+                "";
+
+
+            /* =================================================
+               LOAD SAVED PROFILE
+            ================================================= */
+
+
+            const savedProfile =
+
+                localStorage.getItem(
+
+                    PROFILE_STORAGE_KEY
+
+                );
+
+
+            if (savedProfile) {
+
+
+                try {
+
+
+                    const profile =
+
+                        JSON.parse(
+
+                            savedProfile
+
+                        );
+
+
+                    setValue(
+
+                        "first-name",
+
+                        profile.first_name
+
+                    );
+
+
+                    setValue(
+
+                        "last-name",
+
+                        profile.last_name
+
+                    );
+
+
+                    setValue(
+
+                        "display-name",
+
+                        profile.display_name
+
+                    );
+
+
+                    setValue(
+
+                        "date-of-birth",
+
+                        profile.date_of_birth
+
+                    );
+
+
+                    setValue(
+
+                        "gender",
+
+                        profile.gender
+
+                    );
+
+
+                    setValue(
+
+                        "country",
+
+                        profile.country
+
+                    );
+
+
+                    setValue(
+
+                        "state",
+
+                        profile.state
+
+                    );
+
+
+                    setValue(
+
+                        "city",
+
+                        profile.city
+
+                    );
+
+
+                    if (
+
+                        profile.phone !==
+
+                        undefined
+
+                    ) {
+
+
+                        phoneInput.value =
+
+                            profile.phone || "";
+
+                    }
+
+
+                    setValue(
+
+                        "headline",
+
+                        profile.headline
+
+                    );
+
+
+                    setValue(
+
+                        "about",
+
+                        profile.about
+
+                    );
+
+
+                    setValue(
+
+                        "education-level",
+
+                        profile.education_level
+
+                    );
+
+
+                    setValue(
+
+                        "institution",
+
+                        profile.institution
+
+                    );
+
+
+                    skills =
+
+                        normalizeSkills(
+
+                            profile.skills
+
+                        );
+
+
+                    renderSkills();
+
+                    updateProgress();
+
+                }
+
+                catch (error) {
+
+
+                    console.warn(
+
+                        "Could not load saved profile."
+
+                    );
+
+                }
+
+            }
+
+
+            /* =================================================
+               SKILLS
+            ================================================= */
+
+
+            function addSkill() {
+
+
+                const value =
+
+                    skillsInput.value.trim();
+
+
+                if (!value) {
+
+                    return;
+
+                }
+
+
+                const normalizedValue =
+
+                    value.toLowerCase();
+
+
+                const alreadyExists =
+
+                    skills.some(
+
+                        function (skill) {
+
+
+                            return (
+
+                                skill.toLowerCase() ===
+
+                                normalizedValue
+
+                            );
+
+                        }
+
+                    );
+
+
+                if (
+
+                    alreadyExists
+
+                ) {
+
+
+                    skillsInput.value = "";
+
+                    return;
+
+                }
+
+
+                if (
+
+                    skills.length >= 20
+
+                ) {
+
+
+                    showError(
+
+                        "You can add a maximum of 20 skills."
+
+                    );
+
+
+                    return;
+
+                }
+
+
+                skills.push(value);
+
+
+                skillsInput.value = "";
+
+
+                renderSkills();
+
+
+                updateProgress();
+
+
+                skillsInput.focus();
+
+            }
+
+
+            function renderSkills() {
+
+
+                skillsList.textContent = "";
+
+
+                skills.forEach(
+
+                    function (
+
+                        skill,
+
+                        index
+
+                    ) {
+
+
+                        const tag =
+
+                            document.createElement(
+
+                                "div"
+
+                            );
+
+
+                        tag.className =
+
+                            "skill-tag";
+
+
+                        const text =
+
+                            document.createElement(
+
+                                "span"
+
+                            );
+
+
+                        text.textContent =
+
+                            skill;
+
+
+                        const removeButton =
+
+                            document.createElement(
+
+                                "button"
+
+                            );
+
+
+                        removeButton.type =
+
+                            "button";
+
+
+                        removeButton.className =
+
+                            "remove-skill";
+
+
+                        removeButton.textContent =
+
+                            "×";
+
+
+                        removeButton.setAttribute(
+
+                            "aria-label",
+
+                            "Remove " +
+
+                            skill
+
+                        );
+
+
+                        removeButton.addEventListener(
+
+                            "click",
+
+                            function () {
+
+
+                                skills.splice(
+
+                                    index,
+
+                                    1
+
+                                );
+
+
+                                renderSkills();
+
+                                updateProgress();
+
+                            }
+
+                        );
+
+
+                        tag.appendChild(
+
+                            text
+
+                        );
+
+
+                        tag.appendChild(
+
+                            removeButton
+
+                        );
+
+
+                        skillsList.appendChild(
+
+                            tag
+
+                        );
+
+                    }
+
+                );
+
+            }
+
+
+            addSkillButton.addEventListener(
+
+                "click",
+
+                addSkill
+
+            );
+
+
+            skillsInput.addEventListener(
+
+                "keydown",
+
+                function (event) {
+
+
+                    if (
+
+                        event.key ===
+
+                        "Enter"
+
+                    ) {
+
+
+                        event.preventDefault();
+
+
+                        addSkill();
+
+                    }
+
+                }
+
+            );
+
+
+            /* =================================================
+               PROFILE COMPLETION
+            ================================================= */
+
+
+            function calculateCompletion() {
+
+
+                let completed = 0;
+
+
+                COMPLETION_FIELDS.forEach(
+
+                    function (field) {
+
+
+                        let value = "";
+
+
+                        if (
+
+                            field ===
+
+                            "first_name"
+
+                        ) {
+
+
+                            value =
+
+                                getValue(
+
+                                    "first-name"
+
+                                );
+
+                        }
+
+
+                        else if (
+
+                            field ===
+
+                            "last_name"
+
+                        ) {
+
+
+                            value =
+
+                                getValue(
+
+                                    "last-name"
+
+                                );
+
+                        }
+
+
+                        else if (
+
+                            field ===
+
+                            "display_name"
+
+                        ) {
+
+
+                            value =
+
+                                getValue(
+
+                                    "display-name"
+
+                                );
+
+                        }
+
+
+                        else if (
+
+                            field ===
+
+                            "date_of_birth"
+
+                        ) {
+
+
+                            value =
+
+                                getValue(
+
+                                    "date-of-birth"
+
+                                );
+
+                        }
+
+
+                        else if (
+
+                            field ===
+
+                            "education_level"
+
+                        ) {
+
+
+                            value =
+
+                                getValue(
+
+                                    "education-level"
+
+                                );
+
+                        }
+
+
+                        else {
+
+
+                            value =
+
+                                getValue(
+
+                                    field
+
+                                );
+
+                        }
+
+
+                        if (value) {
+
+
+                            completed++;
+
+                        }
+
+                    }
+
+                );
+
+
+                if (
+
+                    skills.length > 0
+
+                ) {
+
+
+                    completed++;
+
+                }
+
+
+                const total =
+
+                    COMPLETION_FIELDS.length +
+
+                    1;
+
+
+                return Math.min(
+
+                    100,
+
+                    Math.round(
+
+                        (
+
+                            completed /
+
+                            total
+
+                        ) *
+
+                        65
+
+                    ) + 35
+
+                );
+
+            }
+
+
+            function updateProgress() {
+
+
+                const percentage =
+
+                    calculateCompletion();
+
+
+                progressBar.style.width =
+
+                    percentage +
+
+                    "%";
+
+
+                progressPercent.textContent =
+
+                    percentage +
+
+                    "%";
+
+            }
+
+
+            form.addEventListener(
+
+                "input",
+
+                updateProgress
+
+            );
+
+
+            form.addEventListener(
+
+                "change",
+
+                updateProgress
+
+            );
+
+
+            /* =================================================
+               COLLECT PROFILE DATA
+            ================================================= */
+
+
+            function collectProfile() {
+
+
+                return {
+
+
+                    account_id:
+
+                        account.id,
+
+
+                    email:
+
+                        account.email ||
+
+                        "",
+
+
+                    first_name:
+
+                        getValue(
+
+                            "first-name"
+
+                        ),
+
+
+                    last_name:
+
+                        getValue(
+
+                            "last-name"
+
+                        ),
+
+
+                    display_name:
+
+                        getValue(
+
+                            "display-name"
+
+                        ),
+
+
+                    date_of_birth:
+
+                        getValue(
+
+                            "date-of-birth"
+
+                        ),
+
+
+                    gender:
+
+                        getValue(
+
+                            "gender"
+
+                        ),
+
+
+                    country:
+
+                        getValue(
+
+                            "country"
+
+                        ),
+
+
+                    state:
+
+                        getValue(
+
+                            "state"
+
+                        ),
+
+
+                    city:
+
+                        getValue(
+
+                            "city"
+
+                        ),
+
+
+                    phone:
+
+                        getValue(
+
+                            "phone"
+
+                        ),
+
+
+                    headline:
+
+                        getValue(
+
+                            "headline"
+
+                        ),
+
+
+                    about:
+
+                        getValue(
+
+                            "about"
+
+                        ),
+
+
+                    skills:
+
+                        skills.slice(),
+
+
+                    education_level:
+
+                        getValue(
+
+                            "education-level"
+
+                        ),
+
+
+                    institution:
+
+                        getValue(
+
+                            "institution"
+
+                        ),
+
+
+                    profile_completion:
+
+                        calculateCompletion()
+
+                };
+
+            }
+
+
+            /* =================================================
+               LOCAL STORAGE
+            ================================================= */
+
+
+            function saveLocally(profile) {
+
+
+                localStorage.setItem(
+
+                    PROFILE_STORAGE_KEY,
+
+                    JSON.stringify(
+
+                        profile
+
+                    )
+
+                );
+
+            }
+
+
+            /* =================================================
+               API
+            ================================================= */
+
+
+            async function saveToAPI(profile) {
+
+
+                const response =
+
+                    await fetch(
+
+                        API_URL +
+
+                        "/api/profile",
+
+                        {
+
+
+                            method: "POST",
+
+
+                            headers: {
+
+
+                                "Content-Type":
+
+                                    "application/json"
+
+                            },
+
+
+                            body:
+
+                                JSON.stringify(
+
+                                    profile
+
+                                )
+
+                        }
+
+                    );
+
+
+                let data =
+
+                    null;
+
+
+                try {
+
+
+                    data =
+
+                        await response.json();
+
+                }
+
+                catch (error) {
+
+
+                    data =
+
+                        null;
+
+                }
+
+
+                if (
+
+                    !response.ok
+
+                ) {
+
+
+                    const message =
+
+                        data &&
+
+                        (
+
+                            data.error ||
+
+                            data.message
+
+                        );
+
+
+                    throw new Error(
+
+                        message ||
+
+                        "The profile could not be saved."
+
+                    );
+
+                }
+
+
+                return data;
+
+            }
+
+
+            /* =================================================
+               SUBMIT
+            ================================================= */
+
+
+            form.addEventListener(
+
+                "submit",
+
+                async function (event) {
+
+
+                    event.preventDefault();
+
+
+                    clearMessages();
+
+
+                    const firstName =
+
+                        getValue(
+
+                            "first-name"
+
+                        );
+
+
+                    const lastName =
+
+                        getValue(
+
+                            "last-name"
+
+                        );
+
+
+                    if (
+
+                        !firstName ||
+
+                        !lastName
+
+                    ) {
+
+
+                        showError(
+
+                            "First name and last name are required."
+
+                        );
+
+
+                        return;
+
+                    }
+
+
+                    const profile =
+
+                        collectProfile();
+
+
+                    saveButton.disabled =
+
+                        true;
+
+
+                    saveButton.textContent =
+
+                        "Saving...";
+
+
+                    try {
+
+
+                        saveLocally(
+
+                            profile
+
+                        );
+
+
+                        await saveToAPI(
+
+                            profile
+
+                        );
+
+
+                        showSuccess(
+
+                            "Your profile has been saved successfully."
+
+                        );
+
+
+                        saveButton.textContent =
+
+                            "Saved";
+
+
+                        setTimeout(
+
+                            function () {
+
+
+                                window.location.href =
+
+                                    "profile.html";
+
+                            },
+
+                            700
+
+                        );
+
+                    }
+
+
+                    catch (error) {
+
+
+                        console.error(
+
+                            "Profile save error:",
+
+                            error
+
+                        );
+
+
+                        showError(
+
+                            error.message ||
+
+                            "Unable to save your profile. Please try again."
+
+                        );
+
+
+                        saveButton.disabled =
+
+                            false;
+
+
+                        saveButton.textContent =
+
+                            "Save Profile";
+
+                    }
+
+                }
+
+            );
+
+
+            /* =================================================
+               INITIAL PROGRESS
+            ================================================= */
+
+
+            updateProgress();
+
+
+        })();
+
+    </script>
 
 
 </body>
