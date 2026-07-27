@@ -1,717 +1,1597 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"><title>REMADEF Platform</title>
 
-<meta
-    name="description"
-    content="REMADEF — education, apprenticeship, skills, jobs, business opportunities, and economic participation."
->
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<style>
-    :root {
-        --navy: #071a3d;
-        --navy-light: #0d2a5c;
-        --blue: #1769e0;
-        --background: #f5f7fb;
-        --white: #ffffff;
-        --text: #152238;
-        --muted: #6b7280;
-        --border: #e6eaf0;
-        --success: #16803c;
-    }
+    <meta
+        name="theme-color"
+        content="#071a3d"
+    >
 
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
+    <meta
+        name="description"
+        content="REMADEF — education, apprenticeship, skills, jobs, business opportunities, and economic participation."
+    >
 
-    body {
-        min-height: 100vh;
-        background: var(--background);
-        color: var(--text);
-        font-family:
-            Inter,
-            system-ui,
-            -apple-system,
-            BlinkMacSystemFont,
-            "Segoe UI",
-            sans-serif;
-    }
+    <title>REMADEF Platform</title>
 
-    .app {
-        min-height: 100vh;
-    }
 
-    /* Header */
+    <style>
 
-    .header {
-        height: 68px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 24px;
-        background: var(--white);
-        border-bottom: 1px solid var(--border);
-        position: sticky;
-        top: 0;
-        z-index: 100;
-    }
+        :root {
 
-    .brand {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        color: var(--navy);
-        font-size: 20px;
-        font-weight: 800;
-        text-decoration: none;
-        letter-spacing: -0.4px;
-    }
+            --navy: #071a3d;
 
-    .brand-mark {
-        width: 36px;
-        height: 36px;
-        display: grid;
-        place-items: center;
-        border-radius: 10px;
-        background: var(--navy);
-        color: var(--white);
-        font-size: 16px;
-        font-weight: 800;
-    }
+            --navy-light: #0d2a5c;
 
-    .header-actions {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
+            --blue: #1769e0;
 
-    .icon-button {
-        width: 40px;
-        height: 40px;
-        border: 1px solid var(--border);
-        border-radius: 50%;
-        background: var(--white);
-        cursor: pointer;
-        font-size: 18px;
-    }
+            --background: #f5f7fb;
 
-    .avatar {
-        width: 40px;
-        height: 40px;
-        display: grid;
-        place-items: center;
-        border-radius: 50%;
-        background: var(--navy);
-        color: var(--white);
-        font-weight: 700;
-    }
+            --white: #ffffff;
 
-    /* Layout */
+            --text: #152238;
 
-    .layout {
-        display: grid;
-        grid-template-columns: 250px minmax(0, 1fr);
-        min-height: calc(100vh - 68px);
-    }
+            --muted: #6b7280;
 
-    .sidebar {
-        background: var(--navy);
-        padding: 24px 14px;
-    }
+            --border: #e6eaf0;
 
-    .nav-label {
-        padding: 0 14px;
-        margin-bottom: 12px;
-        color: #9eacc5;
-        font-size: 11px;
-        font-weight: 700;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-    }
+            --success: #16803c;
 
-    .nav {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .nav a {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 13px 14px;
-        color: #dce5f4;
-        border-radius: 9px;
-        text-decoration: none;
-        font-size: 14px;
-        transition: background 0.2s ease;
-    }
-
-    .nav a:hover,
-    .nav a.active {
-        background: var(--navy-light);
-        color: var(--white);
-    }
-
-    .main {
-        width: 100%;
-        max-width: 1400px;
-        padding: 32px;
-        margin: 0 auto;
-    }
-
-    /* Welcome */
-
-    .welcome {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-
-    .welcome h1 {
-        color: var(--navy);
-        font-size: clamp(24px, 3vw, 34px);
-        letter-spacing: -1px;
-    }
-
-    .welcome p {
-        margin-top: 8px;
-        color: var(--muted);
-    }
-
-    .status {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 10px 14px;
-        background: var(--white);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        color: var(--muted);
-        font-size: 13px;
-    }
-
-    .status-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--success);
-    }
-
-    /* Cards */
-
-    .cards {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 18px;
-        margin-bottom: 30px;
-    }
-
-    .card {
-        padding: 22px;
-        background: var(--white);
-        border: 1px solid var(--border);
-        border-radius: 14px;
-    }
-
-    .card-label {
-        color: var(--muted);
-        font-size: 13px;
-    }
-
-    .card-value {
-        margin-top: 12px;
-        color: var(--navy);
-        font-size: 27px;
-        font-weight: 800;
-    }
-
-    /* Main grid */
-
-    .content-grid {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 22px;
-    }
-
-    .section {
-        padding: 24px;
-        background: var(--white);
-        border: 1px solid var(--border);
-        border-radius: 14px;
-    }
-
-    .section-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 20px;
-    }
-
-    .section h2 {
-        color: var(--navy);
-        font-size: 19px;
-    }
-
-    .section-link {
-        color: var(--blue);
-        font-size: 13px;
-        font-weight: 600;
-        text-decoration: none;
-    }
-
-    /* Opportunity items */
-
-    .opportunities {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .opportunity {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        padding: 15px;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-    }
-
-    .opportunity-icon {
-        width: 42px;
-        height: 42px;
-        display: grid;
-        place-items: center;
-        border-radius: 10px;
-        background: #eef3fb;
-        color: var(--navy);
-        font-weight: 800;
-    }
-
-    .opportunity h3 {
-        color: var(--text);
-        font-size: 14px;
-    }
-
-    .opportunity p {
-        margin-top: 4px;
-        color: var(--muted);
-        font-size: 12px;
-    }
-
-    /* Quick actions */
-
-    .actions {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .action {
-        width: 100%;
-        padding: 14px;
-        border: 1px solid var(--border);
-        border-radius: 9px;
-        background: var(--white);
-        color: var(--text);
-        text-align: left;
-        cursor: pointer;
-        font-size: 14px;
-        transition: border-color 0.2s ease;
-    }
-
-    .action:hover {
-        border-color: var(--blue);
-    }
-
-    /* Mobile */
-
-    @media (max-width: 1000px) {
-        .cards {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
-        .content-grid {
-            grid-template-columns: 1fr;
-        }
-    }
 
-    @media (max-width: 720px) {
-        .layout {
-            display: block;
-        }
+        * {
 
-        .sidebar {
-            display: none;
+            box-sizing: border-box;
+
+            margin: 0;
+
+            padding: 0;
+
         }
 
-        .main {
-            padding: 22px 16px;
+
+        body {
+
+            min-height: 100vh;
+
+            background: var(--background);
+
+            color: var(--text);
+
+            font-family:
+
+                Inter,
+
+                system-ui,
+
+                -apple-system,
+
+                BlinkMacSystemFont,
+
+                "Segoe UI",
+
+                sans-serif;
+
         }
 
-        .welcome {
-            align-items: flex-start;
-            flex-direction: column;
+
+        .app {
+
+            min-height: 100vh;
+
         }
 
-        .cards {
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
 
-        .card {
-            padding: 16px;
-        }
-
-        .card-value {
-            font-size: 22px;
-        }
+        /* ====================================================
+           HEADER
+        ==================================================== */
 
         .header {
-            padding: 0 16px;
+
+            height: 68px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 0 24px;
+
+            background: var(--white);
+
+            border-bottom: 1px solid var(--border);
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 100;
+
         }
-    }
-</style>
 
-</head><body><div class="app">
 
-    <!-- Header -->
+        .brand {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            color: var(--navy);
+
+            font-size: 20px;
+
+            font-weight: 800;
+
+            text-decoration: none;
+
+            letter-spacing: -0.4px;
+
+        }
+
+
+        .brand-mark {
+
+            width: 36px;
+
+            height: 36px;
+
+            display: grid;
+
+            place-items: center;
+
+            border-radius: 10px;
+
+            background: var(--navy);
+
+            color: var(--white);
+
+            font-size: 16px;
+
+            font-weight: 800;
+
+        }
+
+
+        .header-actions {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+        }
+
+
+        .icon-button {
+
+            width: 40px;
+
+            height: 40px;
+
+            border: 1px solid var(--border);
+
+            border-radius: 50%;
+
+            background: var(--white);
+
+            cursor: pointer;
+
+            font-size: 18px;
+
+        }
+
+
+        .avatar {
+
+            width: 40px;
+
+            height: 40px;
+
+            display: grid;
+
+            place-items: center;
+
+            border-radius: 50%;
+
+            background: var(--navy);
+
+            color: var(--white);
+
+            font-weight: 700;
+
+            text-decoration: none;
+
+        }
+
+
+        /* ====================================================
+           LAYOUT
+        ==================================================== */
+
+        .layout {
+
+            display: grid;
+
+            grid-template-columns: 250px minmax(0, 1fr);
+
+            min-height: calc(100vh - 68px);
+
+        }
+
+
+        .sidebar {
+
+            background: var(--navy);
+
+            padding: 24px 14px;
+
+        }
+
+
+        .nav-label {
+
+            padding: 0 14px;
+
+            margin-bottom: 12px;
+
+            color: #9eacc5;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            letter-spacing: 1px;
+
+            text-transform: uppercase;
+
+        }
+
+
+        .nav {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 4px;
+
+        }
+
+
+        .nav a {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            padding: 13px 14px;
+
+            color: #dce5f4;
+
+            border-radius: 9px;
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+            transition: background 0.2s ease;
+
+        }
+
+
+        .nav a:hover,
+
+        .nav a.active {
+
+            background: var(--navy-light);
+
+            color: var(--white);
+
+        }
+
+
+        .main {
+
+            width: 100%;
+
+            max-width: 1400px;
+
+            padding: 32px;
+
+            margin: 0 auto;
+
+        }
+
+
+        /* ====================================================
+           WELCOME
+        ==================================================== */
+
+        .welcome {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 20px;
+
+            margin-bottom: 30px;
+
+        }
+
+
+        .welcome h1 {
+
+            color: var(--navy);
+
+            font-size: clamp(24px, 3vw, 34px);
+
+            letter-spacing: -1px;
+
+        }
+
+
+        .welcome p {
+
+            margin-top: 8px;
+
+            color: var(--muted);
+
+        }
+
+
+        .status {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            padding: 10px 14px;
+
+            background: var(--white);
+
+            border: 1px solid var(--border);
+
+            border-radius: 8px;
+
+            color: var(--muted);
+
+            font-size: 13px;
+
+        }
+
+
+        .status-dot {
+
+            width: 8px;
+
+            height: 8px;
+
+            border-radius: 50%;
+
+            background: var(--success);
+
+        }
+
+
+        /* ====================================================
+           CARDS
+        ==================================================== */
+
+        .cards {
+
+            display: grid;
+
+            grid-template-columns:
+
+                repeat(
+
+                    4,
+
+                    minmax(
+
+                        0,
+
+                        1fr
+
+                    )
+
+                );
+
+            gap: 18px;
+
+            margin-bottom: 30px;
+
+        }
+
+
+        .card {
+
+            padding: 22px;
+
+            background: var(--white);
+
+            border: 1px solid var(--border);
+
+            border-radius: 14px;
+
+        }
+
+
+        .card-label {
+
+            color: var(--muted);
+
+            font-size: 13px;
+
+        }
+
+
+        .card-value {
+
+            margin-top: 12px;
+
+            color: var(--navy);
+
+            font-size: 27px;
+
+            font-weight: 800;
+
+        }
+
+
+        /* ====================================================
+           MAIN GRID
+        ==================================================== */
+
+        .content-grid {
+
+            display: grid;
+
+            grid-template-columns: 2fr 1fr;
+
+            gap: 22px;
+
+        }
+
+
+        .section {
+
+            padding: 24px;
+
+            background: var(--white);
+
+            border: 1px solid var(--border);
+
+            border-radius: 14px;
+
+        }
+
+
+        .section-header {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            margin-bottom: 20px;
+
+        }
+
+
+        .section h2 {
+
+            color: var(--navy);
+
+            font-size: 19px;
+
+        }
+
+
+        .section-link {
+
+            color: var(--blue);
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            text-decoration: none;
+
+        }
+
+
+        /* ====================================================
+           OPPORTUNITIES
+        ==================================================== */
+
+        .opportunities {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 12px;
+
+        }
+
+
+        .opportunity {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 14px;
+
+            padding: 15px;
+
+            border: 1px solid var(--border);
+
+            border-radius: 10px;
+
+            cursor: pointer;
+
+            transition:
+
+                border-color .2s ease,
+
+                transform .2s ease;
+
+        }
+
+
+        .opportunity:hover {
+
+            border-color: var(--blue);
+
+            transform: translateY(-1px);
+
+        }
+
+
+        .opportunity-icon {
+
+            width: 42px;
+
+            height: 42px;
+
+            display: grid;
+
+            place-items: center;
+
+            border-radius: 10px;
+
+            background: #eef3fb;
+
+            color: var(--navy);
+
+            font-weight: 800;
+
+        }
+
+
+        .opportunity h3 {
+
+            color: var(--text);
+
+            font-size: 14px;
+
+        }
+
+
+        .opportunity p {
+
+            margin-top: 4px;
+
+            color: var(--muted);
+
+            font-size: 12px;
+
+        }
+
+
+        /* ====================================================
+           QUICK ACTIONS
+        ==================================================== */
+
+        .actions {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 10px;
+
+        }
+
+
+        .action {
+
+            width: 100%;
+
+            padding: 14px;
+
+            border: 1px solid var(--border);
+
+            border-radius: 9px;
+
+            background: var(--white);
+
+            color: var(--text);
+
+            text-align: left;
+
+            cursor: pointer;
+
+            font-size: 14px;
+
+            transition: border-color 0.2s ease;
+
+        }
+
+
+        .action:hover {
+
+            border-color: var(--blue);
+
+        }
+
+
+        /* ====================================================
+           MOBILE
+        ==================================================== */
+
+        @media (max-width: 1000px) {
+
+            .cards {
+
+                grid-template-columns:
+
+                    repeat(
+
+                        2,
+
+                        minmax(
+
+                            0,
+
+                            1fr
+
+                        )
+
+                    );
+
+            }
+
+
+            .content-grid {
+
+                grid-template-columns: 1fr;
+
+            }
+
+        }
+
+
+        @media (max-width: 720px) {
+
+            .layout {
+
+                display: block;
+
+            }
+
+
+            .sidebar {
+
+                display: none;
+
+            }
+
+
+            .main {
+
+                padding: 22px 16px;
+
+            }
+
+
+            .welcome {
+
+                align-items: flex-start;
+
+                flex-direction: column;
+
+            }
+
+
+            .cards {
+
+                grid-template-columns: 1fr 1fr;
+
+                gap: 10px;
+
+            }
+
+
+            .card {
+
+                padding: 16px;
+
+            }
+
+
+            .card-value {
+
+                font-size: 22px;
+
+            }
+
+
+            .header {
+
+                padding: 0 16px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="app">
+
+
+    <!-- ====================================================
+         HEADER
+    ==================================================== -->
+
 
     <header class="header">
 
-        <a href="home.html" class="brand">
-            <span class="brand-mark">R</span>
+
+        <a
+            href="home.html"
+            class="brand"
+        >
+
+            <span class="brand-mark">
+                R
+            </span>
+
             REMADEF
+
         </a>
 
+
         <div class="header-actions">
+
 
             <button
                 class="icon-button"
                 aria-label="Notifications"
                 type="button"
             >
+
                 🔔
+
             </button>
+
 
             <a
                 href="profile.html"
                 class="avatar"
+                id="avatar"
                 aria-label="Open profile"
             >
+
                 U
+
             </a>
 
+
         </div>
+
 
     </header>
 
 
+    <!-- ====================================================
+         LAYOUT
+    ==================================================== -->
+
+
     <div class="layout">
 
-        <!-- Sidebar -->
+
+        <!-- SIDEBAR -->
+
 
         <aside class="sidebar">
 
+
             <div class="nav-label">
+
                 Platform
+
             </div>
 
+
             <nav class="nav">
+
 
                 <a
                     href="home.html"
                     class="active"
                 >
+
                     🏠
-                    <span>Home</span>
+
+                    <span>
+                        Home
+                    </span>
+
                 </a>
 
-                <a href="profile.html">
+
+                <a
+                    href="profile.html"
+                >
+
                     👤
-                    <span>My Profile</span>
+
+                    <span>
+                        My Profile
+                    </span>
+
                 </a>
 
-                <a href="#">
+
+                <a
+                    href="learning.html"
+                >
+
                     🎓
-                    <span>Learning</span>
+
+                    <span>
+                        Learning
+                    </span>
+
                 </a>
 
-                <a href="#">
+
+                <a
+                    href="apprenticeships.html"
+                >
+
                     🛠️
-                    <span>Apprenticeships</span>
+
+                    <span>
+                        Apprenticeships
+                    </span>
+
                 </a>
 
-                <a href="#">
+
+                <a
+                    href="jobs.html"
+                >
+
                     💼
-                    <span>Jobs</span>
+
+                    <span>
+                        Jobs
+                    </span>
+
                 </a>
 
-                <a href="#">
+
+                <a
+                    href="business.html"
+                >
+
                     🤝
-                    <span>Business</span>
+
+                    <span>
+                        Business
+                    </span>
+
                 </a>
+
 
             </nav>
+
 
         </aside>
 
 
-        <!-- Main -->
+        <!-- MAIN -->
+
 
         <main class="main">
 
-            <!-- Welcome -->
+
+            <!-- WELCOME -->
+
 
             <section class="welcome">
 
+
                 <div>
-                    <h1>
+
+
+                    <h1 id="welcome-title">
+
                         Welcome to REMADEF
+
                     </h1>
 
+
                     <p>
+
                         Your gateway to learning, skills, work,
                         and economic opportunity.
+
                     </p>
+
+
                 </div>
 
+
                 <div class="status">
-                    <span class="status-dot"></span>
-                    <span id="api-status">
+
+
+                    <span
+                        class="status-dot"
+                    ></span>
+
+
+                    <span
+                        id="api-status"
+                    >
+
                         Checking platform...
+
                     </span>
+
+
                 </div>
+
 
             </section>
 
 
-            <!-- Stats -->
+            <!-- STATS -->
+
 
             <section class="cards">
 
+
                 <div class="card">
+
+
                     <div class="card-label">
+
                         Profile Completion
+
                     </div>
 
-                    <div class="card-value">
+
+                    <div
+                        class="card-value"
+                        id="profile-completion"
+                    >
+
                         0%
+
                     </div>
+
+
                 </div>
 
+
                 <div class="card">
+
+
                     <div class="card-label">
+
                         Learning
+
                     </div>
+
 
                     <div class="card-value">
+
                         0
+
                     </div>
+
+
                 </div>
 
+
                 <div class="card">
+
+
                     <div class="card-label">
+
                         Applications
+
                     </div>
 
+
                     <div class="card-value">
+
                         0
+
                     </div>
+
+
                 </div>
+
 
                 <div class="card">
+
+
                     <div class="card-label">
+
                         Opportunities
+
                     </div>
 
+
                     <div class="card-value">
+
                         0
+
                     </div>
+
+
                 </div>
+
 
             </section>
 
 
-            <!-- Content -->
+            <!-- CONTENT -->
+
 
             <div class="content-grid">
 
+
                 <section class="section">
+
 
                     <div class="section-header">
 
+
                         <h2>
+
                             Explore REMADEF
+
                         </h2>
 
+
                         <a
-                            href="#"
+                            href="learning.html"
                             class="section-link"
                         >
+
                             View all
+
                         </a>
+
 
                     </div>
 
 
                     <div class="opportunities">
 
-                        <div class="opportunity">
+
+                        <div
+                            class="opportunity"
+                            onclick="window.location.href='learning.html'"
+                        >
+
 
                             <div class="opportunity-icon">
+
                                 L
+
                             </div>
 
+
                             <div>
+
+
                                 <h3>
+
                                     Learning & Skills
+
                                 </h3>
 
+
                                 <p>
+
                                     Build practical skills for the economy.
+
                                 </p>
+
+
                             </div>
+
 
                         </div>
 
 
-                        <div class="opportunity">
+                        <div
+                            class="opportunity"
+                            onclick="window.location.href='apprenticeships.html'"
+                        >
+
 
                             <div class="opportunity-icon">
+
                                 A
+
                             </div>
+
 
                             <div>
+
+
                                 <h3>
+
                                     Apprenticeships
+
                                 </h3>
 
+
                                 <p>
+
                                     Connect with practical learning opportunities.
+
                                 </p>
+
+
                             </div>
+
 
                         </div>
 
 
-                        <div class="opportunity">
+                        <div
+                            class="opportunity"
+                            onclick="window.location.href='jobs.html'"
+                        >
+
 
                             <div class="opportunity-icon">
+
                                 J
+
                             </div>
+
 
                             <div>
+
+
                                 <h3>
+
                                     Jobs & Opportunities
+
                                 </h3>
 
+
                                 <p>
+
                                     Discover opportunities to grow and work.
+
                                 </p>
+
+
                             </div>
 
+
                         </div>
+
 
                     </div>
+
 
                 </section>
 
 
                 <section class="section">
 
+
                     <div class="section-header">
 
+
                         <h2>
+
                             Quick Actions
+
                         </h2>
+
 
                     </div>
 
 
                     <div class="actions">
 
+
                         <button
                             class="action"
                             type="button"
                             onclick="window.location.href='profile.html'"
                         >
+
                             Complete my profile
+
                         </button>
+
 
                         <button
                             class="action"
                             type="button"
+                            onclick="window.location.href='learning.html'"
                         >
+
                             Find learning opportunities
+
                         </button>
+
 
                         <button
                             class="action"
                             type="button"
+                            onclick="window.location.href='apprenticeships.html'"
                         >
+
                             Explore apprenticeships
+
                         </button>
+
 
                         <button
                             class="action"
                             type="button"
+                            onclick="window.location.href='jobs.html'"
                         >
+
                             Find jobs
+
                         </button>
+
 
                     </div>
 
+
                 </section>
+
 
             </div>
 
+
         </main>
 
+
     </div>
+
 
 </div>
 
 
-<!-- REMADEF API -->
+<!-- ========================================================
+     APPWRITE WEB SDK
+======================================================== -->
 
-<script src="api.js"></script>
+
+<script
+    src="https://cdn.jsdelivr.net/npm/appwrite@21.1.0"
+></script>
+
+
+<!-- ========================================================
+     REMADEF API CLIENT
+======================================================== -->
+
+
+<script
+    src="api.js"
+></script>
+
+
+<!-- ========================================================
+     CURRENT USER SESSION
+======================================================== -->
+
 
 <script>
 
-    apiRequest("/api/health")
+"use strict";
 
-        .then(data => {
 
-            const status =
-                document.getElementById("api-status");
+const PROJECT_ID =
 
-            status.textContent =
-                "Platform online";
+    "6a634fdc00148a907132";
 
-        })
 
-        .catch(error => {
+const APPWRITE_ENDPOINT =
 
-            const status =
-                document.getElementById("api-status");
+    "https://fra.cloud.appwrite.io/v1";
 
-            status.textContent =
-                "Platform unavailable";
 
-            console.error(
-                "REMADEF API Error:",
-                error
+const client =
+
+    new Appwrite.Client();
+
+
+client
+
+    .setEndpoint(
+
+        APPWRITE_ENDPOINT
+
+    )
+
+    .setProject(
+
+        PROJECT_ID
+
+    );
+
+
+const account =
+
+    new Appwrite.Account(
+
+        client
+
+    );
+
+
+async function loadCurrentUser() {
+
+
+    try {
+
+
+        const user =
+
+            await account.get();
+
+
+        console.log(
+
+            "Logged-in user:",
+
+            user
+
+        );
+
+
+        const avatar =
+
+            document.getElementById(
+
+                "avatar"
+
             );
 
-        });
+
+        if (
+
+            avatar
+
+        ) {
+
+
+            let initial =
+
+                "U";
+
+
+            if (
+
+                user.name
+
+            ) {
+
+
+                initial =
+
+                    user.name
+
+                        .charAt(
+
+                            0
+
+                        )
+
+                        .toUpperCase();
+
+            }
+
+
+            else if (
+
+                user.email
+
+            ) {
+
+
+                initial =
+
+                    user.email
+
+                        .charAt(
+
+                            0
+
+                        )
+
+                        .toUpperCase();
+
+            }
+
+
+            else if (
+
+                user.phone
+
+            ) {
+
+
+                initial =
+
+                    "U";
+
+            }
+
+
+            avatar.textContent =
+
+                initial;
+
+        }
+
+
+    }
+
+
+    catch (
+
+        error
+
+    ) {
+
+
+        console.error(
+
+            "USER SESSION ERROR:",
+
+            error
+
+        );
+
+
+        window.location.replace(
+
+            "login.html"
+
+        );
+
+    }
+
+}
+
+
+async function checkAPI() {
+
+
+    const status =
+
+        document.getElementById(
+
+            "api-status"
+
+        );
+
+
+    try {
+
+
+        await RemadefAPI.health();
+
+
+        if (
+
+            status
+
+        ) {
+
+
+            status.textContent =
+
+                "Platform online";
+
+        }
+
+
+    }
+
+
+    catch (
+
+        error
+
+    ) {
+
+
+        if (
+
+            status
+
+        ) {
+
+
+            status.textContent =
+
+                "Platform unavailable";
+
+        }
+
+
+        console.error(
+
+            "REMADEF API ERROR:",
+
+            error
+
+        );
+
+    }
+
+}
+
+
+loadCurrentUser();
+
+
+checkAPI();
 
 </script>
 
+
 </body>
+
 </html>
