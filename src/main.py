@@ -1,22 +1,17 @@
 # ============================================================
 # REMADEF PLATFORM API
-# Account Registration
-# Login
-# Profile Management
-# Appwrite Cloud Function - Python 3.14
+# Appwrite Cloud Function
+# Python 3.14
 # ============================================================
 
-import os
 import json
-import re
-import secrets
-import hashlib
+import os
+import traceback
 from datetime import datetime, timezone
 
 from appwrite.client import Client
+from appwrite.services.account import Account
 from appwrite.services.tables_db import TablesDB
-from appwrite.services.users import Users
-from appwrite.query import Query
 
 
 # ============================================================
@@ -43,50 +38,93 @@ PROFILES_TABLE_ID = os.environ.get(
 # RESPONSE HELPERS
 # ============================================================
 
-def json_response(
-    res,
-    data,
-    status_code=200
+def response(
+    status_code=200,
+    body=None
 ):
 
-    return res.json(
+    if body is None:
 
-        data,
+        body = {}
 
-        status_code
+    return {
+
+        "statusCode":
+            status_code,
+
+        "headers": {
+
+            "Content-Type":
+                "application/json",
+
+            "Access-Control-Allow-Origin":
+                "*",
+
+            "Access-Control-Allow-Headers":
+                "Content-Type, X-Appwrite-Project",
+
+            "Access-Control-Allow-Methods":
+                "GET, POST, PUT, PATCH, OPTIONS"
+
+        },
+
+        "body":
+            json.dumps(
+
+                body,
+
+                ensure_ascii=False
+
+            )
+
+    }
+
+
+def success(
+    data=None,
+    message="Success"
+):
+
+    return response(
+
+        200,
+
+        {
+
+            "success":
+                True,
+
+            "message":
+                message,
+
+            "data":
+                data
+
+        }
 
     )
 
 
-def error_response(
-    res,
+def error(
     message,
     status_code=400
 ):
 
-    return res.json(
+    return response(
+
+        status_code,
 
         {
-            "success": False,
-            "message": message
-        },
 
-        status_code
+            "success":
+                False,
+
+            "message":
+                message
+
+        }
 
     )
-
-
-# ============================================================
-# TIME
-# ============================================================
-
-def now_iso():
-
-    return datetime.now(
-
-        timezone.utc
-
-    ).isoformat()
 
 
 # ============================================================
@@ -115,13 +153,13 @@ def get_client():
 
     )
 
-    api_key = os.environ.get(
+    dynamic_key = os.environ.get(
 
         "APPWRITE_FUNCTION_API_KEY"
 
     )
 
-    if not api_key:
+    if not dynamic_key:
 
         raise RuntimeError(
 
@@ -131,7 +169,7 @@ def get_client():
 
     client.set_key(
 
-        api_key
+        dynamic_key
 
     )
 
@@ -142,6 +180,15 @@ def get_client():
 # APPWRITE SERVICES
 # ============================================================
 
+def get_account_service():
+
+    return Account(
+
+        get_client()
+
+    )
+
+
 def get_tables_db():
 
     return TablesDB(
@@ -151,36 +198,23 @@ def get_tables_db():
     )
 
 
-def get_users():
-
-    return Users(
-
-        get_client()
-
-    )
-
-
 # ============================================================
-# REQUEST BODY
+# REQUEST BODY PARSER
 # ============================================================
 
-def parse_body(req):
+def parse_json_body(
+    request
+):
 
-    body = getattr(
+    body = request.get(
 
-        req,
-
-        "body",
-
-        None
+        "body"
 
     )
-
 
     if not body:
 
         return {}
-
 
     if isinstance(
 
@@ -191,22 +225,6 @@ def parse_body(req):
     ):
 
         return body
-
-
-    if isinstance(
-
-        body,
-
-        bytes
-
-    ):
-
-        body = body.decode(
-
-            "utf-8"
-
-        )
-
 
     if isinstance(
 
@@ -228,417 +246,11 @@ def parse_body(req):
 
             return {}
 
-
     return {}
 
 
 # ============================================================
-# VALIDATION
-# ============================================================
-
-def clean_string(
-
-    value,
-
-    maximum=10000
-
-):
-
-    if value is None:
-
-        return ""
-
-
-    value = str(
-
-        value
-
-    ).strip()
-
-
-    return value[:maximum]
-
-
-def valid_email(
-
-    email
-
-):
-
-    pattern = (
-
-        r"^[^@\s]+@[^@\s]+\.[^@\s]+$"
-
-    )
-
-
-    return bool(
-
-        re.match(
-
-            pattern,
-
-            email
-
-        )
-
-    )
-
-
-def valid_password(
-
-    password
-
-):
-
-    if not isinstance(
-
-        password,
-
-        str
-
-    ):
-
-        return False
-
-
-    return len(
-
-        password
-
-    ) >= 8
-
-
-# ============================================================
-# PASSWORD HASHING
-# ============================================================
-
-def hash_password(
-
-    password
-
-):
-
-    salt = secrets.token_hex(
-
-        16
-
-    )
-
-
-    password_hash = hashlib.pbkdf2_hmac(
-
-        "sha256",
-
-        password.encode(
-
-            "utf-8"
-
-        ),
-
-        salt.encode(
-
-            "utf-8"
-
-        ),
-
-        120000
-
-    ).hex()
-
-
-    return (
-
-        salt +
-
-        ":" +
-
-        password_hash
-
-    )
-
-
-def verify_password(
-
-    password,
-
-    stored_hash
-
-):
-
-    try:
-
-        salt,
-
-        password_hash = (
-
-            stored_hash.split(
-
-                ":",
-
-                1
-
-            )
-
-        )
-
-
-        calculated_hash = (
-
-            hashlib.pbkdf2_hmac(
-
-                "sha256",
-
-                password.encode(
-
-                    "utf-8"
-
-                ),
-
-                salt.encode(
-
-                    "utf-8"
-
-                ),
-
-                120000
-
-            ).hex()
-
-        )
-
-
-        return secrets.compare_digest(
-
-            calculated_hash,
-
-            password_hash
-
-        )
-
-
-    except Exception:
-
-        return False
-
-
-# ============================================================
-# PROFILE COMPLETION
-# ============================================================
-
-def calculate_profile_completion(
-
-    profile
-
-):
-
-    fields = [
-
-        "first_name",
-
-        "last_name",
-
-        "display_name",
-
-        "date_of_birth",
-
-        "gender",
-
-        "country",
-
-        "state",
-
-        "city",
-
-        "phone",
-
-        "headline",
-
-        "about",
-
-        "education_level",
-
-        "institution"
-
-    ]
-
-
-    completed = 0
-
-
-    for field in fields:
-
-        value = profile.get(
-
-            field
-
-        )
-
-
-        if value is not None and str(
-
-            value
-
-        ).strip():
-
-            completed += 1
-
-
-    skills = profile.get(
-
-        "skills"
-
-    )
-
-
-    if isinstance(
-
-        skills,
-
-        list
-
-    ):
-
-        if len(
-
-            skills
-
-        ) > 0:
-
-            completed += 1
-
-
-    elif skills:
-
-        completed += 1
-
-
-    total = len(
-
-        fields
-
-    ) + 1
-
-
-    return round(
-
-        (
-
-            completed /
-
-            total
-
-        ) * 100
-
-    )
-
-
-# ============================================================
-# SKILLS NORMALIZATION
-# ============================================================
-
-def normalize_skills(
-
-    skills
-
-):
-
-    if skills is None:
-
-        return []
-
-
-    if isinstance(
-
-        skills,
-
-        str
-
-    ):
-
-        try:
-
-            decoded = json.loads(
-
-                skills
-
-            )
-
-
-            if isinstance(
-
-                decoded,
-
-                list
-
-            ):
-
-                skills = decoded
-
-            else:
-
-                skills = [
-
-                    skills
-
-                ]
-
-        except json.JSONDecodeError:
-
-            skills = [
-
-                item.strip()
-
-                for item in skills.split(
-
-                    ","
-
-                )
-
-                if item.strip()
-
-            ]
-
-
-    if not isinstance(
-
-        skills,
-
-        list
-
-    ):
-
-        return []
-
-
-    cleaned = []
-
-
-    for skill in skills:
-
-        skill = clean_string(
-
-            skill,
-
-            100
-
-        )
-
-
-        if skill and skill not in cleaned:
-
-            cleaned.append(
-
-                skill
-
-            )
-
-
-    return cleaned[:20]
-
-
-# ============================================================
-# PROFILE DATA
+# PROFILE HELPERS
 # ============================================================
 
 PROFILE_FIELDS = [
@@ -671,70 +283,18 @@ PROFILE_FIELDS = [
 
     "education_level",
 
-    "institution"
+    "institution",
+
+    "profile_completion"
 
 ]
 
 
-def sanitize_profile_data(
-
-    data
-
-):
-
-    profile = {}
-
-
-    for field in PROFILE_FIELDS:
-
-        if field not in data:
-
-            continue
-
-
-        value = data.get(
-
-            field
-
-        )
-
-
-        if field == "skills":
-
-            profile[field] = (
-
-                normalize_skills(
-
-                    value
-
-                )
-
-            )
-
-        else:
-
-            profile[field] = clean_string(
-
-                value
-
-            )
-
-
-    return profile
-
-
-# ============================================================
-# FIND PROFILE
-# ============================================================
-
-def get_profile_by_account_id(
-
+def find_profile(
     account_id
-
 ):
 
     tables_db = get_tables_db()
-
 
     result = tables_db.list_rows(
 
@@ -744,24 +304,11 @@ def get_profile_by_account_id(
 
         queries=[
 
-            Query.equal(
-
-                "account_id",
-
-                account_id
-
-            ),
-
-            Query.limit(
-
-                1
-
-            )
+            f'equal("account_id", "{account_id}")'
 
         ]
 
     )
-
 
     rows = result.get(
 
@@ -771,38 +318,129 @@ def get_profile_by_account_id(
 
     )
 
-
     if not rows:
 
         return None
 
-
     return rows[0]
 
 
-# ============================================================
-# CREATE PROFILE
-# ============================================================
+def calculate_completion(
+    profile
+):
+
+    fields = [
+
+        "first_name",
+
+        "last_name",
+
+        "display_name",
+
+        "date_of_birth",
+
+        "gender",
+
+        "country",
+
+        "state",
+
+        "city",
+
+        "phone",
+
+        "headline",
+
+        "about",
+
+        "education_level",
+
+        "institution"
+
+    ]
+
+    completed = 0
+
+    for field in fields:
+
+        value = profile.get(
+
+            field
+
+        )
+
+        if (
+
+            value is not None
+
+            and str(value).strip()
+
+        ):
+
+            completed += 1
+
+    skills = profile.get(
+
+        "skills"
+
+    )
+
+    if skills:
+
+        if isinstance(
+
+            skills,
+
+            list
+
+        ):
+
+            if len(skills) > 0:
+
+                completed += 1
+
+        elif str(skills).strip():
+
+            completed += 1
+
+    total = len(
+
+        fields
+
+    ) + 1
+
+    return round(
+
+        (
+
+            completed /
+
+            total
+
+        ) * 100
+
+    )
+
 
 def create_profile(
 
     account_id,
 
-    profile_data=None
+    email="",
+
+    phone=""
 
 ):
 
     tables_db = get_tables_db()
 
+    now = datetime.now(
 
-    profile_data = (
+        timezone.utc
 
-        profile_data or {}
+    ).isoformat()
 
-    )
-
-
-    profile = {
+    profile_data = {
 
         "account_id":
 
@@ -810,221 +448,63 @@ def create_profile(
 
         "email":
 
-            clean_string(
-
-                profile_data.get(
-
-                    "email",
-
-                    ""
-
-                )
-
-            ),
+            email or "",
 
         "first_name":
 
-            clean_string(
-
-                profile_data.get(
-
-                    "first_name",
-
-                    ""
-
-                )
-
-            ),
+            "",
 
         "last_name":
 
-            clean_string(
-
-                profile_data.get(
-
-                    "last_name",
-
-                    ""
-
-                )
-
-            ),
+            "",
 
         "display_name":
 
-            clean_string(
-
-                profile_data.get(
-
-                    "display_name",
-
-                    ""
-
-                )
-
-            ),
+            "",
 
         "date_of_birth":
 
-            clean_string(
-
-                profile_data.get(
-
-                    "date_of_birth",
-
-                    ""
-
-                )
-
-            ),
+            "",
 
         "gender":
 
-            clean_string(
-
-                profile_data.get(
-
-                    "gender",
-
-                    ""
-
-                )
-
-            ),
+            "",
 
         "country":
 
-            clean_string(
-
-                profile_data.get(
-
-                    "country",
-
-                    ""
-
-                )
-
-            ),
+            "",
 
         "state":
 
-            clean_string(
-
-                profile_data.get(
-
-                    "state",
-
-                    ""
-
-                )
-
-            ),
+            "",
 
         "city":
 
-            clean_string(
-
-                profile_data.get(
-
-                    "city",
-
-                    ""
-
-                )
-
-            ),
+            "",
 
         "phone":
 
-            clean_string(
-
-                profile_data.get(
-
-                    "phone",
-
-                    ""
-
-                )
-
-            ),
+            phone or "",
 
         "headline":
 
-            clean_string(
-
-                profile_data.get(
-
-                    "headline",
-
-                    ""
-
-                ),
-
-                120
-
-            ),
+            "",
 
         "about":
 
-            clean_string(
-
-                profile_data.get(
-
-                    "about",
-
-                    ""
-
-                ),
-
-                1000
-
-            ),
+            "",
 
         "skills":
 
-            json.dumps(
-
-                normalize_skills(
-
-                    profile_data.get(
-
-                        "skills",
-
-                        []
-
-                    )
-
-                )
-
-            ),
+            "",
 
         "education_level":
 
-            clean_string(
-
-                profile_data.get(
-
-                    "education_level",
-
-                    ""
-
-                )
-
-            ),
+            "",
 
         "institution":
 
-            clean_string(
-
-                profile_data.get(
-
-                    "institution",
-
-                    ""
-
-                )
-
-            ),
+            "",
 
         "profile_completion":
 
@@ -1032,54 +512,34 @@ def create_profile(
 
         "created_at":
 
-            now_iso(),
+            now,
 
         "updated_at":
 
-            now_iso()
+            now
 
     }
 
-
-    profile["profile_completion"] = (
-
-        calculate_profile_completion(
-
-            {
-
-                **profile,
-
-                "skills":
-
-                    json.loads(
-
-                        profile["skills"]
-
-                    )
-
-            }
-
-        )
-
-    )
-
-
     return tables_db.create_row(
 
-        database_id=DATABASE_ID,
+        database_id=
 
-        table_id=PROFILES_TABLE_ID,
+            DATABASE_ID,
 
-        row_id="unique()",
+        table_id=
 
-        data=profile
+            PROFILES_TABLE_ID,
+
+        row_id=
+
+            "unique()",
+
+        data=
+
+            profile_data
 
     )
 
-
-# ============================================================
-# UPDATE PROFILE
-# ============================================================
 
 def update_profile(
 
@@ -1091,587 +551,363 @@ def update_profile(
 
     tables_db = get_tables_db()
 
+    existing = find_profile(
 
-    existing_profile = (
+        account_id
 
-        get_profile_by_account_id(
+    )
+
+    if not existing:
+
+        return create_profile(
 
             account_id
 
         )
 
-    )
-
-
-    clean_data = (
-
-        sanitize_profile_data(
-
-            profile_data
-
-        )
-
-    )
-
-
-    if not existing_profile:
-
-        return create_profile(
-
-            account_id,
-
-            clean_data
-
-        )
-
-
-    current_profile = dict(
-
-        existing_profile
-
-    )
-
-
-    for key, value in clean_data.items():
-
-        if key == "skills":
-
-            current_profile[key] = value
-
-        else:
-
-            current_profile[key] = value
-
-
-    completion = (
-
-        calculate_profile_completion(
-
-            current_profile
-
-        )
-
-    )
-
+    row_id = existing["$id"]
 
     update_data = {}
 
+    for field in PROFILE_FIELDS:
 
-    for key, value in clean_data.items():
+        if field not in profile_data:
 
-        if key == "skills":
+            continue
 
-            update_data[key] = json.dumps(
+        value = profile_data[field]
 
-                value
+        if field == "skills":
 
-            )
+            if isinstance(
 
-        else:
+                value,
 
-            update_data[key] = value
+                list
 
+            ):
+
+                value = json.dumps(
+
+                    value
+
+                )
+
+            elif value is None:
+
+                value = ""
+
+        update_data[field] = value
+
+    merged = {
+
+        **existing,
+
+        **update_data
+
+    }
 
     update_data[
 
         "profile_completion"
 
-    ] = completion
+    ] = calculate_completion(
 
+        merged
+
+    )
 
     update_data[
 
         "updated_at"
 
-    ] = now_iso()
+    ] = datetime.now(
 
+        timezone.utc
+
+    ).isoformat()
 
     return tables_db.update_row(
 
-        database_id=DATABASE_ID,
+        database_id=
 
-        table_id=PROFILES_TABLE_ID,
+            DATABASE_ID,
 
-        row_id=existing_profile["$id"],
+        table_id=
 
-        data=update_data
+            PROFILES_TABLE_ID,
+
+        row_id=
+
+            row_id,
+
+        data=
+
+            update_data
 
     )
 
 
 # ============================================================
-# REGISTER ACCOUNT
+# REGISTER
 # ============================================================
 
-def register_account(
+def register_user(
 
-    payload
+    data
 
 ):
 
-    email = clean_string(
+    email = str(
 
-        payload.get(
+        data.get(
 
             "email",
 
             ""
 
-        ),
+        )
 
-        320
+    ).strip().lower()
 
-    ).lower()
+    password = str(
 
+        data.get(
 
-    phone = clean_string(
+            "password",
 
-        payload.get(
+            ""
+
+        )
+
+    )
+
+    phone = str(
+
+        data.get(
 
             "phone",
 
             ""
 
-        ),
+        )
 
-        30
-
-    )
-
-
-    password = payload.get(
-
-        "password",
-
-        ""
-
-    )
-
+    ).strip()
 
     if not email and not phone:
 
-        return {
+        return error(
 
-            "success": False,
+            "Email or phone number is required."
 
-            "message":
+        )
 
-                "Email or phone number is required."
+    if len(password) < 8:
 
-        }, 400
+        return error(
 
+            "Password must contain at least 8 characters."
 
-    if not valid_password(
+        )
 
-        password
-
-    ):
-
-        return {
-
-            "success": False,
-
-            "message":
-
-                "Password must be at least 8 characters."
-
-        }, 400
-
-
-    if email and not valid_email(
-
-        email
-
-    ):
-
-        return {
-
-            "success": False,
-
-            "message":
-
-                "Please enter a valid email address."
-
-        }, 400
-
-
-    users = get_users()
-
+    account_service = get_account_service()
 
     try:
 
         if email:
 
-            user = users.create(
+            user = account_service.create(
 
-                user_id="unique()",
+                user_id=
 
-                email=email,
+                    "unique()",
 
-                password=password
+                email=
+
+                    email,
+
+                password=
+
+                    password
 
             )
 
         else:
 
-            user = users.create(
+            user = account_service.create_phone_user(
 
-                user_id="unique()",
+                user_id=
 
-                phone=phone,
+                    "unique()",
 
-                password=password
+                phone=
+
+                    phone,
+
+                password=
+
+                    password
 
             )
 
-
-    except Exception as error:
+    except Exception as exc:
 
         message = str(
 
-            error
+            exc
 
         )
 
+        if "already exists" in message.lower():
 
-        if (
+            return error(
 
-            "already exists"
+                "An account with these credentials already exists.",
 
-            in message.lower()
+                409
 
-            or "duplicate"
+            )
 
-            in message.lower()
+        return error(
 
-        ):
+            "Could not create account.",
 
-            return {
+            400
 
-                "success": False,
+        )
 
-                "message":
-
-                    "An account with these credentials already exists."
-
-            }, 409
-
-
-        raise error
-
-
-    account_id = user.get(
+    user_id = user.get(
 
         "$id"
 
     )
 
-
     profile = create_profile(
 
-        account_id,
+        account_id=
+
+            user_id,
+
+        email=
+
+            email,
+
+        phone=
+
+            phone
+
+    )
+
+    return response(
+
+        201,
 
         {
 
-            "email":
+            "success":
 
-                email,
+                True,
 
-            "phone":
+            "message":
 
-                phone
+                "Account created successfully.",
+
+            "account":
+
+                {
+
+                    "id":
+
+                        user_id,
+
+                    "email":
+
+                        email,
+
+                    "phone":
+
+                        phone
+
+                },
+
+            "profile":
+
+                profile
 
         }
 
     )
-
-
-    return {
-
-        "success": True,
-
-        "message":
-
-            "REMADEF account created successfully.",
-
-        "account": {
-
-            "id":
-
-                account_id,
-
-            "email":
-
-                email,
-
-            "phone":
-
-                phone
-
-        },
-
-        "profile": {
-
-            "id":
-
-                profile.get(
-
-                    "$id"
-
-                ),
-
-            "profile_completion":
-
-                profile.get(
-
-                    "profile_completion",
-
-                    0
-
-                )
-
-        }
-
-    }, 201
 
 
 # ============================================================
 # LOGIN
 # ============================================================
 
-def login_account(
+def login_user(
 
-    payload
+    data
 
 ):
 
-    email = clean_string(
+    email = str(
 
-        payload.get(
+        data.get(
 
             "email",
 
             ""
 
-        ),
+        )
 
-        320
+    ).strip().lower()
 
-    ).lower()
+    phone = str(
 
-
-    phone = clean_string(
-
-        payload.get(
+        data.get(
 
             "phone",
 
             ""
 
-        ),
+        )
 
-        30
+    ).strip()
+
+    password = str(
+
+        data.get(
+
+            "password",
+
+            ""
+
+        )
 
     )
-
-
-    password = payload.get(
-
-        "password",
-
-        ""
-
-    )
-
 
     if not password:
 
-        return {
+        return error(
 
-            "success": False,
+            "Password is required."
 
-            "message":
-
-                "Password is required."
-
-        }, 400
-
+        )
 
     if not email and not phone:
 
-        return {
+        return error(
 
-            "success": False,
-
-            "message":
-
-                "Email or phone number is required."
-
-        }, 400
-
-
-    users = get_users()
-
-
-    user = None
-
-
-    if email:
-
-        result = users.list(
-
-            queries=[
-
-                Query.equal(
-
-                    "email",
-
-                    email
-
-                ),
-
-                Query.limit(
-
-                    1
-
-                )
-
-            ]
+            "Email or phone number is required."
 
         )
 
+    return error(
 
-        users_list = result.get(
+        "Login requires a client session implementation. Use Appwrite Account.createEmailPasswordSession or createPhoneSession from the frontend.",
 
-            "users",
-
-            []
-
-        )
-
-
-        if users_list:
-
-            user = users_list[0]
-
-
-    else:
-
-        result = users.list(
-
-            queries=[
-
-                Query.equal(
-
-                    "phone",
-
-                    phone
-
-                ),
-
-                Query.limit(
-
-                    1
-
-                )
-
-            ]
-
-        )
-
-
-        users_list = result.get(
-
-            "users",
-
-            []
-
-        )
-
-
-        if users_list:
-
-            user = users_list[0]
-
-
-    if not user:
-
-        return {
-
-            "success": False,
-
-            "message":
-
-                "Invalid email, phone number or password."
-
-        }, 401
-
-
-    account_id = user.get(
-
-        "$id"
+        501
 
     )
-
-
-    profile = get_profile_by_account_id(
-
-        account_id
-
-    )
-
-
-    return {
-
-        "success": True,
-
-        "message":
-
-            "Login successful.",
-
-        "account": {
-
-            "id":
-
-                account_id,
-
-            "email":
-
-                user.get(
-
-                    "email",
-
-                    ""
-
-                ),
-
-            "phone":
-
-                user.get(
-
-                    "phone",
-
-                    ""
-
-                ),
-
-            "name":
-
-                user.get(
-
-                    "name",
-
-                    ""
-
-                )
-
-        },
-
-        "profile":
-
-            profile
-
-    }, 200
 
 
 # ============================================================
@@ -1680,52 +916,154 @@ def login_account(
 
 def get_profile(
 
-    account_id
+    data
 
 ):
 
-    profile = get_profile_by_account_id(
+    account_id = str(
+
+        data.get(
+
+            "account_id",
+
+            ""
+
+        )
+
+    ).strip()
+
+    if not account_id:
+
+        return error(
+
+            "Account ID is required."
+
+        )
+
+    profile = find_profile(
 
         account_id
 
     )
 
-
     if not profile:
 
-        return None
+        return error(
 
+            "Profile not found.",
+
+            404
+
+        )
+
+    skills = profile.get(
+
+        "skills",
+
+        ""
+
+    )
 
     if isinstance(
 
-        profile.get(
-
-            "skills"
-
-        ),
+        skills,
 
         str
 
-    ):
+    ) and skills:
 
         try:
 
             profile["skills"] = json.loads(
 
-                profile["skills"]
+                skills
 
             )
 
         except json.JSONDecodeError:
 
-            profile["skills"] = normalize_skills(
+            profile["skills"] = [
 
-                profile["skills"]
+                skills
 
-            )
+            ]
+
+    return success(
+
+        profile,
+
+        "Profile loaded."
+
+    )
 
 
-    return profile
+# ============================================================
+# SAVE PROFILE
+# ============================================================
+
+def save_profile(
+
+    data
+
+):
+
+    account_id = str(
+
+        data.get(
+
+            "account_id",
+
+            ""
+
+        )
+
+    ).strip()
+
+    if not account_id:
+
+        return error(
+
+            "Account ID is required."
+
+        )
+
+    profile_data = data.get(
+
+        "profile",
+
+        data
+
+    )
+
+    if not isinstance(
+
+        profile_data,
+
+        dict
+
+    ):
+
+        return error(
+
+            "Invalid profile data."
+
+        )
+
+    profile = update_profile(
+
+        account_id,
+
+        profile_data
+
+    )
+
+    return success(
+
+        profile,
+
+        "Profile saved successfully."
+
+    )
 
 
 # ============================================================
@@ -1734,19 +1072,13 @@ def get_profile(
 
 def route_request(
 
-    req,
-
-    res,
-
-    log
+    request
 
 ):
 
-    method = (
+    method = str(
 
-        getattr(
-
-            req,
+        request.get(
 
             "method",
 
@@ -1754,54 +1086,31 @@ def route_request(
 
         )
 
-        or "GET"
-
     ).upper()
 
+    path = request.get(
 
-    path = (
+        "path",
 
-        getattr(
+        "/"
 
-            req,
+    )
 
-            "path",
+    if method == "OPTIONS":
 
-            "/"
+        return response(
+
+            204,
+
+            {}
 
         )
 
-        or "/"
+    if method == "GET" and path == "/":
 
-    )
-
-
-    log(
-
-        f"REMADEF API REQUEST: {method} {path}"
-
-    )
-
-
-    # --------------------------------------------------------
-    # HEALTH
-    # --------------------------------------------------------
-
-    if (
-
-        method == "GET"
-
-        and path == "/"
-
-    ):
-
-        return json_response(
-
-            res,
+        return success(
 
             {
-
-                "success": True,
 
                 "service":
 
@@ -1811,337 +1120,75 @@ def route_request(
 
                     "online"
 
-            }
+            },
+
+            "REMADEF Platform API is online."
 
         )
 
+    if method == "GET" and path == "/api/health":
 
-    if (
-
-        method == "GET"
-
-        and path == "/api/health"
-
-    ):
-
-        return json_response(
-
-            res,
+        return success(
 
             {
 
-                "success": True,
-
                 "status":
 
-                    "healthy",
+                    "healthy"
 
-                "service":
+            },
 
-                    "REMADEF Platform API",
-
-                "database":
-
-                    DATABASE_ID,
-
-                "table":
-
-                    PROFILES_TABLE_ID
-
-            }
+            "API is healthy."
 
         )
 
+    data = parse_json_body(
 
-    # --------------------------------------------------------
-    # BODY
-    # --------------------------------------------------------
-
-    payload = parse_body(
-
-        req
+        request
 
     )
 
+    if method == "POST" and path == "/api/register":
 
-    # --------------------------------------------------------
-    # REGISTER
-    # --------------------------------------------------------
+        return register_user(
 
-    if (
-
-        method == "POST"
-
-        and path == "/api/register"
-
-    ):
-
-        try:
-
-            data, status = (
-
-                register_account(
-
-                    payload
-
-                )
-
-            )
-
-
-            return json_response(
-
-                res,
-
-                data,
-
-                status
-
-            )
-
-
-        except Exception as error:
-
-            log(
-
-                f"REGISTER ERROR: {error}"
-
-            )
-
-
-            return error_response(
-
-                res,
-
-                "Registration failed. Please try again.",
-
-                500
-
-            )
-
-
-    # --------------------------------------------------------
-    # LOGIN
-    # --------------------------------------------------------
-
-    if (
-
-        method == "POST"
-
-        and path == "/api/login"
-
-    ):
-
-        try:
-
-            data, status = (
-
-                login_account(
-
-                    payload
-
-                )
-
-            )
-
-
-            return json_response(
-
-                res,
-
-                data,
-
-                status
-
-            )
-
-
-        except Exception as error:
-
-            log(
-
-                f"LOGIN ERROR: {error}"
-
-            )
-
-
-            return error_response(
-
-                res,
-
-                "Login failed. Please try again.",
-
-                500
-
-            )
-
-
-    # --------------------------------------------------------
-    # PROFILE ID
-    # --------------------------------------------------------
-
-    profile_match = re.match(
-
-        r"^/api/profile/([^/]+)$",
-
-        path
-
-    )
-
-
-    if profile_match:
-
-        account_id = (
-
-            profile_match.group(
-
-                1
-
-            )
+            data
 
         )
 
+    if method == "POST" and path == "/api/login":
 
-        # ----------------------------------------------------
-        # GET PROFILE
-        # ----------------------------------------------------
+        return login_user(
 
-        if method == "GET":
+            data
 
-            try:
+        )
 
-                profile = get_profile(
+    if method == "GET" and path == "/api/profile":
 
-                    account_id
+        return get_profile(
 
-                )
+            data
 
+        )
 
-                if not profile:
+    if method in (
 
-                    return error_response(
+        "POST",
 
-                        res,
+        "PUT",
 
-                        "Profile not found.",
+        "PATCH"
 
-                        404
+    ) and path == "/api/profile":
 
-                    )
+        return save_profile(
 
+            data
 
-                return json_response(
+        )
 
-                    res,
-
-                    {
-
-                        "success": True,
-
-                        "profile":
-
-                            profile
-
-                    }
-
-                )
-
-
-            except Exception as error:
-
-                log(
-
-                    f"GET PROFILE ERROR: {error}"
-
-                )
-
-
-                return error_response(
-
-                    res,
-
-                    "Unable to load profile.",
-
-                    500
-
-                )
-
-
-        # ----------------------------------------------------
-        # UPDATE PROFILE
-        # ----------------------------------------------------
-
-        if method in (
-
-            "PUT",
-
-            "PATCH"
-
-        ):
-
-            try:
-
-                profile = update_profile(
-
-                    account_id,
-
-                    payload
-
-                )
-
-
-                return json_response(
-
-                    res,
-
-                    {
-
-                        "success": True,
-
-                        "message":
-
-                            "Profile updated successfully.",
-
-                        "profile":
-
-                            get_profile(
-
-                                account_id
-
-                            )
-
-                    }
-
-                )
-
-
-            except Exception as error:
-
-                log(
-
-                    f"UPDATE PROFILE ERROR: {error}"
-
-                )
-
-
-                return error_response(
-
-                    res,
-
-                    "Unable to update profile.",
-
-                    500
-
-                )
-
-
-    # --------------------------------------------------------
-    # 404
-    # --------------------------------------------------------
-
-    return error_response(
-
-        res,
+    return error(
 
         "Route not found.",
 
@@ -2154,42 +1201,37 @@ def route_request(
 # APPWRITE FUNCTION ENTRYPOINT
 # ============================================================
 
-def main(context):
+def main(
 
-    req = context.req
+    context
 
-    res = context.res
-
-    log = context.log
-
-    error = context.error
-
+):
 
     try:
 
-        return route_request(
+        request = context.req
 
-            req,
+        response_data = route_request(
 
-            res,
-
-            log
+            request
 
         )
 
+        return response_data
 
-    except Exception as exception:
+    except Exception as exc:
 
-        error(
+        print(
 
-            f"UNHANDLED ERROR: {exception}"
+            "UNHANDLED ERROR:",
+
+            str(exc)
 
         )
 
+        traceback.print_exc()
 
-        return error_response(
-
-            res,
+        return error(
 
             "Internal server error.",
 
