@@ -1,36 +1,26 @@
 # ============================================================
-# REMADEF PROFILE SERVICE
+# REMADEF PROFILE MANAGEMENT
 # ============================================================
 
 import os
-import re
 from datetime import datetime, timezone
 
 from appwrite.client import Client
-from appwrite.services.databases import Databases
-from appwrite.query import Query
-from appwrite.exception import AppwriteException
+from appwrite.services.tables_db import TablesDB
 
 
 # ============================================================
 # CONFIGURATION
 # ============================================================
 
-PROJECT_ID = os.environ.get(
-    "APPWRITE_PROJECT_ID",
-    "6a634fdc00148a907132"
-)
-
 DATABASE_ID = os.environ.get(
-    "APPWRITE_DATABASE_ID"
+    "APPWRITE_DATABASE_ID",
+    "6a66577c000d17565b18"
 )
 
-PROFILE_COLLECTION_ID = os.environ.get(
-    "APPWRITE_PROFILE_COLLECTION_ID"
-)
-
-FUNCTION_API_KEY = os.environ.get(
-    "APPWRITE_FUNCTION_API_KEY"
+TABLE_ID = os.environ.get(
+    "APPWRITE_PROFILES_TABLE_ID",
+    "profiles"
 )
 
 
@@ -50,425 +40,315 @@ def get_client():
     )
 
     client.set_project(
-        PROJECT_ID
+        os.environ.get(
+            "APPWRITE_PROJECT_ID",
+            "6a634fdc00148a907132"
+        )
     )
 
-    if not FUNCTION_API_KEY:
+    # Appwrite provides a temporary dynamic API key
+    # during function execution.
+    dynamic_key = os.environ.get(
+        "APPWRITE_FUNCTION_API_KEY"
+    )
+
+    if not dynamic_key:
 
         raise RuntimeError(
             "APPWRITE_FUNCTION_API_KEY is missing."
         )
 
     client.set_key(
-        FUNCTION_API_KEY
+        dynamic_key
     )
 
     return client
 
 
 # ============================================================
-# DATABASE CLIENT
+# TABLES DATABASE SERVICE
 # ============================================================
 
-def get_database():
+def get_tables_db():
 
-    return Databases(
-        get_client()
+    client = get_client()
+
+    return TablesDB(
+        client
     )
 
 
 # ============================================================
-# VALIDATE USER ID
+# FIND PROFILE BY ACCOUNT ID
 # ============================================================
 
-def validate_user_id(user_id):
-
-    if not user_id:
-
-        raise ValueError(
-            "User ID is required."
-        )
-
-    user_id = str(
-        user_id
-    ).strip()
-
-    if len(user_id) > 36:
-
-        raise ValueError(
-            "Invalid user ID."
-        )
-
-    return user_id
-
-
-# ============================================================
-# CLEAN TEXT
-# ============================================================
-
-def clean_text(value, max_length=5000):
-
-    if value is None:
-
-        return ""
-
-    value = str(
-        value
-    ).strip()
-
-    return value[:max_length]
-
-
-# ============================================================
-# CLEAN SKILLS
-# ============================================================
-
-def clean_skills(skills):
-
-    if not isinstance(
-        skills,
-        list
-    ):
-
-        return []
-
-
-    cleaned = []
-
-
-    for skill in skills:
-
-        skill = clean_text(
-            skill,
-            80
-        )
-
-
-        if not skill:
-
-            continue
-
-
-        if skill.lower() in [
-
-            existing.lower()
-
-            for existing in cleaned
-
-        ]:
-
-            continue
-
-
-        cleaned.append(
-            skill
-        )
-
-
-        if len(cleaned) >= 20:
-
-            break
-
-
-    return cleaned
-
-
-# ============================================================
-# PROFILE DATA
-# ============================================================
-
-PROFILE_FIELDS = [
-
-    "first_name",
-    "last_name",
-    "display_name",
-    "date_of_birth",
-    "gender",
-    "country",
-    "state",
-    "city",
-    "phone",
-    "headline",
-    "about",
-    "skills",
-    "education_level",
-    "institution"
-
-]
-
-
-# ============================================================
-# NORMALIZE PROFILE
-# ============================================================
-
-def normalize_profile(data):
-
-    if not isinstance(
-        data,
-        dict
-    ):
-
-        data = {}
-
-
-    profile = {}
-
-
-    for field in PROFILE_FIELDS:
-
-        value = data.get(
-            field
-        )
-
-
-        if field == "skills":
-
-            profile[field] = clean_skills(
-                value
-            )
-
-        else:
-
-            profile[field] = clean_text(
-                value
-            )
-
-
-    return profile
-
-
-# ============================================================
-# FIND PROFILE
-# ============================================================
-
-def find_profile(user_id):
-
-    user_id = validate_user_id(
-        user_id
+def get_profile_by_account_id(
+    account_id
+):
+
+    tables_db = get_tables_db()
+
+    result = tables_db.list_rows(
+        database_id=DATABASE_ID,
+        table_id=TABLE_ID,
+        queries=[
+            f'equal("account_id", "{account_id}")'
+        ]
     )
 
-
-    if not DATABASE_ID:
-
-        raise RuntimeError(
-            "APPWRITE_DATABASE_ID is missing."
-        )
-
-
-    if not PROFILE_COLLECTION_ID:
-
-        raise RuntimeError(
-            "APPWRITE_PROFILE_COLLECTION_ID is missing."
-        )
-
-
-    databases = get_database()
-
-
-    try:
-
-        result = databases.list_documents(
-
-            database_id=DATABASE_ID,
-
-            collection_id=PROFILE_COLLECTION_ID,
-
-            queries=[
-
-                Query.equal(
-                    "user_id",
-                    user_id
-                ),
-
-                Query.limit(
-                    1
-                )
-
-            ]
-
-        )
-
-
-        documents = result.get(
-            "documents",
-            []
-        )
-
-
-        if not documents:
-
-            return None
-
-
-        return documents[0]
-
-
-    except AppwriteException as error:
-
-        raise RuntimeError(
-            f"PROFILE LOOKUP ERROR: {error}"
-        )
-
-
-# ============================================================
-# GET PROFILE
-# ============================================================
-
-def get_profile(user_id):
-
-    profile = find_profile(
-        user_id
+    rows = result.get(
+        "rows",
+        []
     )
 
-
-    if not profile:
+    if not rows:
 
         return None
 
-
-    return profile
+    return rows[0]
 
 
 # ============================================================
-# SAVE PROFILE
+# CREATE PROFILE
 # ============================================================
 
-def save_profile(
-
-    user_id,
-
-    profile_data
-
+def create_profile(
+    account_id,
+    email="",
+    phone=""
 ):
 
-    user_id = validate_user_id(
-        user_id
-    )
-
-
-    if not DATABASE_ID:
-
-        raise RuntimeError(
-            "APPWRITE_DATABASE_ID is missing."
-        )
-
-
-    if not PROFILE_COLLECTION_ID:
-
-        raise RuntimeError(
-            "APPWRITE_PROFILE_COLLECTION_ID is missing."
-        )
-
-
-    profile = normalize_profile(
-        profile_data
-    )
-
-
-    profile["user_id"] = user_id
-
+    tables_db = get_tables_db()
 
     now = datetime.now(
         timezone.utc
     ).isoformat()
 
+    profile_data = {
 
-    existing = find_profile(
-        user_id
+        "account_id":
+            account_id,
+
+        "email":
+            email or "",
+
+        "first_name":
+            "",
+
+        "last_name":
+            "",
+
+        "display_name":
+            "",
+
+        "date_of_birth":
+            "",
+
+        "gender":
+            "",
+
+        "country":
+            "",
+
+        "state":
+            "",
+
+        "city":
+            "",
+
+        "phone":
+            phone or "",
+
+        "headline":
+            "",
+
+        "about":
+            "",
+
+        "skills":
+            "",
+
+        "education_level":
+            "",
+
+        "institution":
+            "",
+
+        "profile_completion":
+            0,
+
+        "created_at":
+            now,
+
+        "updated_at":
+            now
+
+    }
+
+    return tables_db.create_row(
+        database_id=DATABASE_ID,
+        table_id=TABLE_ID,
+        row_id="unique()",
+        data=profile_data
     )
 
 
-    databases = get_database()
+# ============================================================
+# UPDATE PROFILE
+# ============================================================
 
+def update_profile(
+    account_id,
+    profile_data
+):
 
-    try:
+    tables_db = get_tables_db()
 
-        if existing:
+    existing_profile = (
 
-            document_id = existing["$id"]
+        get_profile_by_account_id(
 
+            account_id
 
-            result = databases.update_document(
-
-                database_id=DATABASE_ID,
-
-                collection_id=PROFILE_COLLECTION_ID,
-
-                document_id=document_id,
-
-                data={
-
-                    **profile,
-
-                    "updated_at": now
-
-                }
-
-            )
-
-
-        else:
-
-            result = databases.create_document(
-
-                database_id=DATABASE_ID,
-
-                collection_id=PROFILE_COLLECTION_ID,
-
-                document_id="unique()",
-
-                data={
-
-                    **profile,
-
-                    "user_id": user_id,
-
-                    "created_at": now,
-
-                    "updated_at": now
-
-                }
-
-            )
-
-
-        return result
-
-
-    except AppwriteException as error:
-
-        raise RuntimeError(
-            f"SAVE PROFILE ERROR: {error}"
         )
+
+    )
+
+    if not existing_profile:
+
+        return create_profile(
+
+            account_id
+
+        )
+
+    row_id = existing_profile["$id"]
+
+    now = datetime.now(
+        timezone.utc
+    ).isoformat()
+
+    allowed_fields = [
+
+        "email",
+
+        "first_name",
+
+        "last_name",
+
+        "display_name",
+
+        "date_of_birth",
+
+        "gender",
+
+        "country",
+
+        "state",
+
+        "city",
+
+        "phone",
+
+        "headline",
+
+        "about",
+
+        "skills",
+
+        "education_level",
+
+        "institution",
+
+        "profile_completion"
+
+    ]
+
+    update_data = {}
+
+    for field in allowed_fields:
+
+        if field in profile_data:
+
+            value = profile_data[field]
+
+            # Appwrite text column for skills
+            # receives a JSON string.
+            if field == "skills":
+
+                if isinstance(
+                    value,
+                    list
+                ):
+
+                    import json
+
+                    value = json.dumps(
+                        value
+                    )
+
+                elif value is None:
+
+                    value = ""
+
+            update_data[field] = value
+
+    update_data[
+        "updated_at"
+    ] = now
+
+    return tables_db.update_row(
+
+        database_id=DATABASE_ID,
+
+        table_id=TABLE_ID,
+
+        row_id=row_id,
+
+        data=update_data
+
+    )
 
 
 # ============================================================
 # PROFILE COMPLETION
 # ============================================================
 
-def calculate_completion(profile):
+def calculate_profile_completion(
+    profile
+):
 
     fields = [
 
         "first_name",
+
         "last_name",
+
         "display_name",
+
         "date_of_birth",
+
         "gender",
+
         "country",
+
         "state",
+
         "city",
+
         "phone",
+
         "headline",
+
         "about",
+
         "education_level",
+
         "institution"
 
     ]
 
-
     completed = 0
-
 
     for field in fields:
 
@@ -476,25 +356,31 @@ def calculate_completion(profile):
             field
         )
 
+        if (
 
-        if value:
+            value is not None
+
+            and
+
+            str(value).strip()
+
+        ):
 
             completed += 1
 
-
-    if profile.get(
+    skills = profile.get(
         "skills"
-    ):
+    )
+
+    if skills:
 
         completed += 1
-
 
     total = len(
         fields
     ) + 1
 
-
-    percentage = round(
+    return round(
 
         (
 
@@ -504,10 +390,4 @@ def calculate_completion(profile):
 
         ) * 100
 
-    )
-
-
-    return min(
-        percentage,
-        100
     )
