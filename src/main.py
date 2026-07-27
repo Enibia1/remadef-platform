@@ -556,62 +556,42 @@ def update_profile(
     )
 
 
+
 # ============================================================
 # REGISTER USER
 # ============================================================
 
 def register_user(
-
     data,
-
     context
-
 ):
 
     email = str(
         data.get(
             "email",
             ""
-        )
+        ) or ""
     ).strip().lower()
 
-    phone = str(
-        data.get(
-            "phone",
-            ""
-        )
-    ).strip()
 
     password = str(
         data.get(
             "password",
             ""
-        )
+        ) or ""
     )
 
-    method = str(
+
+    phone = str(
         data.get(
-            "method",
+            "phone",
             ""
-        )
-    ).strip().lower()
+        ) or ""
+    ).strip()
 
 
     # ========================================================
-    # NORMALIZE METHOD
-    # ========================================================
-
-    if method == "phone":
-
-        email = ""
-
-    elif method == "email":
-
-        phone = ""
-
-
-    # ========================================================
-    # VALIDATE CREDENTIALS
+    # VALIDATION
     # ========================================================
 
     if not email and not phone:
@@ -620,11 +600,63 @@ def register_user(
             "Email or phone number is required."
         )
 
+
     if len(password) < 8:
 
         return error(
             "Password must contain at least 8 characters."
         )
+
+
+    # ========================================================
+    # NORMALIZE NIGERIAN PHONE NUMBER
+    # ========================================================
+
+    if phone:
+
+        # Remove spaces, hyphens and brackets
+
+        phone = (
+            phone
+            .replace(" ", "")
+            .replace("-", "")
+            .replace("(", "")
+            .replace(")", "")
+        )
+
+
+        # 08037537614
+        # becomes
+        # +2348037537614
+
+        if phone.startswith("0"):
+
+            phone = "+234" + phone[1:]
+
+
+        # 2348037537614
+        # becomes
+        # +2348037537614
+
+        elif phone.startswith("234"):
+
+            phone = "+" + phone
+
+
+        # Validate final Nigerian format
+
+        if not phone.startswith("+234"):
+
+            return error(
+                "Please enter a valid Nigerian phone number."
+            )
+
+
+        if len(phone) != 14:
+
+            return error(
+                "Please enter a valid Nigerian phone number."
+            )
 
 
     # ========================================================
@@ -642,25 +674,30 @@ def register_user(
 
     try:
 
-        if phone:
-
-            user = account_service.create_phone_user(
-
-                user_id="unique()",
-
-                phone=phone,
-
-                password=password
-
-            )
-
-        else:
+        if email:
 
             user = account_service.create(
 
                 user_id="unique()",
 
                 email=email,
+
+                password=password
+
+            )
+
+
+        else:
+
+            # IMPORTANT:
+            # Appwrite Python SDK uses create_phone()
+            # NOT create_phone_user()
+
+            user = account_service.create_phone(
+
+                user_id="unique()",
+
+                phone=phone,
 
                 password=password
 
@@ -679,6 +716,7 @@ def register_user(
 
         )
 
+
         message = str(
             exc
         ).lower()
@@ -686,11 +724,15 @@ def register_user(
 
         if (
 
-            "already exists" in message
+            "already exists"
+            in
+            message
 
-            or "user_already_exists" in message
+            or
 
-            or "already registered" in message
+            "user_already_exists"
+            in
+            message
 
         ):
 
@@ -699,6 +741,52 @@ def register_user(
                 "An account with these credentials already exists.",
 
                 409
+
+            )
+
+
+        if (
+
+            "invalid `phone`"
+            in
+            message
+
+            or
+
+            "invalid phone"
+            in
+            message
+
+        ):
+
+            return error(
+
+                "Please enter a valid Nigerian phone number.",
+
+                400
+
+            )
+
+
+        if (
+
+            "invalid `email`"
+            in
+            message
+
+            or
+
+            "invalid email"
+            in
+            message
+
+        ):
+
+            return error(
+
+                "Please enter a valid email address.",
+
+                400
 
             )
 
@@ -722,22 +810,28 @@ def register_user(
             user
         )
 
+
         user_id = (
 
             user_data.get(
                 "$id"
             )
 
-            or user_data.get(
+            or
+
+            user_data.get(
                 "id"
             )
 
         )
 
+
         if not user_id:
 
             raise RuntimeError(
+
                 "Account was created but no user ID was returned."
+
             )
 
 
@@ -752,6 +846,7 @@ def register_user(
             f"{str(exc)}"
 
         )
+
 
         return error(
 
@@ -793,6 +888,7 @@ def register_user(
 
         )
 
+
         return error(
 
             "Account was created, but the profile could not be created.",
@@ -817,22 +913,27 @@ def register_user(
             "message":
                 "Account and profile created successfully.",
 
-            "account": {
+            "account":
 
-                "id": user_id,
+                {
 
-                "email": email,
+                    "id":
+                        user_id,
 
-                "phone": phone
+                    "email":
+                        email,
 
-            },
+                    "phone":
+                        phone
 
-            "profile": profile
+                },
+
+            "profile":
+                profile
 
         }
 
     )
-
 
 # ============================================================
 # HEALTH CHECK
