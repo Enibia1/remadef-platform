@@ -10,7 +10,7 @@ import traceback
 from datetime import datetime, timezone
 
 from appwrite.client import Client
-from appwrite.services.users import Users
+from appwrite.services.account import Account
 from appwrite.services.tables_db import TablesDB
 
 
@@ -35,55 +35,178 @@ PROFILES_TABLE_ID = os.environ.get(
 
 
 # ============================================================
+# JSON SERIALIZATION HELPERS
+# ============================================================
+
+def convert_to_dict(value):
+
+    if value is None:
+        return None
+
+    if isinstance(value, dict):
+        return {
+            key: convert_to_dict(item)
+            for key, item in value.items()
+        }
+
+    if isinstance(value, list):
+        return [
+            convert_to_dict(item)
+            for item in value
+        ]
+
+    if isinstance(value, tuple):
+        return [
+            convert_to_dict(item)
+            for item in value
+        ]
+
+    if hasattr(value, "model_dump"):
+
+        try:
+
+            return convert_to_dict(
+                value.model_dump()
+            )
+
+        except Exception:
+
+            pass
+
+    if hasattr(value, "dict"):
+
+        try:
+
+            return convert_to_dict(
+                value.dict()
+            )
+
+        except Exception:
+
+            pass
+
+    if hasattr(value, "__dict__"):
+
+        try:
+
+            return convert_to_dict(
+                vars(value)
+            )
+
+        except Exception:
+
+            pass
+
+    return value
+
+
+# ============================================================
 # RESPONSE HELPERS
 # ============================================================
 
-def response(status_code=200, body=None):
+def response(
+    status_code=200,
+    body=None
+):
 
     if body is None:
+
         body = {}
 
-    return {
-        "statusCode": status_code,
 
-        "headers": {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": (
-                "Content-Type, X-Appwrite-Project"
-            ),
-            "Access-Control-Allow-Methods": (
-                "GET, POST, PUT, PATCH, OPTIONS"
-            )
-        },
-
-        "body": json.dumps(
-            body,
-            ensure_ascii=False
-        )
-    }
-
-
-def success(data=None, message="Success"):
-
-    return response(
-        200,
-        {
-            "success": True,
-            "message": message,
-            "data": data
-        }
+    safe_body = convert_to_dict(
+        body
     )
 
 
-def error(message, status_code=400):
+    return {
+
+        "statusCode":
+
+            status_code,
+
+        "headers": {
+
+            "Content-Type":
+
+                "application/json",
+
+            "Access-Control-Allow-Origin":
+
+                "*",
+
+            "Access-Control-Allow-Headers":
+
+                "Content-Type, X-Appwrite-Project",
+
+            "Access-Control-Allow-Methods":
+
+                "GET, POST, PUT, PATCH, OPTIONS"
+
+        },
+
+        "body":
+
+            json.dumps(
+
+                safe_body,
+
+                ensure_ascii=False
+
+            )
+
+    }
+
+
+def success(
+    data=None,
+    message="Success"
+):
 
     return response(
-        status_code,
+
+        200,
+
         {
-            "success": False,
-            "message": message
+
+            "success":
+
+                True,
+
+            "message":
+
+                message,
+
+            "data":
+
+                data
+
         }
+
+    )
+
+
+def error(
+    message,
+    status_code=400
+):
+
+    return response(
+
+        status_code,
+
+        {
+
+            "success":
+
+                False,
+
+            "message":
+
+                message
+
+        }
+
     )
 
 
@@ -91,30 +214,55 @@ def error(message, status_code=400):
 # APPWRITE CLIENT
 # ============================================================
 
-def get_client(context):
+def get_client(
+    context
+):
 
     client = Client()
 
+
     client.set_endpoint(
+
         os.environ.get(
+
             "APPWRITE_FUNCTION_ENDPOINT",
+
             "https://fra.cloud.appwrite.io/v1"
+
         )
+
     )
 
-    client.set_project(PROJECT_ID)
+
+    client.set_project(
+
+        PROJECT_ID
+
+    )
+
 
     dynamic_key = context.req.headers.get(
+
         "x-appwrite-key"
+
     )
+
 
     if not dynamic_key:
 
         raise RuntimeError(
+
             "Dynamic Appwrite API key is missing."
+
         )
 
-    client.set_key(dynamic_key)
+
+    client.set_key(
+
+        dynamic_key
+
+    )
+
 
     return client
 
@@ -123,17 +271,33 @@ def get_client(context):
 # APPWRITE SERVICES
 # ============================================================
 
-def get_users_service(context):
+def get_account_service(
+    context
+):
 
-    return Users(
-        get_client(context)
+    return Account(
+
+        get_client(
+
+            context
+
+        )
+
     )
 
 
-def get_tables_db(context):
+def get_tables_db(
+    context
+):
 
     return TablesDB(
-        get_client(context)
+
+        get_client(
+
+            context
+
+        )
+
     )
 
 
@@ -141,25 +305,49 @@ def get_tables_db(context):
 # REQUEST BODY PARSER
 # ============================================================
 
-def parse_json_body(request):
+def parse_json_body(
+    request
+):
 
     body = request.body
 
+
     if not body:
+
         return {}
 
-    if isinstance(body, dict):
+
+    if isinstance(
+
+        body,
+
+        dict
+
+    ):
+
         return body
 
-    if isinstance(body, str):
+
+    if isinstance(
+
+        body,
+
+        str
+
+    ):
 
         try:
 
-            return json.loads(body)
+            return json.loads(
+
+                body
+
+            )
 
         except json.JSONDecodeError:
 
             return {}
+
 
     return {}
 
@@ -171,20 +359,35 @@ def parse_json_body(request):
 PROFILE_FIELDS = [
 
     "email",
+
     "first_name",
+
     "last_name",
+
     "display_name",
+
     "date_of_birth",
+
     "gender",
+
     "country",
+
     "state",
+
     "city",
+
     "phone",
+
     "headline",
+
     "about",
+
     "skills",
+
     "education_level",
+
     "institution",
+
     "profile_completion"
 
 ]
@@ -194,15 +397,30 @@ PROFILE_FIELDS = [
 # FIND PROFILE
 # ============================================================
 
-def find_profile(account_id, context):
+def find_profile(
 
-    tables_db = get_tables_db(context)
+    account_id,
+
+    context
+
+):
+
+    tables_db = get_tables_db(
+
+        context
+
+    )
+
 
     result = tables_db.list_rows(
 
-        database_id=DATABASE_ID,
+        database_id=
 
-        table_id=PROFILES_TABLE_ID,
+            DATABASE_ID,
+
+        table_id=
+
+            PROFILES_TABLE_ID,
 
         queries=[
 
@@ -212,6 +430,25 @@ def find_profile(account_id, context):
 
     )
 
+
+    result = convert_to_dict(
+
+        result
+
+    )
+
+
+    if not isinstance(
+
+        result,
+
+        dict
+
+    ):
+
+        return None
+
+
     rows = result.get(
 
         "rows",
@@ -220,9 +457,11 @@ def find_profile(account_id, context):
 
     )
 
+
     if not rows:
 
         return None
+
 
     return rows[0]
 
@@ -231,31 +470,54 @@ def find_profile(account_id, context):
 # CALCULATE PROFILE COMPLETION
 # ============================================================
 
-def calculate_completion(profile):
+def calculate_completion(
+
+    profile
+
+):
 
     fields = [
 
         "first_name",
+
         "last_name",
+
         "display_name",
+
         "date_of_birth",
+
         "gender",
+
         "country",
+
         "state",
+
         "city",
+
         "phone",
+
         "headline",
+
         "about",
+
         "education_level",
+
         "institution"
 
     ]
 
+
     completed = 0
+
 
     for field in fields:
 
-        value = profile.get(field)
+        value = profile.get(
+
+            field
+
+        )
+
 
         if (
 
@@ -267,11 +529,23 @@ def calculate_completion(profile):
 
             completed += 1
 
-    skills = profile.get("skills")
+
+    skills = profile.get(
+
+        "skills"
+
+    )
+
 
     if skills:
 
-        if isinstance(skills, list):
+        if isinstance(
+
+            skills,
+
+            list
+
+        ):
 
             if len(skills) > 0:
 
@@ -281,11 +555,23 @@ def calculate_completion(profile):
 
             completed += 1
 
-    total = len(fields) + 1
+
+    total = len(
+
+        fields
+
+    ) + 1
+
 
     return round(
 
-        (completed / total) * 100
+        (
+
+            completed /
+
+            total
+
+        ) * 100
 
     )
 
@@ -306,7 +592,12 @@ def create_profile(
 
 ):
 
-    tables_db = get_tables_db(context)
+    tables_db = get_tables_db(
+
+        context
+
+    )
+
 
     now = datetime.now(
 
@@ -314,57 +605,112 @@ def create_profile(
 
     ).isoformat()
 
+
     profile_data = {
 
-        "account_id": account_id,
+        "account_id":
 
-        "email": email or "",
+            account_id,
 
-        "first_name": "",
+        "email":
 
-        "last_name": "",
+            email or "",
 
-        "display_name": "",
+        "first_name":
 
-        "date_of_birth": "",
+            "",
 
-        "gender": "",
+        "last_name":
 
-        "country": "",
+            "",
 
-        "state": "",
+        "display_name":
 
-        "city": "",
+            "",
 
-        "phone": phone or "",
+        "date_of_birth":
 
-        "headline": "",
+            "",
 
-        "about": "",
+        "gender":
 
-        "skills": "",
+            "",
 
-        "education_level": "",
+        "country":
 
-        "institution": "",
+            "",
 
-        "profile_completion": 0,
+        "state":
 
-        "created_at": now,
+            "",
 
-        "updated_at": now
+        "city":
+
+            "",
+
+        "phone":
+
+            phone or "",
+
+        "headline":
+
+            "",
+
+        "about":
+
+            "",
+
+        "skills":
+
+            "",
+
+        "education_level":
+
+            "",
+
+        "institution":
+
+            "",
+
+        "profile_completion":
+
+            0,
+
+        "created_at":
+
+            now,
+
+        "updated_at":
+
+            now
 
     }
 
-    return tables_db.create_row(
 
-        database_id=DATABASE_ID,
+    profile = tables_db.create_row(
 
-        table_id=PROFILES_TABLE_ID,
+        database_id=
 
-        row_id="unique()",
+            DATABASE_ID,
 
-        data=profile_data
+        table_id=
+
+            PROFILES_TABLE_ID,
+
+        row_id=
+
+            "unique()",
+
+        data=
+
+            profile_data
+
+    )
+
+
+    return convert_to_dict(
+
+        profile
 
     )
 
@@ -383,7 +729,12 @@ def update_profile(
 
 ):
 
-    tables_db = get_tables_db(context)
+    tables_db = get_tables_db(
+
+        context
+
+    )
+
 
     existing = find_profile(
 
@@ -392,6 +743,7 @@ def update_profile(
         context
 
     )
+
 
     if not existing:
 
@@ -403,9 +755,25 @@ def update_profile(
 
         )
 
-    row_id = existing["$id"]
+
+    row_id = existing.get(
+
+        "$id"
+
+    )
+
+
+    if not row_id:
+
+        raise RuntimeError(
+
+            "Profile row ID is missing."
+
+        )
+
 
     update_data = {}
+
 
     for field in PROFILE_FIELDS:
 
@@ -413,19 +781,33 @@ def update_profile(
 
             continue
 
+
         value = profile_data[field]
+
 
         if field == "skills":
 
-            if isinstance(value, list):
+            if isinstance(
 
-                value = json.dumps(value)
+                value,
+
+                list
+
+            ):
+
+                value = json.dumps(
+
+                    value
+
+                )
 
             elif value is None:
 
                 value = ""
 
+
         update_data[field] = value
+
 
     merged = {
 
@@ -435,31 +817,53 @@ def update_profile(
 
     }
 
-    update_data["profile_completion"] = (
 
-        calculate_completion(merged)
+    update_data[
 
-    )
+        "profile_completion"
 
-    update_data["updated_at"] = (
+    ] = calculate_completion(
 
-        datetime.now(
-
-            timezone.utc
-
-        ).isoformat()
+        merged
 
     )
 
-    return tables_db.update_row(
 
-        database_id=DATABASE_ID,
+    update_data[
 
-        table_id=PROFILES_TABLE_ID,
+        "updated_at"
 
-        row_id=row_id,
+    ] = datetime.now(
 
-        data=update_data
+        timezone.utc
+
+    ).isoformat()
+
+
+    updated_profile = tables_db.update_row(
+
+        database_id=
+
+            DATABASE_ID,
+
+        table_id=
+
+            PROFILES_TABLE_ID,
+
+        row_id=
+
+            row_id,
+
+        data=
+
+            update_data
+
+    )
+
+
+    return convert_to_dict(
+
+        updated_profile
 
     )
 
@@ -468,7 +872,13 @@ def update_profile(
 # REGISTER USER
 # ============================================================
 
-def register_user(data, context):
+def register_user(
+
+    data,
+
+    context
+
+):
 
     email = str(
 
@@ -482,6 +892,7 @@ def register_user(data, context):
 
     ).strip().lower()
 
+
     password = str(
 
         data.get(
@@ -493,6 +904,7 @@ def register_user(data, context):
         )
 
     )
+
 
     phone = str(
 
@@ -506,6 +918,7 @@ def register_user(data, context):
 
     ).strip()
 
+
     if not email and not phone:
 
         return error(
@@ -513,6 +926,7 @@ def register_user(data, context):
             "Email or phone number is required."
 
         )
+
 
     if len(password) < 8:
 
@@ -522,7 +936,8 @@ def register_user(data, context):
 
         )
 
-    users_service = get_users_service(
+
+    account_service = get_account_service(
 
         context
 
@@ -530,32 +945,44 @@ def register_user(data, context):
 
 
     # ========================================================
-    # CREATE USER ACCOUNT
+    # CREATE ACCOUNT
     # ========================================================
 
     try:
 
         if email:
 
-            user = users_service.create(
+            user = account_service.create(
 
-                user_id="unique()",
+                user_id=
 
-                email=email,
+                    "unique()",
 
-                password=password
+                email=
+
+                    email,
+
+                password=
+
+                    password
 
             )
 
         else:
 
-            user = users_service.create(
+            user = account_service.create_phone_user(
 
-                user_id="unique()",
+                user_id=
 
-                phone=phone,
+                    "unique()",
 
-                password=password
+                phone=
+
+                    phone,
+
+                password=
+
+                    password
 
             )
 
@@ -564,7 +991,7 @@ def register_user(data, context):
 
         context.error(
 
-            "User creation failed: "
+            "Account creation failed: "
 
             f"{type(exc).__name__}: "
 
@@ -572,7 +999,13 @@ def register_user(data, context):
 
         )
 
-        message = str(exc)
+
+        message = str(
+
+            exc
+
+        )
+
 
         if (
 
@@ -592,6 +1025,7 @@ def register_user(data, context):
 
             )
 
+
         return error(
 
             "Could not create account.",
@@ -607,43 +1041,35 @@ def register_user(data, context):
 
     try:
 
-        if hasattr(
+        user_data = convert_to_dict(
 
-            user,
+            user
 
-            "model_dump"
+        )
 
-        ):
-
-            user_data = user.model_dump()
-
-        elif hasattr(
-
-            user,
-
-            "dict"
-
-        ):
-
-            user_data = user.dict()
-
-        else:
-
-            user_data = vars(user)
 
         user_id = (
 
-            user_data.get("$id")
+            user_data.get(
 
-            or user_data.get("id")
+                "$id"
+
+            )
+
+            or user_data.get(
+
+                "id"
+
+            )
 
         )
+
 
         if not user_id:
 
             raise RuntimeError(
 
-                "User was created but no user ID was returned."
+                "Account was created but no user ID was returned."
 
             )
 
@@ -659,6 +1085,7 @@ def register_user(data, context):
             f"{str(exc)}"
 
         )
+
 
         return error(
 
@@ -677,13 +1104,21 @@ def register_user(data, context):
 
         profile = create_profile(
 
-            account_id=user_id,
+            account_id=
 
-            email=email,
+                user_id,
 
-            phone=phone,
+            email=
 
-            context=context
+                email,
+
+            phone=
+
+                phone,
+
+            context=
+
+                context
 
         )
 
@@ -699,6 +1134,7 @@ def register_user(data, context):
             f"{str(exc)}"
 
         )
+
 
         return error(
 
@@ -719,25 +1155,35 @@ def register_user(data, context):
 
         {
 
-            "success": True,
+            "success":
 
-            "message": (
+                True,
 
-                "Account and profile created successfully."
+            "message":
 
-            ),
+                "Account and profile created successfully.",
 
-            "account": {
+            "account":
 
-                "id": user_id,
+                {
 
-                "email": email,
+                    "id":
 
-                "phone": phone
+                        user_id,
 
-            },
+                    "email":
 
-            "profile": profile
+                        email,
+
+                    "phone":
+
+                        phone
+
+                },
+
+            "profile":
+
+                profile
 
         }
 
@@ -754,13 +1200,13 @@ def health_check():
 
         {
 
-            "service": (
+            "service":
 
-                "REMADEF Platform API"
+                "REMADEF Platform API",
 
-            ),
+            "status":
 
-            "status": "healthy"
+                "healthy"
 
         },
 
@@ -783,6 +1229,7 @@ def route_request(
 
     method = request.method.upper()
 
+
     path = request.path
 
 
@@ -798,13 +1245,13 @@ def route_request(
 
             {
 
-                "success": True,
+                "success":
 
-                "message": (
+                    True,
+
+                "message":
 
                     "CORS preflight successful."
-
-                )
 
             }
 
@@ -848,6 +1295,7 @@ def route_request(
 
         )
 
+
         return register_user(
 
             data,
@@ -870,7 +1318,11 @@ def route_request(
 # MAIN ENTRYPOINT
 # ============================================================
 
-def main(context):
+def main(
+
+    context
+
+):
 
     try:
 
@@ -881,6 +1333,7 @@ def main(context):
             context
 
         )
+
 
     except Exception as exc:
 
@@ -894,11 +1347,13 @@ def main(context):
 
         )
 
+
         context.error(
 
             traceback.format_exc()
 
         )
+
 
         return error(
 
