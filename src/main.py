@@ -10,7 +10,7 @@ import traceback
 from datetime import datetime, timezone
 
 from appwrite.client import Client
-from appwrite.services.account import Account
+from appwrite.services.users import Users
 from appwrite.services.tables_db import TablesDB
 
 
@@ -104,12 +104,12 @@ def get_client(context):
 
     client.set_project(PROJECT_ID)
 
-    # Appwrite provides the dynamic key to the function
     dynamic_key = context.req.headers.get(
         "x-appwrite-key"
     )
 
     if not dynamic_key:
+
         raise RuntimeError(
             "Dynamic Appwrite API key is missing."
         )
@@ -123,9 +123,9 @@ def get_client(context):
 # APPWRITE SERVICES
 # ============================================================
 
-def get_account_service(context):
+def get_users_service(context):
 
-    return Account(
+    return Users(
         get_client(context)
     )
 
@@ -154,9 +154,11 @@ def parse_json_body(request):
     if isinstance(body, str):
 
         try:
+
             return json.loads(body)
 
         except json.JSONDecodeError:
+
             return {}
 
     return {}
@@ -197,19 +199,29 @@ def find_profile(account_id, context):
     tables_db = get_tables_db(context)
 
     result = tables_db.list_rows(
+
         database_id=DATABASE_ID,
+
         table_id=PROFILES_TABLE_ID,
+
         queries=[
+
             f'equal("account_id", "{account_id}")'
+
         ]
+
     )
 
     rows = result.get(
+
         "rows",
+
         []
+
     )
 
     if not rows:
+
         return None
 
     return rows[0]
@@ -246,9 +258,13 @@ def calculate_completion(profile):
         value = profile.get(field)
 
         if (
+
             value is not None
+
             and str(value).strip()
+
         ):
+
             completed += 1
 
     skills = profile.get("skills")
@@ -258,6 +274,7 @@ def calculate_completion(profile):
         if isinstance(skills, list):
 
             if len(skills) > 0:
+
                 completed += 1
 
         elif str(skills).strip():
@@ -267,7 +284,9 @@ def calculate_completion(profile):
     total = len(fields) + 1
 
     return round(
+
         (completed / total) * 100
+
     )
 
 
@@ -276,16 +295,23 @@ def calculate_completion(profile):
 # ============================================================
 
 def create_profile(
+
     account_id,
+
     email="",
+
     phone="",
+
     context=None
+
 ):
 
     tables_db = get_tables_db(context)
 
     now = datetime.now(
+
         timezone.utc
+
     ).isoformat()
 
     profile_data = {
@@ -348,16 +374,23 @@ def create_profile(
 # ============================================================
 
 def update_profile(
+
     account_id,
+
     profile_data,
+
     context
+
 ):
 
     tables_db = get_tables_db(context)
 
     existing = find_profile(
+
         account_id,
+
         context
+
     )
 
     if not existing:
@@ -377,6 +410,7 @@ def update_profile(
     for field in PROFILE_FIELDS:
 
         if field not in profile_data:
+
             continue
 
         value = profile_data[field]
@@ -394,18 +428,27 @@ def update_profile(
         update_data[field] = value
 
     merged = {
+
         **existing,
+
         **update_data
+
     }
 
     update_data["profile_completion"] = (
+
         calculate_completion(merged)
+
     )
 
     update_data["updated_at"] = (
+
         datetime.now(
+
             timezone.utc
+
         ).isoformat()
+
     )
 
     return tables_db.update_row(
@@ -428,52 +471,73 @@ def update_profile(
 def register_user(data, context):
 
     email = str(
+
         data.get(
+
             "email",
+
             ""
+
         )
+
     ).strip().lower()
 
     password = str(
+
         data.get(
+
             "password",
+
             ""
+
         )
+
     )
 
     phone = str(
+
         data.get(
+
             "phone",
+
             ""
+
         )
+
     ).strip()
 
     if not email and not phone:
 
         return error(
+
             "Email or phone number is required."
+
         )
 
     if len(password) < 8:
 
         return error(
+
             "Password must contain at least 8 characters."
+
         )
 
-    account_service = get_account_service(
+    users_service = get_users_service(
+
         context
+
     )
 
 
     # ========================================================
-    # CREATE ACCOUNT
+    # CREATE USER ACCOUNT
     # ========================================================
 
     try:
 
         if email:
 
-            user = account_service.create(
+            user = users_service.create(
 
                 user_id="unique()",
 
@@ -485,7 +549,7 @@ def register_user(data, context):
 
         else:
 
-            user = account_service.create_phone_user(
+            user = users_service.create(
 
                 user_id="unique()",
 
@@ -500,7 +564,7 @@ def register_user(data, context):
 
         context.error(
 
-            "Account creation failed: "
+            "User creation failed: "
 
             f"{type(exc).__name__}: "
 
@@ -510,7 +574,15 @@ def register_user(data, context):
 
         message = str(exc)
 
-        if "already exists" in message.lower():
+        if (
+
+            "already exists"
+
+            in
+
+            message.lower()
+
+        ):
 
             return error(
 
@@ -535,11 +607,23 @@ def register_user(data, context):
 
     try:
 
-        if hasattr(user, "model_dump"):
+        if hasattr(
+
+            user,
+
+            "model_dump"
+
+        ):
 
             user_data = user.model_dump()
 
-        elif hasattr(user, "dict"):
+        elif hasattr(
+
+            user,
+
+            "dict"
+
+        ):
 
             user_data = user.dict()
 
@@ -559,7 +643,7 @@ def register_user(data, context):
 
             raise RuntimeError(
 
-                "Account was created but no user ID was returned."
+                "User was created but no user ID was returned."
 
             )
 
@@ -690,8 +774,11 @@ def health_check():
 # ============================================================
 
 def route_request(
+
     request,
+
     context
+
 ):
 
     method = request.method.upper()
@@ -794,7 +881,6 @@ def main(context):
             context
 
         )
-
 
     except Exception as exc:
 
