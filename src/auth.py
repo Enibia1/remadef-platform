@@ -1,5 +1,6 @@
 # ============================================================
-# REMADEF AUTHENTICATION MODULE
+# REMADEF AUTHENTICATION SERVICE
+# Appwrite Cloud Function
 # ============================================================
 
 import os
@@ -14,6 +15,10 @@ from appwrite.services.users import Users
 
 PROJECT_ID = os.environ.get(
     "APPWRITE_FUNCTION_PROJECT_ID"
+)
+
+APPWRITE_API_KEY = os.environ.get(
+    "APPWRITE_API_KEY"
 )
 
 APPWRITE_ENDPOINT = os.environ.get(
@@ -33,11 +38,13 @@ def get_client():
 
     client = Client()
 
+
     client.set_endpoint(
 
         APPWRITE_ENDPOINT
 
     )
+
 
     client.set_project(
 
@@ -45,15 +52,13 @@ def get_client():
 
     )
 
+
     client.set_key(
 
-        os.environ.get(
-
-            "APPWRITE_API_KEY"
-
-        )
+        APPWRITE_API_KEY
 
     )
+
 
     return client
 
@@ -72,14 +77,17 @@ def get_users():
 
 
 # ============================================================
-# GET AUTHENTICATED USER ID
+# GET USER ID FROM REQUEST
 # ============================================================
 
 def get_user_id(request):
 
     headers = request.headers or {}
 
-    return (
+
+    # Appwrite function user header
+
+    user_id = (
 
         headers.get(
 
@@ -98,11 +106,19 @@ def get_user_id(request):
     )
 
 
+    if user_id:
+
+        return user_id
+
+
+    return None
+
+
 # ============================================================
 # REQUIRE AUTHENTICATION
 # ============================================================
 
-def require_user(request):
+def require_authentication(request):
 
     user_id = get_user_id(
 
@@ -110,9 +126,65 @@ def require_user(request):
 
     )
 
+
     if not user_id:
+
+        return {
+
+            "authenticated": False,
+
+            "user_id": None,
+
+            "error":
+                "Authentication required"
+
+        }
+
+
+    return {
+
+        "authenticated": True,
+
+        "user_id": user_id,
+
+        "error": None
+
+    }
+
+
+# ============================================================
+# GET AUTHENTICATED USER
+# ============================================================
+
+def get_authenticated_user(request):
+
+    auth = require_authentication(
+
+        request
+
+    )
+
+
+    if not auth["authenticated"]:
 
         return None
 
 
-    return user_id
+    user_id = auth["user_id"]
+
+
+    try:
+
+        users = get_users()
+
+
+        return users.get(
+
+            user_id
+
+        )
+
+
+    except Exception:
+
+        return None
