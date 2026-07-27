@@ -10,7 +10,7 @@ import traceback
 from datetime import datetime, timezone
 
 from appwrite.client import Client
-from appwrite.services.users import Users
+from appwrite.services.account import Account
 from appwrite.services.tables_db import TablesDB
 
 
@@ -38,50 +38,104 @@ PROFILES_TABLE_ID = os.environ.get(
 # RESPONSE HELPERS
 # ============================================================
 
-def response(status_code=200, body=None):
+def response(
+    status_code=200,
+    body=None
+):
 
     if body is None:
+
         body = {}
 
+
     return {
-        "statusCode": status_code,
+
+        "statusCode":
+
+            status_code,
+
         "headers": {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": (
-                "Content-Type, X-Appwrite-Project"
-            ),
-            "Access-Control-Allow-Methods": (
+
+            "Content-Type":
+
+                "application/json",
+
+            "Access-Control-Allow-Origin":
+
+                "*",
+
+            "Access-Control-Allow-Headers":
+
+                "Content-Type, X-Appwrite-Project",
+
+            "Access-Control-Allow-Methods":
+
                 "GET, POST, PUT, PATCH, OPTIONS"
-            )
+
         },
-        "body": json.dumps(
-            body,
-            ensure_ascii=False
-        )
+
+        "body":
+
+            json.dumps(
+
+                body,
+
+                ensure_ascii=False
+
+            )
+
     }
 
 
-def success(data=None, message="Success"):
+def success(
+    data=None,
+    message="Success"
+):
 
     return response(
+
         200,
+
         {
-            "success": True,
-            "message": message,
-            "data": data
+
+            "success":
+
+                True,
+
+            "message":
+
+                message,
+
+            "data":
+
+                data
+
         }
+
     )
 
 
-def error(message, status_code=400):
+def error(
+    message,
+    status_code=400
+):
 
     return response(
+
         status_code,
+
         {
-            "success": False,
-            "message": message
+
+            "success":
+
+                False,
+
+            "message":
+
+                message
+
         }
+
     )
 
 
@@ -89,34 +143,56 @@ def error(message, status_code=400):
 # APPWRITE CLIENT
 # ============================================================
 
-def get_client(context):
+def get_client(
+    context
+):
 
     client = Client()
 
+
     client.set_endpoint(
+
         os.environ.get(
+
             "APPWRITE_FUNCTION_ENDPOINT",
+
             "https://fra.cloud.appwrite.io/v1"
+
         )
+
     )
+
 
     client.set_project(
+
         PROJECT_ID
+
     )
 
+
+    # Appwrite dynamically provides this key
     dynamic_key = context.req.headers.get(
+
         "x-appwrite-key"
+
     )
+
 
     if not dynamic_key:
 
         raise RuntimeError(
+
             "Dynamic Appwrite API key is missing."
+
         )
 
+
     client.set_key(
+
         dynamic_key
+
     )
+
 
     return client
 
@@ -125,17 +201,33 @@ def get_client(context):
 # APPWRITE SERVICES
 # ============================================================
 
-def get_users_service(context):
+def get_account_service(
+    context
+):
 
-    return Users(
-        get_client(context)
+    return Account(
+
+        get_client(
+
+            context
+
+        )
+
     )
 
 
-def get_tables_db(context):
+def get_tables_db(
+    context
+):
 
     return TablesDB(
-        get_client(context)
+
+        get_client(
+
+            context
+
+        )
+
     )
 
 
@@ -143,27 +235,49 @@ def get_tables_db(context):
 # REQUEST BODY PARSER
 # ============================================================
 
-def parse_json_body(request):
+def parse_json_body(
+    request
+):
 
     body = request.body
+
 
     if not body:
 
         return {}
 
-    if isinstance(body, dict):
+
+    if isinstance(
+
+        body,
+
+        dict
+
+    ):
 
         return body
 
-    if isinstance(body, str):
+
+    if isinstance(
+
+        body,
+
+        str
+
+    ):
 
         try:
 
-            return json.loads(body)
+            return json.loads(
+
+                body
+
+            )
 
         except json.JSONDecodeError:
 
             return {}
+
 
     return {}
 
@@ -175,20 +289,35 @@ def parse_json_body(request):
 PROFILE_FIELDS = [
 
     "email",
+
     "first_name",
+
     "last_name",
+
     "display_name",
+
     "date_of_birth",
+
     "gender",
+
     "country",
+
     "state",
+
     "city",
+
     "phone",
+
     "headline",
+
     "about",
+
     "skills",
+
     "education_level",
+
     "institution",
+
     "profile_completion"
 
 ]
@@ -198,30 +327,53 @@ PROFILE_FIELDS = [
 # FIND PROFILE
 # ============================================================
 
-def find_profile(account_id, context):
+def find_profile(
 
-    tables_db = get_tables_db(context)
+    account_id,
+
+    context
+
+):
+
+    tables_db = get_tables_db(
+
+        context
+
+    )
+
 
     result = tables_db.list_rows(
 
-        database_id=DATABASE_ID,
+        database_id=
 
-        table_id=PROFILES_TABLE_ID,
+            DATABASE_ID,
+
+        table_id=
+
+            PROFILES_TABLE_ID,
 
         queries=[
+
             f'equal("account_id", "{account_id}")'
+
         ]
 
     )
 
+
     rows = result.get(
+
         "rows",
+
         []
+
     )
+
 
     if not rows:
 
         return None
+
 
     return rows[0]
 
@@ -230,31 +382,54 @@ def find_profile(account_id, context):
 # CALCULATE PROFILE COMPLETION
 # ============================================================
 
-def calculate_completion(profile):
+def calculate_completion(
+
+    profile
+
+):
 
     fields = [
 
         "first_name",
+
         "last_name",
+
         "display_name",
+
         "date_of_birth",
+
         "gender",
+
         "country",
+
         "state",
+
         "city",
+
         "phone",
+
         "headline",
+
         "about",
+
         "education_level",
+
         "institution"
 
     ]
 
+
     completed = 0
+
 
     for field in fields:
 
-        value = profile.get(field)
+        value = profile.get(
+
+            field
+
+        )
+
 
         if (
 
@@ -266,13 +441,23 @@ def calculate_completion(profile):
 
             completed += 1
 
+
     skills = profile.get(
+
         "skills"
+
     )
+
 
     if skills:
 
-        if isinstance(skills, list):
+        if isinstance(
+
+            skills,
+
+            list
+
+        ):
 
             if len(skills) > 0:
 
@@ -282,12 +467,24 @@ def calculate_completion(profile):
 
             completed += 1
 
-    total = len(fields) + 1
+
+    total = len(
+
+        fields
+
+    ) + 1
+
 
     return round(
+
         (
-            completed / total
+
+            completed /
+
+            total
+
         ) * 100
+
     )
 
 
@@ -298,69 +495,127 @@ def calculate_completion(profile):
 def create_profile(
 
     account_id,
+
     email="",
+
     phone="",
+
     context=None
 
 ):
 
-    tables_db = get_tables_db(context)
+    tables_db = get_tables_db(
+
+        context
+
+    )
+
 
     now = datetime.now(
+
         timezone.utc
+
     ).isoformat()
+
 
     profile_data = {
 
-        "account_id": account_id,
+        "account_id":
 
-        "email": email or "",
+            account_id,
 
-        "first_name": "",
+        "email":
 
-        "last_name": "",
+            email or "",
 
-        "display_name": "",
+        "first_name":
 
-        "date_of_birth": "",
+            "",
 
-        "gender": "",
+        "last_name":
 
-        "country": "",
+            "",
 
-        "state": "",
+        "display_name":
 
-        "city": "",
+            "",
 
-        "phone": phone or "",
+        "date_of_birth":
 
-        "headline": "",
+            "",
 
-        "about": "",
+        "gender":
 
-        "skills": "",
+            "",
 
-        "education_level": "",
+        "country":
 
-        "institution": "",
+            "",
 
-        "profile_completion": 0,
+        "state":
 
-        "created_at": now,
+            "",
 
-        "updated_at": now
+        "city":
+
+            "",
+
+        "phone":
+
+            phone or "",
+
+        "headline":
+
+            "",
+
+        "about":
+
+            "",
+
+        "skills":
+
+            "",
+
+        "education_level":
+
+            "",
+
+        "institution":
+
+            "",
+
+        "profile_completion":
+
+            0,
+
+        "created_at":
+
+            now,
+
+        "updated_at":
+
+            now
 
     }
 
+
     return tables_db.create_row(
 
-        database_id=DATABASE_ID,
+        database_id=
 
-        table_id=PROFILES_TABLE_ID,
+            DATABASE_ID,
 
-        row_id="unique()",
+        table_id=
 
-        data=profile_data
+            PROFILES_TABLE_ID,
+
+        row_id=
+
+            "unique()",
+
+        data=
+
+            profile_data
 
     )
 
@@ -372,19 +627,28 @@ def create_profile(
 def update_profile(
 
     account_id,
+
     profile_data,
+
     context
 
 ):
 
-    tables_db = get_tables_db(context)
+    tables_db = get_tables_db(
+
+        context
+
+    )
+
 
     existing = find_profile(
 
         account_id,
+
         context
 
     )
+
 
     if not existing:
 
@@ -396,9 +660,12 @@ def update_profile(
 
         )
 
+
     row_id = existing["$id"]
 
+
     update_data = {}
+
 
     for field in PROFILE_FIELDS:
 
@@ -406,19 +673,33 @@ def update_profile(
 
             continue
 
+
         value = profile_data[field]
+
 
         if field == "skills":
 
-            if isinstance(value, list):
+            if isinstance(
 
-                value = json.dumps(value)
+                value,
+
+                list
+
+            ):
+
+                value = json.dumps(
+
+                    value
+
+                )
 
             elif value is None:
 
                 value = ""
 
+
         update_data[field] = value
+
 
     merged = {
 
@@ -428,27 +709,46 @@ def update_profile(
 
     }
 
-    update_data[
-        "profile_completion"
-    ] = calculate_completion(
-        merged
-    )
 
     update_data[
+
+        "profile_completion"
+
+    ] = calculate_completion(
+
+        merged
+
+    )
+
+
+    update_data[
+
         "updated_at"
+
     ] = datetime.now(
+
         timezone.utc
+
     ).isoformat()
+
 
     return tables_db.update_row(
 
-        database_id=DATABASE_ID,
+        database_id=
 
-        table_id=PROFILES_TABLE_ID,
+            DATABASE_ID,
 
-        row_id=row_id,
+        table_id=
 
-        data=update_data
+            PROFILES_TABLE_ID,
+
+        row_id=
+
+            row_id,
+
+        data=
+
+            update_data
 
     )
 
@@ -457,34 +757,52 @@ def update_profile(
 # REGISTER USER
 # ============================================================
 
-def register_user(data, context):
+def register_user(
+
+    data,
+
+    context
+
+):
 
     email = str(
 
         data.get(
+
             "email",
+
             ""
+
         )
 
     ).strip().lower()
 
+
     password = str(
 
         data.get(
+
             "password",
+
             ""
+
         )
 
     )
 
+
     phone = str(
 
         data.get(
+
             "phone",
+
             ""
+
         )
 
     ).strip()
+
 
     if not email and not phone:
 
@@ -494,6 +812,7 @@ def register_user(data, context):
 
         )
 
+
     if len(password) < 8:
 
         return error(
@@ -502,67 +821,76 @@ def register_user(data, context):
 
         )
 
-    users_service = get_users_service(
+
+    account_service = get_account_service(
+
         context
+
     )
 
-    user = None
 
-    # --------------------------------------------------------
-    # CREATE EMAIL USER
-    # --------------------------------------------------------
+    # ========================================================
+    # CREATE ACCOUNT
+    # ========================================================
 
     try:
 
         if email:
 
-            user = users_service.create(
+            user = account_service.create(
 
-                user_id="unique()",
+                user_id=
 
-                email=email,
+                    "unique()",
 
-                password=password
+                email=
+
+                    email,
+
+                password=
+
+                    password
 
             )
 
         else:
 
-            user = users_service.create(
+            user = account_service.create_phone_user(
 
-                user_id="unique()",
+                user_id=
 
-                phone=phone,
+                    "unique()",
 
-                password=password
+                phone=
+
+                    phone,
+
+                password=
+
+                    password
 
             )
+
 
     except Exception as exc:
 
         context.error(
 
-            "Account creation failed: "
+            f"Account creation failed: "
 
-            f"{type(exc).__name__}: "
-
-            f"{str(exc)}"
+            f"{type(exc).__name__}: {str(exc)}"
 
         )
 
-        message = str(exc)
 
-        if (
+        message = str(
 
-            "already exists"
+            exc
 
-            in message.lower()
+        )
 
-            or "user_already_exists"
 
-            in message.lower()
-
-        ):
+        if "already exists" in message.lower():
 
             return error(
 
@@ -572,6 +900,7 @@ def register_user(data, context):
 
             )
 
+
         return error(
 
             "Could not create account.",
@@ -580,505 +909,118 @@ def register_user(data, context):
 
         )
 
-    # --------------------------------------------------------
-    # VERIFY USER CREATION
-    # --------------------------------------------------------
 
-    if not user:
+    # ========================================================
+    # EXTRACT USER ID
+    # ========================================================
 
-        context.error(
+    try:
 
-            "Account creation returned no user."
+        # The Appwrite Python SDK returns a Pydantic User object.
+        # It is NOT a normal dictionary.
+
+        if hasattr(
+
+            user,
+
+            "model_dump"
+
+        ):
+
+            user_data = user.model_dump()
+
+
+        elif hasattr(
+
+            user,
+
+            "dict"
+
+        ):
+
+            user_data = user.dict()
+
+
+        else:
+
+            user_data = vars(
+
+                user
+
+            )
+
+
+        user_id = (
+
+            user_data.get(
+
+                "$id"
+
+            )
+
+            or user_data.get(
+
+                "id"
+
+            )
 
         )
 
+
+        if not user_id:
+
+            raise RuntimeError(
+
+                "Account was created but no user ID was returned."
+
+            )
+
+
+    except Exception as exc:
+
+        context.error(
+
+            f"User ID extraction failed: "
+
+            f"{type(exc).__name__}: {str(exc)}"
+
+        )
+
+
         return error(
 
-            "Account creation failed.",
+            "Account was created, but the user ID could not be retrieved.",
 
             500
 
         )
 
-    user_id = user.get(
 
-        "$id"
-
-    )
-
-    if not user_id:
-
-        context.error(
-
-            "Account was created but no user ID was returned."
-
-        )
-
-        return error(
-
-            "Account creation failed.",
-
-            500
-
-        )
-
-    # --------------------------------------------------------
+    # ========================================================
     # CREATE PROFILE
-    # --------------------------------------------------------
+    # ========================================================
 
     try:
 
         profile = create_profile(
 
-            account_id=user_id,
+            account_id=
 
-            email=email,
+                user_id,
 
-            phone=phone,
+            email=
 
-            context=context
+                email,
 
-        )
+            phone=
 
-    except Exception as exc:
+                phone,
 
-        context.error(
+            context=
 
-            "Profile creation failed: "
-
-            f"{type(exc).__name__}: "
-
-            f"{str(exc)}"
+                context
 
         )
 
-        # IMPORTANT:
-        # The Auth user was already created successfully.
-        # We do not pretend the entire registration failed.
 
-        return response(
-
-            201,
-
-            {
-
-                "success": True,
-
-                "message": (
-
-                    "Account created successfully, "
-
-                    "but profile setup is pending."
-
-                ),
-
-                "account": {
-
-                    "id": user_id,
-
-                    "email": email,
-
-                    "phone": phone
-
-                },
-
-                "profile": None
-
-            }
-
-        )
-
-    # --------------------------------------------------------
-    # SUCCESS
-    # --------------------------------------------------------
-
-    return response(
-
-        201,
-
-        {
-
-            "success": True,
-
-            "message": (
-
-                "Account created successfully."
-
-            ),
-
-            "account": {
-
-                "id": user_id,
-
-                "email": email,
-
-                "phone": phone
-
-            },
-
-            "profile": profile
-
-        }
-
-    )
-
-
-# ============================================================
-# LOGIN
-# ============================================================
-
-def login_user(data):
-
-    return error(
-
-        (
-
-            "Login is handled by the frontend using "
-
-            "Appwrite Account.createEmailPasswordSession "
-
-            "or Account.createPhoneSession."
-
-        ),
-
-        501
-
-    )
-
-
-# ============================================================
-# GET PROFILE
-# ============================================================
-
-def get_profile(data, context):
-
-    account_id = str(
-
-        data.get(
-
-            "account_id",
-
-            ""
-
-        )
-
-    ).strip()
-
-    if not account_id:
-
-        return error(
-
-            "Account ID is required."
-
-        )
-
-    profile = find_profile(
-
-        account_id,
-
-        context
-
-    )
-
-    if not profile:
-
-        return error(
-
-            "Profile not found.",
-
-            404
-
-        )
-
-    skills = profile.get(
-
-        "skills",
-
-        ""
-
-    )
-
-    if isinstance(
-
-        skills,
-
-        str
-
-    ) and skills:
-
-        try:
-
-            profile["skills"] = json.loads(
-
-                skills
-
-            )
-
-        except json.JSONDecodeError:
-
-            profile["skills"] = [
-
-                skills
-
-            ]
-
-    return success(
-
-        profile,
-
-        "Profile loaded."
-
-    )
-
-
-# ============================================================
-# SAVE PROFILE
-# ============================================================
-
-def save_profile(data, context):
-
-    account_id = str(
-
-        data.get(
-
-            "account_id",
-
-            ""
-
-        )
-
-    ).strip()
-
-    if not account_id:
-
-        return error(
-
-            "Account ID is required."
-
-        )
-
-    profile_data = data.get(
-
-        "profile",
-
-        data
-
-    )
-
-    if not isinstance(
-
-        profile_data,
-
-        dict
-
-    ):
-
-        return error(
-
-            "Invalid profile data."
-
-        )
-
-    profile = update_profile(
-
-        account_id,
-
-        profile_data,
-
-        context
-
-    )
-
-    return success(
-
-        profile,
-
-        "Profile saved successfully."
-
-    )
-
-
-# ============================================================
-# ROUTER
-# ============================================================
-
-def route_request(request, context):
-
-    method = str(
-
-        request.method or "GET"
-
-    ).upper()
-
-    path = request.path or "/"
-
-    if method == "OPTIONS":
-
-        return response(
-
-            204,
-
-            {}
-
-        )
-
-    if method == "GET" and path == "/":
-
-        return success(
-
-            {
-
-                "service":
-
-                    "REMADEF Platform API",
-
-                "status":
-
-                    "online"
-
-            },
-
-            "REMADEF Platform API is online."
-
-        )
-
-    if method == "GET" and path == "/api/health":
-
-        return success(
-
-            {
-
-                "status":
-
-                    "healthy"
-
-            },
-
-            "API is healthy."
-
-        )
-
-    data = parse_json_body(
-
-        request
-
-    )
-
-    if (
-
-        method == "POST"
-
-        and path == "/api/register"
-
-    ):
-
-        return register_user(
-
-            data,
-
-            context
-
-        )
-
-    if (
-
-        method == "POST"
-
-        and path == "/api/login"
-
-    ):
-
-        return login_user(
-
-            data
-
-        )
-
-    if (
-
-        method == "GET"
-
-        and path == "/api/profile"
-
-    ):
-
-        return get_profile(
-
-            data,
-
-            context
-
-        )
-
-    if (
-
-        method in (
-
-            "POST",
-
-            "PUT",
-
-            "PATCH"
-
-        )
-
-        and path == "/api/profile"
-
-    ):
-
-        return save_profile(
-
-            data,
-
-            context
-
-        )
-
-    return error(
-
-        "Route not found.",
-
-        404
-
-    )
-
-
-# ============================================================
-# APPWRITE FUNCTION ENTRYPOINT
-# ============================================================
-
-def main(context):
-
-    try:
-
-        request = context.req
-
-        return route_request(
-
-            request,
-
-            context
-
-        )
-
-    except Exception as exc:
-
-        context.error(
-
-            "UNHANDLED ERROR: "
-
-            f"{type(exc).__name__}: "
-
-            f"{str(exc)}"
-
-        )
-
-        traceback.print_exc()
-
-        return error(
-
-            "Internal server error.",
-
-            500
-
-        )
+    except Exception as
