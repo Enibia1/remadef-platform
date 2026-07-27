@@ -2,93 +2,293 @@
 
 /*
 ============================================================
-REMADEF PROFILE
-Authenticated Profile Controller
+REMADEF PROFILE MANAGEMENT
+============================================================
+
+Responsibilities:
+
+1. Verify the user is logged into Appwrite
+2. Load the current Appwrite user
+3. Load the user's profile from the REMADEF API
+4. Populate the profile form
+5. Manage skills
+6. Calculate profile completion
+7. Save profile to the REMADEF API
+8. Redirect to profile.html after saving
+
 ============================================================
 */
 
+
+// ============================================================
+// CONFIGURATION
+// ============================================================
+
+const PROJECT_ID =
+    "6a5bc178003a2529271e";
+
+
+const APPWRITE_ENDPOINT =
+    "https://sfo.cloud.appwrite.io/v1";
+
+
 const API_URL =
-    "https://6a6380f50016f677984e.fra.appwrite.run/";
-// Replace with your actual deployed REMADEF Platform API URL
+    "https://6a6380f50016f677984e.fra.appwrite.run";
+
+
+// IMPORTANT:
+// Replace the API_URL above with your real deployed
+// REMADEF Platform API function URL.
+//
+// Example:
+//
+// const API_URL =
+//     "https://YOUR-FUNCTION-DOMAIN/api";
 
 
 // ============================================================
-// DOM
+// APPWRITE CLIENT
 // ============================================================
 
-const profileName =
-    document.getElementById("profile-name");
+const client = new Appwrite.Client();
 
-const profileEmail =
-    document.getElementById("profile-email");
 
-const profileHeadline =
-    document.getElementById("profile-headline");
+client
+    .setEndpoint(
 
-const profileAbout =
-    document.getElementById("profile-about");
+        APPWRITE_ENDPOINT
 
-const profileLocation =
-    document.getElementById("profile-location");
+    )
+    .setProject(
 
-const profileSkills =
-    document.getElementById("profile-skills");
+        PROJECT_ID
 
-const profileCompletion =
-    document.getElementById("profile-completion");
+    );
 
-const editProfileButton =
-    document.getElementById("edit-profile");
+
+const account =
+
+    new Appwrite.Account(
+
+        client
+
+    );
 
 
 // ============================================================
-// ACCOUNT
+// DOM ELEMENTS
 // ============================================================
 
-function getAccount() {
+const form =
 
-    const savedAccount =
-        localStorage.getItem(
-            "remadef_account"
-        );
+    document.getElementById(
 
-    if (!savedAccount) {
+        "profile-form"
 
-        window.location.replace(
-            "index.html"
-        );
+    );
 
-        return null;
 
-    }
+const errorBox =
 
-    try {
+    document.getElementById(
 
-        return JSON.parse(
-            savedAccount
-        );
+        "error"
 
-    }
+    );
 
-    catch (error) {
 
-        localStorage.removeItem(
-            "remadef_account"
-        );
+const successBox =
 
-        window.location.replace(
-            "index.html"
-        );
+    document.getElementById(
 
-        return null;
+        "success"
 
-    }
+    );
+
+
+const emailInput =
+
+    document.getElementById(
+
+        "email"
+
+    );
+
+
+const phoneInput =
+
+    document.getElementById(
+
+        "phone"
+
+    );
+
+
+const skillsInput =
+
+    document.getElementById(
+
+        "skills-input"
+
+    );
+
+
+const addSkillButton =
+
+    document.getElementById(
+
+        "add-skill"
+
+    );
+
+
+const skillsList =
+
+    document.getElementById(
+
+        "skills-list"
+
+    );
+
+
+const progressBar =
+
+    document.getElementById(
+
+        "progress-bar"
+
+    );
+
+
+const progressPercent =
+
+    document.getElementById(
+
+        "progress-percent"
+
+    );
+
+
+const saveButton =
+
+    document.getElementById(
+
+        "save-profile"
+
+    );
+
+
+// ============================================================
+// STATE
+// ============================================================
+
+let currentUser = null;
+
+
+let skills = [];
+
+
+// ============================================================
+// FORM FIELD IDS
+// ============================================================
+
+const FIELD_IDS = [
+
+    "first-name",
+
+    "last-name",
+
+    "display-name",
+
+    "date-of-birth",
+
+    "gender",
+
+    "country",
+
+    "state",
+
+    "city",
+
+    "phone",
+
+    "headline",
+
+    "about",
+
+    "education-level",
+
+    "institution"
+
+];
+
+
+// ============================================================
+// MESSAGE HELPERS
+// ============================================================
+
+function showError(message) {
+
+
+    successBox.style.display =
+
+        "none";
+
+
+    errorBox.textContent =
+
+        message;
+
+
+    errorBox.style.display =
+
+        "block";
+
+
+    window.scrollTo({
+
+        top: 0,
+
+        behavior: "smooth"
+
+    });
 
 }
 
 
-const account =
-    getAccount();
+function showSuccess(message) {
+
+
+    errorBox.style.display =
+
+        "none";
+
+
+    successBox.textContent =
+
+        message;
+
+
+    successBox.style.display =
+
+        "block";
+
+}
+
+
+function clearMessages() {
+
+
+    errorBox.style.display =
+
+        "none";
+
+
+    successBox.style.display =
+
+        "none";
+
+}
 
 
 // ============================================================
@@ -103,6 +303,7 @@ async function apiRequest(
 
 ) {
 
+
     const response =
 
         await fetch(
@@ -112,26 +313,29 @@ async function apiRequest(
             {
 
                 method:
+
                     options.method ||
+
                     "GET",
+
 
                 headers: {
 
                     "Content-Type":
-                        "application/json",
 
-                    "X-Appwrite-User-Id":
-
-                        account.id
+                        "application/json"
 
                 },
+
 
                 body:
 
                     options.body
 
                         ? JSON.stringify(
+
                             options.body
+
                         )
 
                         : undefined
@@ -141,18 +345,36 @@ async function apiRequest(
         );
 
 
-    const data =
+    let data;
 
-        await response.json();
+
+    try {
+
+        data =
+
+            await response.json();
+
+    }
+
+    catch (error) {
+
+        throw new Error(
+
+            "The server returned an invalid response."
+
+        );
+
+    }
 
 
     if (!response.ok) {
+
 
         throw new Error(
 
             data.error ||
 
-            "Request failed"
+            "Unable to complete request."
 
         );
 
@@ -165,50 +387,54 @@ async function apiRequest(
 
 
 // ============================================================
-// LOAD PROFILE
+// LOAD CURRENT APPWRITE USER
 // ============================================================
 
-async function loadProfile() {
+async function loadCurrentUser() {
+
 
     try {
 
-        const result =
 
-            await apiRequest(
+        currentUser =
 
-                "/api/profile"
-
-            );
+            await account.get();
 
 
-        const profile =
+        if (
 
-            result.profile;
+            emailInput
 
+        ) {
 
-        renderProfile(
+            emailInput.value =
 
-            profile
+                currentUser.email ||
 
-        );
+                "";
+
+        }
 
 
     }
 
     catch (error) {
 
+
         console.error(
 
-            "PROFILE LOAD ERROR:",
+            "APPWRITE USER ERROR:",
 
             error
 
         );
 
 
-        // Fallback to localStorage
+        window.location.replace(
 
-        loadLocalProfile();
+            "login.html"
+
+        );
 
     }
 
@@ -216,51 +442,63 @@ async function loadProfile() {
 
 
 // ============================================================
-// LOCAL PROFILE FALLBACK
+// LOAD PROFILE FROM API
 // ============================================================
 
-function loadLocalProfile() {
-
-    const savedProfile =
-
-        localStorage.getItem(
-
-            "remadef_profile"
-
-        );
-
-
-    if (!savedProfile) {
-
-        renderEmptyProfile();
-
-        return;
-
-    }
+async function loadProfile() {
 
 
     try {
 
-        const profile =
 
-            JSON.parse(
+        const result =
 
-                savedProfile
+            await apiRequest(
+
+                "/api/profile",
+
+                {
+
+                    method:
+
+                        "GET"
+
+                }
 
             );
 
 
-        renderProfile(
+        if (
 
-            profile
+            result.success &&
 
-        );
+            result.profile
+
+        ) {
+
+
+            populateForm(
+
+                result.profile
+
+            );
+
+        }
+
 
     }
 
     catch (error) {
 
-        renderEmptyProfile();
+
+        // A profile may not exist yet.
+        // This is normal for a new account.
+
+        console.info(
+
+            "No existing profile found."
+
+        );
 
     }
 
@@ -268,236 +506,92 @@ function loadLocalProfile() {
 
 
 // ============================================================
-// RENDER PROFILE
+// POPULATE FORM
 // ============================================================
 
-function renderProfile(
+function populateForm(
 
     profile
 
 ) {
 
-    if (!profile) {
 
-        renderEmptyProfile();
+    FIELD_IDS.forEach(
 
-        return;
+        function (id) {
 
-    }
 
+            const element =
 
-    const firstName =
+                document.getElementById(
 
-        profile.first_name ||
+                    id
 
-        profile.firstName ||
+                );
 
-        "";
 
+            if (!element) {
 
-    const lastName =
+                return;
 
-        profile.last_name ||
+            }
 
-        profile.lastName ||
 
-        "";
+            const key =
 
+                element.name;
 
-    const displayName =
 
-        profile.display_name ||
+            if (
 
-        profile.displayName ||
+                profile[key] !==
 
-        `${firstName} ${lastName}`.trim();
+                undefined &&
 
+                profile[key] !==
 
-    const headline =
+                null
 
-        profile.headline ||
+            ) {
 
-        "";
+                element.value =
 
+                    profile[key];
 
-    const about =
+            }
 
-        profile.about ||
-
-        profile.bio ||
-
-        "";
-
-
-    const city =
-
-        profile.city ||
-
-        "";
-
-
-    const state =
-
-        profile.state ||
-
-        "";
-
-
-    const country =
-
-        profile.country ||
-
-        "";
-
-
-    const skills =
-
-        profile.skills ||
-
-        [];
-
-
-    if (profileName) {
-
-        profileName.textContent =
-
-            displayName ||
-
-            "REMADEF Member";
-
-    }
-
-
-    if (profileEmail) {
-
-        profileEmail.textContent =
-
-            profile.email ||
-
-            account.email ||
-
-            "";
-
-    }
-
-
-    if (profileHeadline) {
-
-        profileHeadline.textContent =
-
-            headline ||
-
-            "Add a professional headline";
-
-    }
-
-
-    if (profileAbout) {
-
-        profileAbout.textContent =
-
-            about ||
-
-            "Tell the REMADEF ecosystem about yourself.";
-
-    }
-
-
-    if (profileLocation) {
-
-        profileLocation.textContent =
-
-            [
-
-                city,
-
-                state,
-
-                country
-
-            ]
-
-                .filter(Boolean)
-
-                .join(", ") ||
-
-            "Location not added";
-
-    }
-
-
-    renderSkills(
-
-        skills
+        }
 
     );
 
 
-    calculateCompletion(
+    if (
 
-        profile
+        Array.isArray(
 
-    );
+            profile.skills
 
-}
+        )
 
+    ) {
 
-// ============================================================
-// EMPTY PROFILE
-// ============================================================
+        skills =
 
-function renderEmptyProfile() {
+            profile.skills.slice(
 
-    if (profileName) {
+                0,
 
-        profileName.textContent =
+                20
 
-            "Complete your profile";
-
-    }
-
-
-    if (profileEmail) {
-
-        profileEmail.textContent =
-
-            account.email ||
-
-            "";
+            );
 
     }
 
 
-    if (profileHeadline) {
-
-        profileHeadline.textContent =
-
-            "Add a professional headline";
-
-    }
+    renderSkills();
 
 
-    if (profileAbout) {
-
-        profileAbout.textContent =
-
-            "Complete your profile to connect with opportunities.";
-
-    }
-
-
-    if (profileLocation) {
-
-        profileLocation.textContent =
-
-            "Location not added";
-
-    }
-
-
-    renderSkills([]);
-
-    calculateCompletion({});
+    updateProgress();
 
 }
 
@@ -506,44 +600,105 @@ function renderEmptyProfile() {
 // SKILLS
 // ============================================================
 
-function renderSkills(
-
-    skills
-
-) {
-
-    if (!profileSkills) return;
+function addSkill() {
 
 
-    profileSkills.innerHTML = "";
+    const value =
+
+        skillsInput.value.trim();
 
 
-    if (
-
-        !Array.isArray(skills) ||
-
-        skills.length === 0
-
-    ) {
-
-        profileSkills.textContent =
-
-            "No skills added yet.";
+    if (!value) {
 
         return;
 
     }
 
 
+    if (
+
+        skills.some(
+
+            function (skill) {
+
+                return skill.toLowerCase() ===
+
+                    value.toLowerCase();
+
+            }
+
+        )
+
+    ) {
+
+
+        skillsInput.value = "";
+
+
+        return;
+
+    }
+
+
+    if (
+
+        skills.length >= 20
+
+    ) {
+
+
+        showError(
+
+            "You can add a maximum of 20 skills."
+
+        );
+
+
+        return;
+
+    }
+
+
+    skills.push(
+
+        value
+
+    );
+
+
+    skillsInput.value = "";
+
+
+    renderSkills();
+
+
+    updateProgress();
+
+}
+
+
+function renderSkills() {
+
+
+    skillsList.innerHTML = "";
+
+
     skills.forEach(
 
-        function (skill) {
+        function (
+
+            skill,
+
+            index
+
+        ) {
+
 
             const tag =
 
                 document.createElement(
 
-                    "span"
+                    "div"
 
                 );
 
@@ -553,12 +708,94 @@ function renderSkills(
                 "skill-tag";
 
 
-            tag.textContent =
+            const text =
+
+                document.createElement(
+
+                    "span"
+
+                );
+
+
+            text.textContent =
 
                 skill;
 
 
-            profileSkills.appendChild(
+            const removeButton =
+
+                document.createElement(
+
+                    "button"
+
+                );
+
+
+            removeButton.type =
+
+                "button";
+
+
+            removeButton.className =
+
+                "remove-skill";
+
+
+            removeButton.textContent =
+
+                "×";
+
+
+            removeButton.setAttribute(
+
+                "aria-label",
+
+                "Remove " + skill
+
+            );
+
+
+            removeButton.addEventListener(
+
+                "click",
+
+                function () {
+
+
+                    skills.splice(
+
+                        index,
+
+                        1
+
+                    );
+
+
+                    renderSkills();
+
+
+                    updateProgress();
+
+                }
+
+            );
+
+
+            tag.appendChild(
+
+                text
+
+            );
+
+
+            tag.appendChild(
+
+                removeButton
+
+            );
+
+
+            skillsList.appendChild(
 
                 tag
 
@@ -572,80 +809,101 @@ function renderSkills(
 
 
 // ============================================================
+// SKILL EVENTS
+// ============================================================
+
+addSkillButton.addEventListener(
+
+    "click",
+
+    addSkill
+
+);
+
+
+skillsInput.addEventListener(
+
+    "keydown",
+
+    function (event) {
+
+
+        if (
+
+            event.key ===
+
+            "Enter"
+
+        ) {
+
+
+            event.preventDefault();
+
+
+            addSkill();
+
+        }
+
+    }
+
+);
+
+
+// ============================================================
 // PROFILE COMPLETION
 // ============================================================
 
-function calculateCompletion(
-
-    profile
-
-) {
-
-    const fields = [
-
-        profile.first_name ||
-
-        profile.firstName,
+function updateProgress() {
 
 
-        profile.last_name ||
-
-        profile.lastName,
+    let completed = 0;
 
 
-        profile.display_name ||
+    FIELD_IDS.forEach(
 
-        profile.displayName,
-
-
-        profile.date_of_birth ||
-
-        profile.dateOfBirth,
+        function (id) {
 
 
-        profile.gender,
+            const element =
+
+                document.getElementById(
+
+                    id
+
+                );
 
 
-        profile.country,
+            if (
+
+                element &&
+
+                element.value.trim()
+
+            ) {
+
+                completed++;
+
+            }
+
+        }
+
+    );
 
 
-        profile.state,
+    if (
+
+        skills.length > 0
+
+    ) {
+
+        completed++;
+
+    }
 
 
-        profile.city,
+    const totalFields =
 
-
-        profile.phone,
-
-
-        profile.headline,
-
-
-        profile.about,
-
-
-        profile.education_level ||
-
-        profile.educationLevel,
-
-
-        profile.institution,
-
-
-        profile.skills &&
-
-        profile.skills.length > 0
-
-    ];
-
-
-    const completed =
-
-        fields.filter(
-
-            Boolean
-
-        ).length;
+        FIELD_IDS.length + 1;
 
 
     const percentage =
@@ -656,55 +914,561 @@ function calculateCompletion(
 
                 completed /
 
-                fields.length
+                totalFields
 
-            ) *
+            ) * 100
+
+        );
+
+
+    const finalPercentage =
+
+        Math.min(
+
+            percentage,
 
             100
 
         );
 
 
-    if (profileCompletion) {
+    progressBar.style.width =
 
-        profileCompletion.textContent =
+        finalPercentage + "%";
 
-            percentage + "%";
+
+    progressPercent.textContent =
+
+        finalPercentage + "%";
+
+}
+
+
+// ============================================================
+// PROFILE DATA
+// ============================================================
+
+function collectProfileData() {
+
+
+    return {
+
+
+        first_name:
+
+            document
+
+                .getElementById(
+
+                    "first-name"
+
+                )
+
+                .value
+
+                .trim(),
+
+
+        last_name:
+
+            document
+
+                .getElementById(
+
+                    "last-name"
+
+                )
+
+                .value
+
+                .trim(),
+
+
+        display_name:
+
+            document
+
+                .getElementById(
+
+                    "display-name"
+
+                )
+
+                .value
+
+                .trim(),
+
+
+        date_of_birth:
+
+            document
+
+                .getElementById(
+
+                    "date-of-birth"
+
+                )
+
+                .value,
+
+
+        gender:
+
+            document
+
+                .getElementById(
+
+                    "gender"
+
+                )
+
+                .value,
+
+
+        country:
+
+            document
+
+                .getElementById(
+
+                    "country"
+
+                )
+
+                .value
+
+                .trim(),
+
+
+        state:
+
+            document
+
+                .getElementById(
+
+                    "state"
+
+                )
+
+                .value
+
+                .trim(),
+
+
+        city:
+
+            document
+
+                .getElementById(
+
+                    "city"
+
+                )
+
+                .value
+
+                .trim(),
+
+
+        phone:
+
+            phoneInput.value.trim(),
+
+
+        headline:
+
+            document
+
+                .getElementById(
+
+                    "headline"
+
+                )
+
+                .value
+
+                .trim(),
+
+
+        about:
+
+            document
+
+                .getElementById(
+
+                    "about"
+
+                )
+
+                .value
+
+                .trim(),
+
+
+        skills:
+
+
+            skills.slice(),
+
+
+        education_level:
+
+            document
+
+                .getElementById(
+
+                    "education-level"
+
+                )
+
+                .value,
+
+
+        institution:
+
+            document
+
+                .getElementById(
+
+                    "institution"
+
+                )
+
+                .value
+
+                .trim()
+
+    };
+
+}
+
+
+// ============================================================
+// VALIDATE PROFILE
+// ============================================================
+
+function validateProfile(
+
+    data
+
+) {
+
+
+    if (
+
+        !data.first_name
+
+    ) {
+
+
+        return (
+
+            "Please enter your first name."
+
+        );
+
+    }
+
+
+    if (
+
+        !data.last_name
+
+    ) {
+
+
+        return (
+
+            "Please enter your last name."
+
+        );
+
+    }
+
+
+    if (
+
+        data.first_name.length < 2
+
+    ) {
+
+
+        return (
+
+            "First name must be at least 2 characters."
+
+        );
+
+    }
+
+
+    if (
+
+        data.last_name.length < 2
+
+    ) {
+
+
+        return (
+
+            "Last name must be at least 2 characters."
+
+        );
+
+    }
+
+
+    return null;
+
+}
+
+
+// ============================================================
+// SAVE PROFILE
+// ============================================================
+
+form.addEventListener(
+
+    "submit",
+
+    async function (event) {
+
+
+        event.preventDefault();
+
+
+        clearMessages();
+
+
+        const profileData =
+
+            collectProfileData();
+
+
+        const validationError =
+
+            validateProfile(
+
+                profileData
+
+            );
+
+
+        if (
+
+            validationError
+
+        ) {
+
+
+            showError(
+
+                validationError
+
+            );
+
+
+            return;
+
+        }
+
+
+        saveButton.disabled =
+
+            true;
+
+
+        saveButton.textContent =
+
+            "Saving...";
+
+
+        try {
+
+
+            const result =
+
+                await apiRequest(
+
+                    "/api/profile",
+
+                    {
+
+                        method:
+
+                            "PUT",
+
+
+                        body:
+
+                            profileData
+
+                    }
+
+                );
+
+
+            if (
+
+                !result.success
+
+            ) {
+
+
+                throw new Error(
+
+                    result.error ||
+
+                    "Unable to save profile."
+
+                );
+
+            }
+
+
+            showSuccess(
+
+                "Your profile has been saved successfully."
+
+            );
+
+
+            setTimeout(
+
+                function () {
+
+
+                    window.location.replace(
+
+                        "profile.html"
+
+                    );
+
+                },
+
+                900
+
+            );
+
+        }
+
+
+        catch (error) {
+
+
+            console.error(
+
+                "PROFILE SAVE ERROR:",
+
+                error
+
+            );
+
+
+            showError(
+
+                error.message ||
+
+                "Unable to save your profile."
+
+            );
+
+
+            saveButton.disabled =
+
+                false;
+
+
+            saveButton.textContent =
+
+                "Save Profile";
+
+        }
+
+    }
+
+);
+
+
+// ============================================================
+// FORM INPUT EVENTS
+// ============================================================
+
+form.addEventListener(
+
+    "input",
+
+    updateProgress
+
+);
+
+
+form.addEventListener(
+
+    "change",
+
+    updateProgress
+
+);
+
+
+// ============================================================
+// INITIALIZE
+// ============================================================
+
+async function initialize() {
+
+
+    saveButton.disabled =
+
+        true;
+
+
+    try {
+
+
+        await loadCurrentUser();
+
+
+        await loadProfile();
+
+
+        updateProgress();
+
+
+        saveButton.disabled =
+
+            false;
+
+    }
+
+
+    catch (error) {
+
+
+        console.error(
+
+            "PROFILE INITIALIZATION ERROR:",
+
+            error
+
+        );
+
+
+        showError(
+
+            "Unable to load your profile."
+
+        );
+
+
+        saveButton.disabled =
+
+            false;
 
     }
 
 }
 
 
-// ============================================================
-// EDIT PROFILE
-// ============================================================
-
-if (editProfileButton) {
-
-    editProfileButton.addEventListener(
-
-        "click",
-
-        function () {
-
-            window.location.href =
-
-                "profile-completion.html";
-
-        }
-
-    );
-
-}
-
-
-// ============================================================
-// START
-// ============================================================
-
-if (account) {
-
-    loadProfile();
-
-}
+initialize();
