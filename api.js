@@ -1,17 +1,27 @@
 /* ============================================================
-   REMADEF PLATFORM API
+   REMADEF PLATFORM API CLIENT
    Appwrite Function Execution API
-   SYNCHRONOUS EXECUTION
+   Synchronous Function Execution
+============================================================ */
+
+"use strict";
+
+
+/* ============================================================
+   CONFIGURATION
 ============================================================ */
 
 const APPWRITE_ENDPOINT =
     "https://fra.cloud.appwrite.io/v1";
 
+
 const PROJECT_ID =
     "6a634fdc00148a907132";
 
+
 const FUNCTION_ID =
     "6a6380f40035f4b76305";
+
 
 const EXECUTION_URL =
     `${APPWRITE_ENDPOINT}/functions/${FUNCTION_ID}/executions`;
@@ -37,11 +47,236 @@ function debugLog(message) {
 
 
 /* ============================================================
+   SAFE JSON PARSER
+============================================================ */
+
+async function parseResponse(response) {
+
+    const text =
+        await response.text();
+
+
+    let data;
+
+
+    try {
+
+        data =
+            text
+                ? JSON.parse(text)
+                : {};
+
+    }
+
+    catch {
+
+        data = {
+
+            raw: text
+
+        };
+
+    }
+
+
+    if (!response.ok) {
+
+        throw new Error(
+
+            data.message ||
+
+            data.error ||
+
+            data.raw ||
+
+            `Request failed with status ${response.status}`
+
+        );
+
+    }
+
+
+    return data;
+
+}
+
+
+/* ============================================================
+   EXECUTE REMADEF FUNCTION
+============================================================ */
+
+async function executeFunction(
+
+    method,
+
+    path,
+
+    payload = null
+
+) {
+
+
+    const requestBody = {
+
+        method,
+
+        path,
+
+        headers: {
+
+            "Content-Type":
+                "application/json"
+
+        },
+
+        async: false
+
+    };
+
+
+    if (payload !== null) {
+
+        requestBody.body =
+            JSON.stringify(payload);
+
+    }
+
+
+    debugLog(
+
+        "API REQUEST STARTED" +
+
+        "\nURL: " +
+
+        EXECUTION_URL +
+
+        "\nMETHOD: " +
+
+        method +
+
+        "\nPATH: " +
+
+        path
+
+    );
+
+
+    let response;
+
+
+    try {
+
+
+        response =
+
+            await fetch(
+
+                EXECUTION_URL,
+
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        "X-Appwrite-Project":
+                            PROJECT_ID
+
+                    },
+
+                    body:
+
+                        JSON.stringify(
+
+                            requestBody
+
+                        )
+
+                }
+
+            );
+
+
+    }
+
+    catch (error) {
+
+
+        debugLog(
+
+            "NETWORK ERROR: " +
+
+            error.message
+
+        );
+
+
+        throw new Error(
+
+            "Unable to connect to the REMADEF server. Please check your internet connection or try again."
+
+        );
+
+    }
+
+
+    debugLog(
+
+        "HTTP RESPONSE RECEIVED" +
+
+        "\nSTATUS: " +
+
+        response.status
+
+    );
+
+
+    const data =
+
+        await parseResponse(
+
+            response
+
+        );
+
+
+    debugLog(
+
+        "FUNCTION EXECUTION COMPLETED" +
+
+        "\nRESPONSE: " +
+
+        JSON.stringify(
+
+            data,
+
+            null,
+
+            2
+
+        )
+
+    );
+
+
+    return data;
+
+}
+
+
+/* ============================================================
    REMADEF API
 ============================================================ */
 
 const RemadefAPI = {
 
+
+    /* ========================================================
+       REGISTER
+    ======================================================== */
 
     async register(payload) {
 
@@ -50,22 +285,15 @@ const RemadefAPI = {
 
             ...payload,
 
-            password: "[HIDDEN]"
+            password:
+                "[HIDDEN]"
 
         };
 
 
         debugLog(
 
-            "API REQUEST STARTED" +
-
-            "\nURL: " +
-
-            EXECUTION_URL +
-
-            "\nMETHOD: POST" +
-
-            "\nPATH: /api/register" +
+            "REGISTER REQUEST" +
 
             "\nBODY: " +
 
@@ -82,172 +310,126 @@ const RemadefAPI = {
         );
 
 
-        try {
+        return executeFunction(
 
+            "POST",
 
-            /* =================================================
-               CREATE SYNCHRONOUS EXECUTION
-            ================================================= */
+            "/api/register",
 
-            const response =
+            payload
 
-                await fetch(
+        );
 
-                    EXECUTION_URL,
+    },
 
-                    {
 
-                        method: "POST",
+    /* ========================================================
+       LOGIN
+    ======================================================== */
 
-                        headers: {
+    async login(payload) {
 
-                            "Content-Type":
-                                "application/json",
 
-                            "X-Appwrite-Project":
-                                PROJECT_ID
+        const maskedPayload = {
 
-                        },
+            ...payload,
 
+            password:
+                "[HIDDEN]"
 
-                        body: JSON.stringify({
+        };
 
-                            method: "POST",
 
-                            path: "/api/register",
+        debugLog(
 
-                            headers: {
+            "LOGIN REQUEST" +
 
-                                "Content-Type":
-                                    "application/json"
+            "\nBODY: " +
 
-                            },
+            JSON.stringify(
 
+                maskedPayload,
 
-                            body:
+                null,
 
-                                JSON.stringify(payload),
+                2
 
+            )
 
-                            /*
-                             * IMPORTANT:
-                             *
-                             * async: false tells Appwrite
-                             * to wait for the function to finish.
-                             *
-                             * Therefore:
-                             *
-                             * 202 + execution ID
-                             * is no longer expected.
-                             *
-                             * The response should contain
-                             * the actual function response.
-                             */
+        );
 
-                            async: false
 
-                        })
+        return executeFunction(
 
-                    }
+            "POST",
 
-                );
+            "/api/login",
 
+            payload
 
-            debugLog(
+        );
 
-                "HTTP RESPONSE RECEIVED" +
+    },
 
-                "\nSTATUS: " +
 
-                response.status
+    /* ========================================================
+       GET PROFILE
+    ======================================================== */
 
-            );
+    async getProfile(accountId) {
 
 
-            const text =
+        return executeFunction(
 
-                await response.text();
+            "GET",
 
+            `/api/profile/${encodeURIComponent(accountId)}`
 
-            let data;
+        );
 
+    },
 
-            try {
 
-                data =
+    /* ========================================================
+       UPDATE PROFILE
+    ======================================================== */
 
-                    JSON.parse(text);
+    async updateProfile(
 
-            }
+        accountId,
 
-            catch {
+        profile
 
-                data = {
+    ) {
 
-                    raw: text
 
-                };
+        return executeFunction(
 
-            }
+            "PUT",
 
+            `/api/profile/${encodeURIComponent(accountId)}`,
 
-            if (!response.ok) {
+            profile
 
-                throw new Error(
+        );
 
-                    data.message ||
+    },
 
-                    data.error ||
 
-                    data.raw ||
+    /* ========================================================
+       HEALTH CHECK
+    ======================================================== */
 
-                    `Registration failed: ${response.status}`
+    async health() {
 
-                );
 
-            }
+        return executeFunction(
 
+            "GET",
 
-            debugLog(
+            "/api/health"
 
-                "FUNCTION EXECUTION COMPLETED" +
-
-                "\nRESPONSE: " +
-
-                JSON.stringify(
-
-                    data,
-
-                    null,
-
-                    2
-
-                )
-
-            );
-
-
-            return data;
-
-
-        }
-
-
-        catch (error) {
-
-
-            debugLog(
-
-                "API ERROR: " +
-
-                error.message
-
-            );
-
-
-            throw error;
-
-        }
+        );
 
     }
 
@@ -263,13 +445,37 @@ window.RemadefAPI =
     RemadefAPI;
 
 
+/* ============================================================
+   COMPATIBILITY
+============================================================ */
+
 window.REMADEF_API =
 
     APPWRITE_ENDPOINT;
 
 
+/* ============================================================
+   CONFIRM CLIENT LOADED
+============================================================ */
+
 console.log(
 
     "REMADEF API CLIENT LOADED"
+
+);
+
+console.log(
+
+    "Function ID:",
+
+    FUNCTION_ID
+
+);
+
+console.log(
+
+    "Execution URL:",
+
+    EXECUTION_URL
 
 );
