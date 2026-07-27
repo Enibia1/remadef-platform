@@ -1,8 +1,12 @@
-# ============================================================
-# REMADEF PLATFORM API
-# Appwrite Cloud Function
-# Python 3.12
-# ============================================================
+============================================================
+
+REMADEF PLATFORM API
+
+Appwrite Cloud Function
+
+Python 3.12
+
+============================================================
 
 import json
 import os
@@ -13,352 +17,483 @@ from appwrite.client import Client
 from appwrite.services.account import Account
 from appwrite.services.tables_db import TablesDB
 
+============================================================
 
-# ============================================================
-# CONFIGURATION
-# ============================================================
+CONFIGURATION
+
+============================================================
 
 PROJECT_ID = os.environ.get(
-    "APPWRITE_PROJECT_ID",
-    "6a634fdc00148a907132"
+"APPWRITE_PROJECT_ID",
+"6a634fdc00148a907132"
 )
 
 DATABASE_ID = os.environ.get(
-    "APPWRITE_DATABASE_ID",
-    "6a66577c000d17565b18"
+"APPWRITE_DATABASE_ID",
+"6a66577c000d17565b18"
 )
 
 PROFILES_TABLE_ID = os.environ.get(
-    "APPWRITE_PROFILES_TABLE_ID",
-    "profiles"
+"APPWRITE_PROFILES_TABLE_ID",
+"profiles"
 )
 
+============================================================
 
-# ============================================================
-# JSON SERIALIZATION HELPERS
-# ============================================================
+JSON SERIALIZATION HELPERS
+
+============================================================
 
 def convert_to_dict(value):
 
-    if value is None:
-        return None
+if value is None:
+    return None
 
-    if isinstance(value, dict):
-        return {
-            key: convert_to_dict(item)
-            for key, item in value.items()
-        }
-
-    if isinstance(value, list):
-        return [
-            convert_to_dict(item)
-            for item in value
-        ]
-
-    if isinstance(value, tuple):
-        return [
-            convert_to_dict(item)
-            for item in value
-        ]
-
-    if hasattr(value, "model_dump"):
-
-        try:
-
-            return convert_to_dict(
-                value.model_dump()
-            )
-
-        except Exception:
-
-            pass
-
-    if hasattr(value, "dict"):
-
-        try:
-
-            return convert_to_dict(
-                value.dict()
-            )
-
-        except Exception:
-
-            pass
-
-    if hasattr(value, "__dict__"):
-
-        try:
-
-            return convert_to_dict(
-                vars(value)
-            )
-
-        except Exception:
-
-            pass
-
-    return value
-
-
-# ============================================================
-# RESPONSE HELPERS
-# ============================================================
-
-def response(
-    status_code=200,
-    body=None
-):
-
-    if body is None:
-
-        body = {}
-
-
-    safe_body = convert_to_dict(
-        body
-    )
-
+if isinstance(value, dict):
 
     return {
-
-        "statusCode":
-
-            status_code,
-
-        "headers": {
-
-            "Content-Type":
-
-                "application/json",
-
-            "Access-Control-Allow-Origin":
-
-                "*",
-
-            "Access-Control-Allow-Headers":
-
-                "Content-Type, X-Appwrite-Project",
-
-            "Access-Control-Allow-Methods":
-
-                "GET, POST, PUT, PATCH, OPTIONS"
-
-        },
-
-        "body":
-
-            json.dumps(
-
-                safe_body,
-
-                ensure_ascii=False
-
-            )
-
+        key: convert_to_dict(item)
+        for key, item in value.items()
     }
 
+if isinstance(value, list):
 
-def success(
-    data=None,
-    message="Success"
+    return [
+        convert_to_dict(item)
+        for item in value
+    ]
+
+if isinstance(value, tuple):
+
+    return [
+        convert_to_dict(item)
+        for item in value
+    ]
+
+if hasattr(value, "model_dump"):
+
+    try:
+
+        return convert_to_dict(
+            value.model_dump()
+        )
+
+    except Exception:
+
+        pass
+
+if hasattr(value, "dict"):
+
+    try:
+
+        return convert_to_dict(
+            value.dict()
+        )
+
+    except Exception:
+
+        pass
+
+if hasattr(value, "__dict__"):
+
+    try:
+
+        return convert_to_dict(
+            vars(value)
+        )
+
+    except Exception:
+
+        pass
+
+return value
+
+============================================================
+
+RESPONSE HELPERS
+
+============================================================
+
+def response(
+status_code=200,
+body=None
 ):
 
-    return response(
+if body is None:
 
-        200,
-
-        {
-
-            "success":
-
-                True,
-
-            "message":
-
-                message,
-
-            "data":
-
-                data
-
-        }
-
-    )
+    body = {}
 
 
-def error(
-    message,
-    status_code=400
-):
+safe_body = convert_to_dict(
+    body
+)
 
-    return response(
+
+return {
+
+    "statusCode":
 
         status_code,
 
-        {
+    "headers": {
 
-            "success":
+        "Content-Type":
 
-                False,
+            "application/json",
 
-            "message":
+        "Access-Control-Allow-Origin":
 
-                message
+            "*",
 
-        }
+        "Access-Control-Allow-Headers": (
 
-    )
+            "Content-Type, X-Appwrite-Project"
 
+        ),
 
-# ============================================================
-# APPWRITE CLIENT
-# ============================================================
+        "Access-Control-Allow-Methods": (
+
+            "GET, POST, PUT, PATCH, OPTIONS"
+
+        )
+
+    },
+
+    "body":
+
+        json.dumps(
+
+            safe_body,
+
+            ensure_ascii=False
+
+        )
+
+}
+
+def success(
+data=None,
+message="Success"
+):
+
+return response(
+
+    200,
+
+    {
+
+        "success":
+
+            True,
+
+        "message":
+
+            message,
+
+        "data":
+
+            data
+
+    }
+
+)
+
+def error(
+message,
+status_code=400
+):
+
+return response(
+
+    status_code,
+
+    {
+
+        "success":
+
+            False,
+
+        "message":
+
+            message
+
+    }
+
+)
+
+============================================================
+
+APPWRITE CLIENT
+
+============================================================
 
 def get_client(
-    context
+context
 ):
 
-    client = Client()
+client = Client()
 
 
-    client.set_endpoint(
+client.set_endpoint(
 
-        os.environ.get(
+    os.environ.get(
 
-            "APPWRITE_FUNCTION_ENDPOINT",
+        "APPWRITE_FUNCTION_ENDPOINT",
 
-            "https://fra.cloud.appwrite.io/v1"
+        "https://fra.cloud.appwrite.io/v1"
 
-        )
+    )
+
+)
+
+
+client.set_project(
+
+    PROJECT_ID
+
+)
+
+
+dynamic_key = context.req.headers.get(
+
+    "x-appwrite-key"
+
+)
+
+
+if not dynamic_key:
+
+    raise RuntimeError(
+
+        "Dynamic Appwrite API key is missing."
 
     )
 
 
-    client.set_project(
+client.set_key(
 
-        PROJECT_ID
+    dynamic_key
 
-    )
-
-
-    dynamic_key = context.req.headers.get(
-
-        "x-appwrite-key"
-
-    )
+)
 
 
-    if not dynamic_key:
+return client
 
-        raise RuntimeError(
+============================================================
 
-            "Dynamic Appwrite API key is missing."
+APPWRITE SERVICES
 
-        )
-
-
-    client.set_key(
-
-        dynamic_key
-
-    )
-
-
-    return client
-
-
-# ============================================================
-# APPWRITE SERVICES
-# ============================================================
+============================================================
 
 def get_account_service(
-    context
+context
 ):
 
-    return Account(
+return Account(
 
-        get_client(
+    get_client(
 
-            context
-
-        )
+        context
 
     )
 
+)
 
 def get_tables_db(
-    context
+context
 ):
 
-    return TablesDB(
+return TablesDB(
 
-        get_client(
+    get_client(
 
-            context
-
-        )
+        context
 
     )
 
+)
 
-# ============================================================
-# REQUEST BODY PARSER
-# ============================================================
+============================================================
+
+REQUEST BODY PARSER
+
+============================================================
 
 def parse_json_body(
-    request
+request
 ):
 
-    body = request.body
+body = request.body
 
 
-    if not body:
-
-        return {}
-
-
-    if isinstance(
-
-        body,
-
-        dict
-
-    ):
-
-        return body
-
-
-    if isinstance(
-
-        body,
-
-        str
-
-    ):
-
-        try:
-
-            return json.loads(
-
-                body
-
-            )
-
-        except json.JSONDecodeError:
-
-            return {}
-
+if not body:
 
     return {}
 
 
-# ============================================================
-# PROFILE FIELDS
-# ============================================================
+if isinstance(
+
+    body,
+
+    dict
+
+):
+
+    return body
+
+
+if isinstance(
+
+    body,
+
+    str
+
+):
+
+    try:
+
+        return json.loads(
+
+            body
+
+        )
+
+    except json.JSONDecodeError:
+
+        return {}
+
+
+return {}
+
+============================================================
+
+PROFILE FIELDS
+
+============================================================
 
 PROFILE_FIELDS = [
 
-    "email",
+"email",
+
+"first_name",
+
+"last_name",
+
+"display_name",
+
+"date_of_birth",
+
+"gender",
+
+"country",
+
+"state",
+
+"city",
+
+"phone",
+
+"headline",
+
+"about",
+
+"skills",
+
+"education_level",
+
+"institution",
+
+"profile_completion"
+
+]
+
+============================================================
+
+FIND PROFILE
+
+============================================================
+
+def find_profile(
+
+account_id,
+
+context
+
+):
+
+tables_db = get_tables_db(
+
+    context
+
+)
+
+
+result = tables_db.list_rows(
+
+    database_id=
+
+        DATABASE_ID,
+
+    table_id=
+
+        PROFILES_TABLE_ID,
+
+    queries=[
+
+        f'equal("account_id", "{account_id}")'
+
+    ]
+
+)
+
+
+result = convert_to_dict(
+
+    result
+
+)
+
+
+if not isinstance(
+
+    result,
+
+    dict
+
+):
+
+    return None
+
+
+rows = result.get(
+
+    "rows",
+
+    []
+
+)
+
+
+if not rows:
+
+    return None
+
+
+return rows[0]
+
+============================================================
+
+CALCULATE PROFILE COMPLETION
+
+============================================================
+
+def calculate_completion(
+
+profile
+
+):
+
+fields = [
 
     "first_name",
 
@@ -382,776 +517,837 @@ PROFILE_FIELDS = [
 
     "about",
 
-    "skills",
-
     "education_level",
 
-    "institution",
-
-    "profile_completion"
+    "institution"
 
 ]
 
 
-# ============================================================
-# FIND PROFILE
-# ============================================================
+completed = 0
 
-def find_profile(
+
+for field in fields:
+
+    value = profile.get(
+
+        field
+
+    )
+
+
+    if (
+
+        value is not None
+
+        and str(value).strip()
+
+    ):
+
+        completed += 1
+
+
+skills = profile.get(
+
+    "skills"
+
+)
+
+
+if skills:
+
+    if isinstance(
+
+        skills,
+
+        list
+
+    ):
+
+        if len(skills) > 0:
+
+            completed += 1
+
+    elif str(skills).strip():
+
+        completed += 1
+
+
+total = len(
+
+    fields
+
+) + 1
+
+
+return round(
+
+    (
+
+        completed /
+
+        total
+
+    ) * 100
+
+)
+
+============================================================
+
+CREATE PROFILE
+
+============================================================
+
+def create_profile(
+
+account_id,
+
+email="",
+
+phone="",
+
+context=None
+
+):
+
+tables_db = get_tables_db(
+
+    context
+
+)
+
+
+now = datetime.now(
+
+    timezone.utc
+
+).isoformat()
+
+
+profile_data = {
+
+    "account_id":
+
+        account_id,
+
+    "email":
+
+        email or "",
+
+    "first_name":
+
+        "",
+
+    "last_name":
+
+        "",
+
+    "display_name":
+
+        "",
+
+    "date_of_birth":
+
+        "",
+
+    "gender":
+
+        "",
+
+    "country":
+
+        "",
+
+    "state":
+
+        "",
+
+    "city":
+
+        "",
+
+    "phone":
+
+        phone or "",
+
+    "headline":
+
+        "",
+
+    "about":
+
+        "",
+
+    "skills":
+
+        "",
+
+    "education_level":
+
+        "",
+
+    "institution":
+
+        "",
+
+    "profile_completion":
+
+        0,
+
+    "created_at":
+
+        now,
+
+    "updated_at":
+
+        now
+
+}
+
+
+profile = tables_db.create_row(
+
+    database_id=
+
+        DATABASE_ID,
+
+    table_id=
+
+        PROFILES_TABLE_ID,
+
+    row_id=
+
+        "unique()",
+
+    data=
+
+        profile_data
+
+)
+
+
+return convert_to_dict(
+
+    profile
+
+)
+
+============================================================
+
+UPDATE PROFILE
+
+============================================================
+
+def update_profile(
+
+account_id,
+
+profile_data,
+
+context
+
+):
+
+tables_db = get_tables_db(
+
+    context
+
+)
+
+
+existing = find_profile(
 
     account_id,
 
     context
 
-):
-
-    tables_db = get_tables_db(
-
-        context
-
-    )
+)
 
 
-    result = tables_db.list_rows(
+if not existing:
 
-        database_id=
+    return create_profile(
 
-            DATABASE_ID,
+        account_id,
 
-        table_id=
-
-            PROFILES_TABLE_ID,
-
-        queries=[
-
-            f'equal("account_id", "{account_id}")'
-
-        ]
+        context=context
 
     )
 
 
-    result = convert_to_dict(
+row_id = existing.get(
 
-        result
+    "$id"
 
-    )
-
-
-    if not isinstance(
-
-        result,
-
-        dict
-
-    ):
-
-        return None
+)
 
 
-    rows = result.get(
+if not row_id:
 
-        "rows",
+    raise RuntimeError(
 
-        []
+        "Profile row ID is missing."
 
     )
 
 
-    if not rows:
-
-        return None
+update_data = {}
 
 
-    return rows[0]
+for field in PROFILE_FIELDS:
+
+    if field not in profile_data:
+
+        continue
 
 
-# ============================================================
-# CALCULATE PROFILE COMPLETION
-# ============================================================
-
-def calculate_completion(
-
-    profile
-
-):
-
-    fields = [
-
-        "first_name",
-
-        "last_name",
-
-        "display_name",
-
-        "date_of_birth",
-
-        "gender",
-
-        "country",
-
-        "state",
-
-        "city",
-
-        "phone",
-
-        "headline",
-
-        "about",
-
-        "education_level",
-
-        "institution"
-
-    ]
+    value = profile_data[field]
 
 
-    completed = 0
-
-
-    for field in fields:
-
-        value = profile.get(
-
-            field
-
-        )
-
-
-        if (
-
-            value is not None
-
-            and str(value).strip()
-
-        ):
-
-            completed += 1
-
-
-    skills = profile.get(
-
-        "skills"
-
-    )
-
-
-    if skills:
+    if field == "skills":
 
         if isinstance(
 
-            skills,
+            value,
 
             list
 
         ):
 
-            if len(skills) > 0:
+            value = json.dumps(
 
-                completed += 1
+                value
 
-        elif str(skills).strip():
+            )
 
-            completed += 1
+        elif value is None:
 
+            value = ""
 
-    total = len(
 
-        fields
+    update_data[field] = value
 
-    ) + 1
 
+merged = {
 
-    return round(
+    **existing,
 
-        (
+    **update_data
 
-            completed /
+}
 
-            total
 
-        ) * 100
+update_data[
 
-    )
+    "profile_completion"
 
+] = calculate_completion(
 
-# ============================================================
-# CREATE PROFILE
-# ============================================================
+    merged
 
-def create_profile(
+)
 
-    account_id,
 
-    email="",
+update_data[
 
-    phone="",
+    "updated_at"
 
-    context=None
+] = datetime.now(
 
-):
+    timezone.utc
 
-    tables_db = get_tables_db(
+).isoformat()
 
-        context
 
-    )
+updated_profile = tables_db.update_row(
 
+    database_id=
 
-    now = datetime.now(
+        DATABASE_ID,
 
-        timezone.utc
+    table_id=
 
-    ).isoformat()
+        PROFILES_TABLE_ID,
 
+    row_id=
 
-    profile_data = {
+        row_id,
 
-        "account_id":
+    data=
 
-            account_id,
+        update_data
 
-        "email":
+)
 
-            email or "",
 
-        "first_name":
+return convert_to_dict(
 
-            "",
+    updated_profile
 
-        "last_name":
+)
 
-            "",
+============================================================
 
-        "display_name":
+REGISTER USER
 
-            "",
-
-        "date_of_birth":
-
-            "",
-
-        "gender":
-
-            "",
-
-        "country":
-
-            "",
-
-        "state":
-
-            "",
-
-        "city":
-
-            "",
-
-        "phone":
-
-            phone or "",
-
-        "headline":
-
-            "",
-
-        "about":
-
-            "",
-
-        "skills":
-
-            "",
-
-        "education_level":
-
-            "",
-
-        "institution":
-
-            "",
-
-        "profile_completion":
-
-            0,
-
-        "created_at":
-
-            now,
-
-        "updated_at":
-
-            now
-
-    }
-
-
-    profile = tables_db.create_row(
-
-        database_id=
-
-            DATABASE_ID,
-
-        table_id=
-
-            PROFILES_TABLE_ID,
-
-        row_id=
-
-            "unique()",
-
-        data=
-
-            profile_data
-
-    )
-
-
-    return convert_to_dict(
-
-        profile
-
-    )
-
-
-# ============================================================
-# UPDATE PROFILE
-# ============================================================
-
-def update_profile(
-
-    account_id,
-
-    profile_data,
-
-    context
-
-):
-
-    tables_db = get_tables_db(
-
-        context
-
-    )
-
-
-    existing = find_profile(
-
-        account_id,
-
-        context
-
-    )
-
-
-    if not existing:
-
-        return create_profile(
-
-            account_id,
-
-            context=context
-
-        )
-
-
-    row_id = existing.get(
-
-        "$id"
-
-    )
-
-
-    if not row_id:
-
-        raise RuntimeError(
-
-            "Profile row ID is missing."
-
-        )
-
-
-    update_data = {}
-
-
-    for field in PROFILE_FIELDS:
-
-        if field not in profile_data:
-
-            continue
-
-
-        value = profile_data[field]
-
-
-        if field == "skills":
-
-            if isinstance(
-
-                value,
-
-                list
-
-            ):
-
-                value = json.dumps(
-
-                    value
-
-                )
-
-            elif value is None:
-
-                value = ""
-
-
-        update_data[field] = value
-
-
-    merged = {
-
-        **existing,
-
-        **update_data
-
-    }
-
-
-    update_data[
-
-        "profile_completion"
-
-    ] = calculate_completion(
-
-        merged
-
-    )
-
-
-    update_data[
-
-        "updated_at"
-
-    ] = datetime.now(
-
-        timezone.utc
-
-    ).isoformat()
-
-
-    updated_profile = tables_db.update_row(
-
-        database_id=
-
-            DATABASE_ID,
-
-        table_id=
-
-            PROFILES_TABLE_ID,
-
-        row_id=
-
-            row_id,
-
-        data=
-
-            update_data
-
-    )
-
-
-    return convert_to_dict(
-
-        updated_profile
-
-    )
-
-
-# ============================================================
-# REGISTER USER
-# ============================================================
+============================================================
 
 def register_user(
 
-    data,
+data,
 
-    context
+context
 
 ):
 
-    email = str(
+# --------------------------------------------------------
+# READ INPUT
+# --------------------------------------------------------
 
-        data.get(
+email = str(
 
-            "email",
+    data.get(
 
-            ""
+        "email",
+
+        ""
+
+    )
+
+).strip().lower()
+
+
+password = str(
+
+    data.get(
+
+        "password",
+
+        ""
+
+    )
+
+)
+
+
+phone = str(
+
+    data.get(
+
+        "phone",
+
+        ""
+
+    )
+
+).strip()
+
+
+method = str(
+
+    data.get(
+
+        "method",
+
+        "email"
+
+    )
+
+).strip().lower()
+
+
+# --------------------------------------------------------
+# NORMALIZE METHOD
+# --------------------------------------------------------
+
+if method == "phone":
+
+    email = ""
+
+else:
+
+    method = "email"
+
+    phone = ""
+
+
+# --------------------------------------------------------
+# VALIDATE CREDENTIALS
+# --------------------------------------------------------
+
+if method == "phone":
+
+    if not phone:
+
+        return error(
+
+            "Phone number is required."
 
         )
 
-    ).strip().lower()
+else:
 
+    if not email:
 
-    password = str(
+        return error(
 
-        data.get(
-
-            "password",
-
-            ""
+            "Email address is required."
 
         )
+
+
+if len(password) < 8:
+
+    return error(
+
+        "Password must contain at least 8 characters."
 
     )
 
 
-    phone = str(
+account_service = get_account_service(
 
-        data.get(
+    context
 
-            "phone",
+)
 
-            ""
+
+# ========================================================
+# CREATE ACCOUNT
+# ========================================================
+
+try:
+
+    if method == "phone":
+
+        user = account_service.create_phone_user(
+
+            user_id=
+
+                "unique()",
+
+            phone=
+
+                phone,
+
+            password=
+
+                password
 
         )
 
-    ).strip()
+    else:
 
+        user = account_service.create(
 
-    if not email and not phone:
+            user_id=
 
-        return error(
+                "unique()",
 
-            "Email or phone number is required."
+            email=
 
-        )
+                email,
 
+            password=
 
-    if len(password) < 8:
-
-        return error(
-
-            "Password must contain at least 8 characters."
+                password
 
         )
 
 
-    account_service = get_account_service(
+except Exception as exc:
 
-        context
+    context.error(
+
+        "Account creation failed: "
+
+        f"{type(exc).__name__}: {str(exc)}"
 
     )
 
 
-    # ========================================================
-    # CREATE ACCOUNT
-    # ========================================================
+    message = str(
 
-    try:
+        exc
 
-        if email:
-
-            user = account_service.create(
-
-                user_id=
-
-                    "unique()",
-
-                email=
-
-                    email,
-
-                password=
-
-                    password
-
-            )
-
-        else:
-
-            user = account_service.create_phone_user(
-
-                user_id=
-
-                    "unique()",
-
-                phone=
-
-                    phone,
-
-                password=
-
-                    password
-
-            )
+    ).lower()
 
 
-    except Exception as exc:
+    if (
 
-        context.error(
+        "already exists"
 
-            "Account creation failed: "
+        in
 
-            f"{type(exc).__name__}: "
+        message
 
-            f"{str(exc)}"
-
-        )
-
-
-        message = str(
-
-            exc
-
-        )
-
-
-        if (
-
-            "already exists"
-
-            in
-
-            message.lower()
-
-        ):
-
-            return error(
-
-                "An account with these credentials already exists.",
-
-                409
-
-            )
-
+    ):
 
         return error(
 
-            "Could not create account.",
+            "An account with these credentials already exists.",
+
+            409
+
+        )
+
+
+    if (
+
+        "valid email address"
+
+        in
+
+        message
+
+    ):
+
+        return error(
+
+            "Please enter a valid email address.",
 
             400
 
         )
 
 
-    # ========================================================
-    # EXTRACT USER ID
-    # ========================================================
+    if (
 
-    try:
+        "valid phone"
 
-        user_data = convert_to_dict(
+        in
 
-            user
+        message
 
-        )
-
-
-        user_id = (
-
-            user_data.get(
-
-                "$id"
-
-            )
-
-            or user_data.get(
-
-                "id"
-
-            )
-
-        )
-
-
-        if not user_id:
-
-            raise RuntimeError(
-
-                "Account was created but no user ID was returned."
-
-            )
-
-
-    except Exception as exc:
-
-        context.error(
-
-            "User ID extraction failed: "
-
-            f"{type(exc).__name__}: "
-
-            f"{str(exc)}"
-
-        )
-
+    ):
 
         return error(
 
-            "Account was created, but the user ID could not be retrieved.",
+            "Please enter a valid phone number.",
 
-            500
-
-        )
-
-
-    # ========================================================
-    # CREATE PROFILE
-    # ========================================================
-
-    try:
-
-        profile = create_profile(
-
-            account_id=
-
-                user_id,
-
-            email=
-
-                email,
-
-            phone=
-
-                phone,
-
-            context=
-
-                context
+            400
 
         )
 
 
-    except Exception as exc:
+    return error(
 
-        context.error(
+        "Could not create account.",
 
-            "Profile creation failed: "
+        400
 
-            f"{type(exc).__name__}: "
+    )
 
-            f"{str(exc)}"
+
+# ========================================================
+# EXTRACT USER ID
+# ========================================================
+
+try:
+
+    user_data = convert_to_dict(
+
+        user
+
+    )
+
+
+    user_id = (
+
+        user_data.get(
+
+            "$id"
+
+        )
+
+        or user_data.get(
+
+            "id"
+
+        )
+
+    )
+
+
+    if not user_id:
+
+        raise RuntimeError(
+
+            "Account was created but no user ID was returned."
 
         )
 
 
-        return error(
+except Exception as exc:
 
-            "Account was created, but the profile could not be created.",
+    context.error(
 
-            500
+        "User ID extraction failed: "
 
-        )
+        f"{type(exc).__name__}: {str(exc)}"
+
+    )
 
 
-    # ========================================================
-    # SUCCESS
-    # ========================================================
+    return error(
+
+        "Account was created, but the user ID could not be retrieved.",
+
+        500
+
+    )
+
+
+# ========================================================
+# CREATE PROFILE
+# ========================================================
+
+try:
+
+    profile = create_profile(
+
+        account_id=
+
+            user_id,
+
+        email=
+
+            email,
+
+        phone=
+
+            phone,
+
+        context=
+
+            context
+
+    )
+
+
+except Exception as exc:
+
+    context.error(
+
+        "Profile creation failed: "
+
+        f"{type(exc).__name__}: {str(exc)}"
+
+    )
+
+
+    return error(
+
+        "Account was created, but the profile could not be created.",
+
+        500
+
+    )
+
+
+# ========================================================
+# SUCCESS
+# ========================================================
+
+return response(
+
+    201,
+
+    {
+
+        "success":
+
+            True,
+
+        "message":
+
+            "Account and profile created successfully.",
+
+        "account":
+
+            {
+
+                "id":
+
+                    user_id,
+
+                "method":
+
+                    method,
+
+                "email":
+
+                    email,
+
+                "phone":
+
+                    phone
+
+            },
+
+        "profile":
+
+            profile
+
+    }
+
+)
+
+============================================================
+
+HEALTH CHECK
+
+============================================================
+
+def health_check():
+
+return success(
+
+    {
+
+        "service":
+
+            "REMADEF Platform API",
+
+        "status":
+
+            "healthy"
+
+    },
+
+    "REMADEF Platform API is running."
+
+)
+
+============================================================
+
+ROUTER
+
+============================================================
+
+def route_request(
+
+request,
+
+context
+
+):
+
+method = request.method.upper()
+
+
+path = request.path
+
+
+# ========================================================
+# CORS PREFLIGHT
+# ========================================================
+
+if method == "OPTIONS":
 
     return response(
 
-        201,
+        200,
 
         {
 
@@ -1161,204 +1357,115 @@ def register_user(
 
             "message":
 
-                "Account and profile created successfully.",
-
-            "account":
-
-                {
-
-                    "id":
-
-                        user_id,
-
-                    "email":
-
-                        email,
-
-                    "phone":
-
-                        phone
-
-                },
-
-            "profile":
-
-                profile
+                "CORS preflight successful."
 
         }
 
     )
 
 
-# ============================================================
-# HEALTH CHECK
-# ============================================================
+# ========================================================
+# HEALTH
+# ========================================================
 
-def health_check():
+if (
 
-    return success(
+    method == "GET"
 
-        {
+    and
 
-            "service":
+    path == "/api/health"
 
-                "REMADEF Platform API",
+):
 
-            "status":
+    return health_check()
 
-                "healthy"
 
-        },
+# ========================================================
+# REGISTER
+# ========================================================
 
-        "REMADEF Platform API is running."
+if (
+
+    method == "POST"
+
+    and
+
+    path == "/api/register"
+
+):
+
+    data = parse_json_body(
+
+        request
 
     )
 
 
-# ============================================================
-# ROUTER
-# ============================================================
+    return register_user(
 
-def route_request(
+        data,
 
-    request,
+        context
 
-    context
+    )
+
+
+return error(
+
+    "Route not found.",
+
+    404
+
+)
+
+============================================================
+
+MAIN ENTRYPOINT
+
+============================================================
+
+def main(
+
+context
 
 ):
 
-    method = request.method.upper()
+try:
+
+    return route_request(
+
+        context.req,
+
+        context
+
+    )
 
 
-    path = request.path
+except Exception as exc:
+
+    context.error(
+
+        "UNHANDLED ERROR: "
+
+        f"{type(exc).__name__}: "
+
+        f"{str(exc)}"
+
+    )
 
 
-    # ========================================================
-    # CORS PREFLIGHT
-    # ========================================================
+    context.error(
 
-    if method == "OPTIONS":
+        traceback.format_exc()
 
-        return response(
-
-            200,
-
-            {
-
-                "success":
-
-                    True,
-
-                "message":
-
-                    "CORS preflight successful."
-
-            }
-
-        )
-
-
-    # ========================================================
-    # HEALTH
-    # ========================================================
-
-    if (
-
-        method == "GET"
-
-        and
-
-        path == "/api/health"
-
-    ):
-
-        return health_check()
-
-
-    # ========================================================
-    # REGISTER
-    # ========================================================
-
-    if (
-
-        method == "POST"
-
-        and
-
-        path == "/api/register"
-
-    ):
-
-        data = parse_json_body(
-
-            request
-
-        )
-
-
-        return register_user(
-
-            data,
-
-            context
-
-        )
+    )
 
 
     return error(
 
-        "Route not found.",
+        "Internal server error.",
 
-        404
+        500
 
     )
-
-
-# ============================================================
-# MAIN ENTRYPOINT
-# ============================================================
-
-def main(
-
-    context
-
-):
-
-    try:
-
-        return route_request(
-
-            context.req,
-
-            context
-
-        )
-
-
-    except Exception as exc:
-
-        context.error(
-
-            "UNHANDLED ERROR: "
-
-            f"{type(exc).__name__}: "
-
-            f"{str(exc)}"
-
-        )
-
-
-        context.error(
-
-            traceback.format_exc()
-
-        )
-
-
-        return error(
-
-            "Internal server error.",
-
-            500
-
-        )
