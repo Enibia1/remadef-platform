@@ -1,21 +1,19 @@
 # ============================================================
-# REMADEF PLATFORM - PROFILE API
-# src/profile.py
+# REMADEF PROFILE SERVICE
 # ============================================================
 
 import os
-import json
 import re
 from datetime import datetime, timezone
 
 from appwrite.client import Client
-from appwrite.services.users import Users
-from appwrite.services.tables_db import TablesDB
+from appwrite.services.databases import Databases
+from appwrite.query import Query
 from appwrite.exception import AppwriteException
 
 
 # ============================================================
-# ENVIRONMENT VARIABLES
+# CONFIGURATION
 # ============================================================
 
 PROJECT_ID = os.environ.get(
@@ -27,8 +25,12 @@ DATABASE_ID = os.environ.get(
     "APPWRITE_DATABASE_ID"
 )
 
-PROFILES_TABLE_ID = os.environ.get(
-    "APPWRITE_PROFILES_TABLE_ID"
+PROFILE_COLLECTION_ID = os.environ.get(
+    "APPWRITE_PROFILE_COLLECTION_ID"
+)
+
+FUNCTION_API_KEY = os.environ.get(
+    "APPWRITE_FUNCTION_API_KEY"
 )
 
 
@@ -47,148 +49,265 @@ def get_client():
         )
     )
 
-    client.set_project(PROJECT_ID)
-
-    # Appwrite automatically creates/provides a dynamic API key
-    # for the function execution when the required scopes are enabled.
-    dynamic_key = os.environ.get(
-        "APPWRITE_FUNCTION_API_KEY"
+    client.set_project(
+        PROJECT_ID
     )
 
-    if dynamic_key:
-        client.set_key(dynamic_key)
+    if not FUNCTION_API_KEY:
+
+        raise RuntimeError(
+            "APPWRITE_FUNCTION_API_KEY is missing."
+        )
+
+    client.set_key(
+        FUNCTION_API_KEY
+    )
 
     return client
 
 
 # ============================================================
-# SERVICES
+# DATABASE CLIENT
 # ============================================================
 
-def get_users_service():
+def get_database():
 
-    client = get_client()
-
-    return Users(client)
-
-
-def get_tables_service():
-
-    client = get_client()
-
-    return TablesDB(client)
+    return Databases(
+        get_client()
+    )
 
 
 # ============================================================
-# BASIC VALIDATION
+# VALIDATE USER ID
 # ============================================================
 
-def clean_text(value, max_length=500):
+def validate_user_id(user_id):
+
+    if not user_id:
+
+        raise ValueError(
+            "User ID is required."
+        )
+
+    user_id = str(
+        user_id
+    ).strip()
+
+    if len(user_id) > 36:
+
+        raise ValueError(
+            "Invalid user ID."
+        )
+
+    return user_id
+
+
+# ============================================================
+# CLEAN TEXT
+# ============================================================
+
+def clean_text(value, max_length=5000):
 
     if value is None:
+
         return ""
 
-    value = str(value).strip()
+    value = str(
+        value
+    ).strip()
 
     return value[:max_length]
 
 
-def clean_name(value):
+# ============================================================
+# CLEAN SKILLS
+# ============================================================
 
-    value = clean_text(value, 100)
+def clean_skills(skills):
 
-    # Remove dangerous HTML characters
-    value = re.sub(r"[<>]", "", value)
+    if not isinstance(
+        skills,
+        list
+    ):
 
-    return value
+        return []
 
 
-def validate_profile_data(data):
+    cleaned = []
 
-    if not isinstance(data, dict):
 
-        return False, "Invalid profile data"
+    for skill in skills:
 
-    allowed_fields = {
+        skill = clean_text(
+            skill,
+            80
+        )
 
-        "first_name",
-        "last_name",
-        "username",
-        "bio",
-        "country",
-        "city",
-        "phone",
-        "avatar_url",
-        "cover_url",
-        "date_of_birth",
-        "gender",
-        "education",
-        "occupation",
-        "skills",
-        "website",
-        "linkedin",
-        "twitter",
-        "instagram"
 
-    }
-
-    cleaned = {}
-
-    for key, value in data.items():
-
-        if key not in allowed_fields:
+        if not skill:
 
             continue
 
-        if key in ["first_name", "last_name", "username"]:
 
-            cleaned[key] = clean_name(value)
+        if skill.lower() in [
 
-        elif key == "bio":
+            existing.lower()
 
-            cleaned[key] = clean_text(value, 1000)
+            for existing in cleaned
 
-        elif key == "skills":
+        ]:
 
-            if isinstance(value, list):
+            continue
 
-                cleaned[key] = [
-                    clean_text(skill, 100)
-                    for skill in value[:30]
-                ]
 
-            else:
+        cleaned.append(
+            skill
+        )
 
-                cleaned[key] = clean_text(value, 500)
+
+        if len(cleaned) >= 20:
+
+            break
+
+
+    return cleaned
+
+
+# ============================================================
+# PROFILE DATA
+# ============================================================
+
+PROFILE_FIELDS = [
+
+    "first_name",
+    "last_name",
+    "display_name",
+    "date_of_birth",
+    "gender",
+    "country",
+    "state",
+    "city",
+    "phone",
+    "headline",
+    "about",
+    "skills",
+    "education_level",
+    "institution"
+
+]
+
+
+# ============================================================
+# NORMALIZE PROFILE
+# ============================================================
+
+def normalize_profile(data):
+
+    if not isinstance(
+        data,
+        dict
+    ):
+
+        data = {}
+
+
+    profile = {}
+
+
+    for field in PROFILE_FIELDS:
+
+        value = data.get(
+            field
+        )
+
+
+        if field == "skills":
+
+            profile[field] = clean_skills(
+                value
+            )
 
         else:
 
-            cleaned[key] = clean_text(value, 500)
+            profile[field] = clean_text(
+                value
+            )
 
-    return True, cleaned
+
+    return profile
 
 
 # ============================================================
-# GET USER
+# FIND PROFILE
 # ============================================================
 
-def get_user(user_id):
+def find_profile(user_id):
+
+    user_id = validate_user_id(
+        user_id
+    )
+
+
+    if not DATABASE_ID:
+
+        raise RuntimeError(
+            "APPWRITE_DATABASE_ID is missing."
+        )
+
+
+    if not PROFILE_COLLECTION_ID:
+
+        raise RuntimeError(
+            "APPWRITE_PROFILE_COLLECTION_ID is missing."
+        )
+
+
+    databases = get_database()
+
 
     try:
 
-        users = get_users_service()
+        result = databases.list_documents(
 
-        return users.get(
-            user_id=user_id
+            database_id=DATABASE_ID,
+
+            collection_id=PROFILE_COLLECTION_ID,
+
+            queries=[
+
+                Query.equal(
+                    "user_id",
+                    user_id
+                ),
+
+                Query.limit(
+                    1
+                )
+
+            ]
+
         )
+
+
+        documents = result.get(
+            "documents",
+            []
+        )
+
+
+        if not documents:
+
+            return None
+
+
+        return documents[0]
+
 
     except AppwriteException as error:
 
-        print(
-            f"GET USER ERROR: {error}"
+        raise RuntimeError(
+            f"PROFILE LOOKUP ERROR: {error}"
         )
-
-        return None
 
 
 # ============================================================
@@ -197,388 +316,198 @@ def get_user(user_id):
 
 def get_profile(user_id):
 
-    if not user_id:
+    profile = find_profile(
+        user_id
+    )
 
-        return {
 
-            "success": False,
-            "error": "User ID is required"
+    if not profile:
 
-        }
+        return None
 
-    if not DATABASE_ID:
 
-        return {
-
-            "success": False,
-            "error": "APPWRITE_DATABASE_ID is not configured"
-
-        }
-
-    if not PROFILES_TABLE_ID:
-
-        return {
-
-            "success": False,
-            "error": "APPWRITE_PROFILES_TABLE_ID is not configured"
-
-        }
-
-    try:
-
-        tables = get_tables_service()
-
-        # New Appwrite TablesDB API
-        result = tables.list_rows(
-
-            database_id=DATABASE_ID,
-
-            table_id=PROFILES_TABLE_ID,
-
-            queries=[
-
-                f'equal("$id", "{user_id}")'
-
-            ]
-
-        )
-
-        rows = result.get(
-
-            "rows",
-
-            []
-
-        )
-
-        if rows:
-
-            return {
-
-                "success": True,
-
-                "profile": rows[0]
-
-            }
-
-        return {
-
-            "success": True,
-
-            "profile": None
-
-        }
-
-    except AppwriteException as error:
-
-        print(
-
-            f"GET PROFILE ERROR: {error}"
-
-        )
-
-        return {
-
-            "success": False,
-
-            "error": str(error)
-
-        }
+    return profile
 
 
 # ============================================================
 # SAVE PROFILE
 # ============================================================
 
-def save_profile(user_id, profile_data):
+def save_profile(
 
-    if not user_id:
+    user_id,
 
-        return {
-
-            "success": False,
-
-            "error": "User ID is required"
-
-        }
-
-    if not DATABASE_ID:
-
-        return {
-
-            "success": False,
-
-            "error": "APPWRITE_DATABASE_ID is not configured"
-
-        }
-
-    if not PROFILES_TABLE_ID:
-
-        return {
-
-            "success": False,
-
-            "error": "APPWRITE_PROFILES_TABLE_ID is not configured"
-
-        }
-
-    valid, cleaned_data = validate_profile_data(
-
-        profile_data
-
-    )
-
-    if not valid:
-
-        return {
-
-            "success": False,
-
-            "error": cleaned_data
-
-        }
-
-    try:
-
-        tables = get_tables_service()
-
-        # Check if profile already exists
-        existing = tables.list_rows(
-
-            database_id=DATABASE_ID,
-
-            table_id=PROFILES_TABLE_ID,
-
-            queries=[
-
-                f'equal("$id", "{user_id}")'
-
-            ]
-
-        )
-
-        rows = existing.get(
-
-            "rows",
-
-            []
-
-        )
-
-        now = datetime.now(
-
-            timezone.utc
-
-        ).isoformat()
-
-        # ========================================================
-        # UPDATE EXISTING PROFILE
-        # ========================================================
-
-        if rows:
-
-            row_id = rows[0]["$id"]
-
-            cleaned_data["updated_at"] = now
-
-            result = tables.update_row(
-
-                database_id=DATABASE_ID,
-
-                table_id=PROFILES_TABLE_ID,
-
-                row_id=row_id,
-
-                data=cleaned_data
-
-            )
-
-            return {
-
-                "success": True,
-
-                "message": "Profile updated successfully",
-
-                "profile": result
-
-            }
-
-        # ========================================================
-        # CREATE NEW PROFILE
-        # ========================================================
-
-        cleaned_data["user_id"] = user_id
-
-        cleaned_data["created_at"] = now
-
-        cleaned_data["updated_at"] = now
-
-        result = tables.create_row(
-
-            database_id=DATABASE_ID,
-
-            table_id=PROFILES_TABLE_ID,
-
-            row_id=user_id,
-
-            data=cleaned_data
-
-        )
-
-        return {
-
-            "success": True,
-
-            "message": "Profile created successfully",
-
-            "profile": result
-
-        }
-
-    except AppwriteException as error:
-
-        print(
-
-            f"SAVE PROFILE ERROR: {error}"
-
-        )
-
-        return {
-
-            "success": False,
-
-            "error": str(error)
-
-        }
-
-
-# ============================================================
-# DELETE PROFILE
-# ============================================================
-
-def delete_profile(user_id):
-
-    if not user_id:
-
-        return {
-
-            "success": False,
-
-            "error": "User ID is required"
-
-        }
-
-    try:
-
-        tables = get_tables_service()
-
-        tables.delete_row(
-
-            database_id=DATABASE_ID,
-
-            table_id=PROFILES_TABLE_ID,
-
-            row_id=user_id
-
-        )
-
-        return {
-
-            "success": True,
-
-            "message": "Profile deleted successfully"
-
-        }
-
-    except AppwriteException as error:
-
-        print(
-
-            f"DELETE PROFILE ERROR: {error}"
-
-        )
-
-        return {
-
-            "success": False,
-
-            "error": str(error)
-
-        }
-
-
-# ============================================================
-# ROUTER
-# ============================================================
-
-def handle_profile_request(
-
-    method,
-
-    user_id=None,
-
-    body=None
+    profile_data
 
 ):
 
-    method = method.upper()
+    user_id = validate_user_id(
+        user_id
+    )
 
-    # ----------------------------------------------------------
-    # GET /api/profile
-    # ----------------------------------------------------------
 
-    if method == "GET":
+    if not DATABASE_ID:
 
-        return get_profile(
-
-            user_id
-
+        raise RuntimeError(
+            "APPWRITE_DATABASE_ID is missing."
         )
 
-    # ----------------------------------------------------------
-    # POST /api/profile
-    # ----------------------------------------------------------
 
-    if method == "POST":
+    if not PROFILE_COLLECTION_ID:
 
-        return save_profile(
-
-            user_id,
-
-            body or {}
-
+        raise RuntimeError(
+            "APPWRITE_PROFILE_COLLECTION_ID is missing."
         )
 
-    # ----------------------------------------------------------
-    # PUT /api/profile
-    # ----------------------------------------------------------
 
-    if method == "PUT":
+    profile = normalize_profile(
+        profile_data
+    )
 
-        return save_profile(
 
-            user_id,
+    profile["user_id"] = user_id
 
-            body or {}
 
+    now = datetime.now(
+        timezone.utc
+    ).isoformat()
+
+
+    existing = find_profile(
+        user_id
+    )
+
+
+    databases = get_database()
+
+
+    try:
+
+        if existing:
+
+            document_id = existing["$id"]
+
+
+            result = databases.update_document(
+
+                database_id=DATABASE_ID,
+
+                collection_id=PROFILE_COLLECTION_ID,
+
+                document_id=document_id,
+
+                data={
+
+                    **profile,
+
+                    "updated_at": now
+
+                }
+
+            )
+
+
+        else:
+
+            result = databases.create_document(
+
+                database_id=DATABASE_ID,
+
+                collection_id=PROFILE_COLLECTION_ID,
+
+                document_id="unique()",
+
+                data={
+
+                    **profile,
+
+                    "user_id": user_id,
+
+                    "created_at": now,
+
+                    "updated_at": now
+
+                }
+
+            )
+
+
+        return result
+
+
+    except AppwriteException as error:
+
+        raise RuntimeError(
+            f"SAVE PROFILE ERROR: {error}"
         )
 
-    # ----------------------------------------------------------
-    # DELETE /api/profile
-    # ----------------------------------------------------------
 
-    if method == "DELETE":
+# ============================================================
+# PROFILE COMPLETION
+# ============================================================
 
-        return delete_profile(
+def calculate_completion(profile):
 
-            user_id
+    fields = [
 
+        "first_name",
+        "last_name",
+        "display_name",
+        "date_of_birth",
+        "gender",
+        "country",
+        "state",
+        "city",
+        "phone",
+        "headline",
+        "about",
+        "education_level",
+        "institution"
+
+    ]
+
+
+    completed = 0
+
+
+    for field in fields:
+
+        value = profile.get(
+            field
         )
 
-    return {
 
-        "success": False,
+        if value:
 
-        "error": "Method not allowed"
+            completed += 1
 
-    }
+
+    if profile.get(
+        "skills"
+    ):
+
+        completed += 1
+
+
+    total = len(
+        fields
+    ) + 1
+
+
+    percentage = round(
+
+        (
+
+            completed /
+
+            total
+
+        ) * 100
+
+    )
+
+
+    return min(
+        percentage,
+        100
+    )
