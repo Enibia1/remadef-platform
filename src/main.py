@@ -3,15 +3,18 @@
 # ============================================================
 
 import json
-import traceback
+
+from appwrite.services.users import Users
 
 from profile import (
 
-    get_profile,
+    get_profile_by_account_id,
 
-    save_profile,
+    create_profile,
 
-    calculate_completion
+    update_profile,
+
+    calculate_profile_completion
 
 )
 
@@ -20,17 +23,15 @@ from profile import (
 # RESPONSE HELPERS
 # ============================================================
 
-def json_response(
-
-    body,
-
-    status_code=200
-
+def response(
+    data,
+    status=200
 ):
 
     return {
 
-        "statusCode": status_code,
+        "statusCode":
+            status,
 
         "headers": {
 
@@ -41,48 +42,47 @@ def json_response(
                 "*",
 
             "Access-Control-Allow-Headers":
-                "Content-Type, X-Appwrite-User-Id",
+                "Content-Type",
 
             "Access-Control-Allow-Methods":
-                "GET, PUT, POST, OPTIONS"
+                "GET, POST, PUT, OPTIONS"
 
         },
 
-        "body": json.dumps(
+        "body":
+            json.dumps(
 
-            body,
+                data,
 
-            ensure_ascii=False
+                default=str
 
-        )
+            )
 
     }
 
 
 # ============================================================
-# GET REQUEST BODY
+# REQUEST BODY
 # ============================================================
 
-def get_body(req):
+def get_body(
+    req
+):
 
-    body = req.body
-
+    body = req.get(
+        "body"
+    )
 
     if not body:
 
         return {}
 
-
     if isinstance(
-
         body,
-
         dict
-
     ):
 
         return body
-
 
     try:
 
@@ -90,155 +90,170 @@ def get_body(req):
             body
         )
 
-
     except Exception:
 
         return {}
 
 
 # ============================================================
-# GET USER ID
+# GET CURRENT USER
 # ============================================================
 
-def get_user_id(req):
+def get_current_user():
 
-    headers = req.headers or {}
+    # The function's dynamic API key
+    # allows the function to use Appwrite
+    # server-side services.
 
+    from appwrite.client import Client
 
-    user_id = (
+    import os
 
-        headers.get(
-            "x-appwrite-user-id"
-        )
+    client = Client()
 
-        or
+    client.set_endpoint(
 
-        headers.get(
-            "X-Appwrite-User-Id"
+        os.environ.get(
+
+            "APPWRITE_FUNCTION_ENDPOINT",
+
+            "https://fra.cloud.appwrite.io/v1"
+
         )
 
     )
 
+    client.set_project(
 
-    if user_id:
+        os.environ.get(
 
-        return str(
-            user_id
-        ).strip()
+            "APPWRITE_PROJECT_ID",
 
+            "6a634fdc00148a907132"
 
-    return None
+        )
+
+    )
+
+    client.set_key(
+
+        os.environ.get(
+
+            "APPWRITE_FUNCTION_API_KEY"
+
+        )
+
+    )
+
+    users = Users(
+        client
+    )
+
+    return users
 
 
 # ============================================================
 # MAIN FUNCTION
 # ============================================================
 
-def main(req, res):
+def main(
+    req,
+    res
+):
 
-    try:
+    method = (
 
-        method = (
+        req.get(
+            "method"
+        )
 
-            req.method or
+        or "GET"
 
-            "GET"
-
-        ).upper()
+    ).upper()
 
 
-        path = (
+    path = (
 
-            req.path or
+        req.get(
+            "path"
+        )
 
-            "/"
+        or "/"
+
+    )
+
+
+    # --------------------------------------------------------
+    # CORS PREFLIGHT
+    # --------------------------------------------------------
+
+    if method == "OPTIONS":
+
+        return response(
+            {
+                "success":
+                    True
+            }
+        )
+
+
+    # --------------------------------------------------------
+    # HEALTH CHECK
+    # --------------------------------------------------------
+
+    if (
+
+        path == "/"
+
+        or path == "/api/health"
+
+    ):
+
+        return response(
+
+            {
+
+                "success":
+                    True,
+
+                "service":
+                    "REMADEF Platform API",
+
+                "status":
+                    "online"
+
+            }
 
         )
 
 
-        # ====================================================
-        # CORS PREFLIGHT
-        # ====================================================
+    # --------------------------------------------------------
+    # GET PROFILE
+    # --------------------------------------------------------
 
-        if method == "OPTIONS":
+    if (
 
-            return json_response(
+        path == "/api/profile"
 
-                {
+        and method == "GET"
 
-                    "success":
-                        True
+    ):
 
-                }
+        account_id = (
 
+            req.get(
+                "headers",
+                {}
+            ).get(
+                "x-account-id"
             )
 
-
-        # ====================================================
-        # ROOT
-        # ====================================================
-
-        if path == "/":
-
-            return json_response(
-
-                {
-
-                    "success":
-                        True,
-
-                    "service":
-                        "REMADEF Platform API",
-
-                    "status":
-                        "online"
-
-                }
-
-            )
-
-
-        # ====================================================
-        # HEALTH
-        # ====================================================
-
-        if (
-
-            path == "/api/health"
-
-            and
-
-            method == "GET"
-
-        ):
-
-            return json_response(
-
-                {
-
-                    "success":
-                        True,
-
-                    "status":
-                        "healthy"
-
-                }
-
-            )
-
-
-        # ====================================================
-        # USER ID
-        # ====================================================
-
-        user_id = get_user_id(
-            req
         )
 
 
-        if not user_id:
+        if not account_id:
 
-            return json_response(
+            return response(
 
                 {
 
@@ -246,58 +261,29 @@ def main(req, res):
                         False,
 
                     "error":
-                        "User authentication is required."
+                        "Account ID is required."
 
                 },
 
-                401
+                400
 
             )
 
 
-        # ====================================================
-        # GET PROFILE
-        # ====================================================
+        profile = (
 
-        if (
+            get_profile_by_account_id(
 
-            path == "/api/profile"
+                account_id
 
-            and
-
-            method == "GET"
-
-        ):
-
-
-            profile = get_profile(
-                user_id
             )
 
-
-            if not profile:
-
-                return json_response(
-
-                    {
-
-                        "success":
-                            True,
-
-                        "profile":
-                            None,
-
-                        "message":
-                            "Profile not found."
-
-                    },
-
-                    200
-
-                )
+        )
 
 
-            return json_response(
+        if not profile:
+
+            return response(
 
                 {
 
@@ -305,145 +291,160 @@ def main(req, res):
                         True,
 
                     "profile":
-                        profile,
-
-                    "completion":
-                        calculate_completion(
-                            profile
-                        )
+                        None
 
                 }
 
             )
 
 
-        # ====================================================
-        # SAVE PROFILE
-        # ====================================================
+        return response(
 
-        if (
+            {
 
-            path == "/api/profile"
+                "success":
+                    True,
 
-            and
+                "profile":
+                    profile
 
-            method in [
+            }
 
-                "PUT",
-
-                "POST"
-
-            ]
-
-        ):
+        )
 
 
-            body = get_body(
-                req
+    # --------------------------------------------------------
+    # UPDATE PROFILE
+    # --------------------------------------------------------
+
+    if (
+
+        path == "/api/profile"
+
+        and method == "PUT"
+
+    ):
+
+        account_id = (
+
+            req.get(
+                "headers",
+                {}
+            ).get(
+                "x-account-id"
             )
 
-
-            if not body:
-
-                return json_response(
-
-                    {
-
-                        "success":
-                            False,
-
-                        "error":
-                            "Profile data is required."
-
-                    },
-
-                    400
-
-                )
+        )
 
 
-            profile = save_profile(
+        if not account_id:
 
-                user_id,
-
-                body
-
-            )
-
-
-            return json_response(
+            return response(
 
                 {
 
                     "success":
-                        True,
+                        False,
 
-                    "message":
-                        "Profile saved successfully.",
-
-                    "profile":
-                        profile,
-
-                    "completion":
-                        calculate_completion(
-                            profile
-                        )
+                    "error":
+                        "Account ID is required."
 
                 },
 
-                200
+                400
 
             )
 
 
-        # ====================================================
-        # NOT FOUND
-        # ====================================================
+        profile_data = get_body(
+            req
+        )
 
-        return json_response(
+
+        if not profile_data:
+
+            return response(
+
+                {
+
+                    "success":
+                        False,
+
+                    "error":
+                        "Profile data is required."
+
+                },
+
+                400
+
+            )
+
+
+        completion = (
+
+            calculate_profile_completion(
+
+                profile_data
+
+            )
+
+        )
+
+
+        profile_data[
+
+            "profile_completion"
+
+        ] = completion
+
+
+        saved_profile = (
+
+            update_profile(
+
+                account_id,
+
+                profile_data
+
+            )
+
+        )
+
+
+        return response(
 
             {
 
                 "success":
-                    False,
+                    True,
 
-                "error":
-                    "Endpoint not found."
+                "message":
+                    "Profile saved successfully.",
 
-            },
+                "profile":
+                    saved_profile
 
-            404
-
-        )
-
-
-    except Exception as error:
-
-
-        print(
-
-            "REMADEF API ERROR:",
-
-            str(error)
+            }
 
         )
 
 
-        traceback.print_exc()
+    # --------------------------------------------------------
+    # UNKNOWN ROUTE
+    # --------------------------------------------------------
 
+    return response(
 
-        return json_response(
+        {
 
-            {
+            "success":
+                False,
 
-                "success":
-                    False,
+            "error":
+                "Route not found."
 
-                "error":
-                    str(error)
+        },
 
-            },
+        404
 
-            500
-
-        )
+    )
