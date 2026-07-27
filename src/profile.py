@@ -1,444 +1,699 @@
 # ============================================================
-# REMADEF PROFILE MODULE
+# REMADEF PLATFORM API
+# APPWRITE CLOUD FUNCTION
 # ============================================================
 
-import os
+import json
 
-from appwrite.client import Client
-from appwrite.services.tables_db import TablesDB
+from .auth import require_user
 
+from .users import (
 
-# ============================================================
-# CONFIGURATION
-# ============================================================
+    register_user,
 
-PROJECT_ID = os.environ.get(
-
-    "APPWRITE_FUNCTION_PROJECT_ID"
+    get_current_user
 
 )
 
+from .profile import (
 
-APPWRITE_ENDPOINT = os.environ.get(
+    get_profile,
 
-    "APPWRITE_FUNCTION_ENDPOINT",
+    save_profile,
 
-    "https://fra.cloud.appwrite.io/v1"
-
-)
-
-
-DATABASE_ID = os.environ.get(
-
-    "APPWRITE_DATABASE_ID",
-
-    "6a66577c000d17565b18"
-
-)
-
-
-TABLE_ID = os.environ.get(
-
-    "APPWRITE_PROFILE_TABLE_ID",
-
-    "profiles"
+    delete_profile
 
 )
 
 
 # ============================================================
-# APPWRITE CLIENT
+# CORS
 # ============================================================
 
-def get_client():
+CORS_HEADERS = {
 
-    client = Client()
+    "Access-Control-Allow-Origin":
 
-    client.set_endpoint(
+        "https://enibia1.github.io",
 
-        APPWRITE_ENDPOINT
+    "Access-Control-Allow-Methods":
+
+        "GET, POST, PUT, DELETE, OPTIONS",
+
+    "Access-Control-Allow-Headers":
+
+        "Content-Type, X-Appwrite-User-Id",
+
+    "Access-Control-Max-Age":
+
+        "86400"
+
+}
+
+
+# ============================================================
+# RESPONSE
+# ============================================================
+
+def response(
+
+    context,
+
+    data,
+
+    status=200
+
+):
+
+    return context.res.json(
+
+        data,
+
+        status,
+
+        CORS_HEADERS
 
     )
 
-    client.set_project(
-
-        PROJECT_ID
-
-    )
-
-    client.set_key(
-
-        os.environ.get(
-
-            "APPWRITE_API_KEY"
-
-        )
-
-    )
-
-    return client
-
 
 # ============================================================
-# DATABASE SERVICE
+# READ REQUEST BODY
 # ============================================================
 
-def get_database():
+def get_body(request):
 
-    return TablesDB(
-
-        get_client()
-
-    )
+    body = request.body or {}
 
 
-# ============================================================
-# ALLOWED PROFILE FIELDS
-# ============================================================
+    if isinstance(
 
-ALLOWED_FIELDS = [
+        body,
 
-    "first_name",
+        str
 
-    "last_name",
+    ):
 
-    "display_name",
+        try:
 
-    "date_of_birth",
+            body = json.loads(
 
-    "gender",
+                body
 
-    "country",
+            )
 
-    "state",
+        except json.JSONDecodeError:
 
-    "city",
+            return None
 
-    "phone",
-
-    "headline",
-
-    "about",
-
-    "skills",
-
-    "education_level",
-
-    "institution"
-
-]
-
-
-# ============================================================
-# FILTER PROFILE DATA
-# ============================================================
-
-def clean_profile_data(data):
 
     if not isinstance(
 
-        data,
+        body,
 
         dict
 
     ):
 
-        return {}
+        return None
 
 
-    cleaned = {}
-
-
-    for field in ALLOWED_FIELDS:
-
-        if field in data:
-
-            cleaned[field] = data[field]
-
-
-    return cleaned
+    return body
 
 
 # ============================================================
-# GET PROFILE
+# LOG ERRORS
 # ============================================================
 
-def get_profile(user_id):
+def log_error(
 
-    if not user_id:
+    context,
 
-        return {
+    result
 
-            "success": False,
+):
 
-            "error":
-                "Authentication required",
+    if result.get(
 
-            "status": 401
+        "log"
 
-        }
+    ):
 
+        context.log(
 
-    try:
-
-        database = get_database()
-
-
-        profile = database.get_row(
-
-            database_id=DATABASE_ID,
-
-            table_id=TABLE_ID,
-
-            row_id=user_id
+            result["log"]
 
         )
 
 
-        return {
-
-            "success": True,
-
-            "profile":
-                profile,
-
-            "status": 200
-
-        }
-
-
-    except Exception as error:
-
-        return {
-
-            "success": False,
-
-            "error":
-                "Profile not found",
-
-            "status": 404,
-
-            "log":
-                str(error)
-
-        }
-
-
 # ============================================================
-# CREATE OR UPDATE PROFILE
+# MAIN
 # ============================================================
 
-def save_profile(
+def main(context):
 
-    user_id,
-
-    data
-
-):
-
-    if not user_id:
-
-        return {
-
-            "success": False,
-
-            "error":
-                "Authentication required",
-
-            "status": 401
-
-        }
+    request = context.req
 
 
-    profile_data = clean_profile_data(
+    method = (
 
-        data
+        request.method
+
+        or
+
+        "GET"
+
+    ).upper()
+
+
+    path = (
+
+        request.path
+
+        or
+
+        "/"
 
     )
 
 
-    if not profile_data:
+    # ========================================================
+    # CORS PREFLIGHT
+    # ========================================================
 
-        return {
+    if method == "OPTIONS":
 
-            "success": False,
+        return response(
 
-            "error":
-                "No profile data provided",
+            context,
 
-            "status": 400
+            {
 
-        }
+                "success": True
 
+            },
 
-    try:
-
-        database = get_database()
-
-
-        # ----------------------------------------------------
-        # TRY TO FIND EXISTING PROFILE
-        # ----------------------------------------------------
-
-        try:
-
-            existing = database.get_row(
-
-                database_id=DATABASE_ID,
-
-                table_id=TABLE_ID,
-
-                row_id=user_id
-
-            )
-
-
-            # ------------------------------------------------
-            # UPDATE
-            # ------------------------------------------------
-
-            profile = database.update_row(
-
-                database_id=DATABASE_ID,
-
-                table_id=TABLE_ID,
-
-                row_id=user_id,
-
-                data=profile_data
-
-            )
-
-
-            return {
-
-                "success": True,
-
-                "message":
-                    "Profile updated successfully",
-
-                "profile":
-                    profile,
-
-                "status": 200
-
-            }
-
-
-        except Exception:
-
-            # ------------------------------------------------
-            # CREATE
-            # ------------------------------------------------
-
-            profile_data["user_id"] = user_id
-
-
-            profile = database.create_row(
-
-                database_id=DATABASE_ID,
-
-                table_id=TABLE_ID,
-
-                row_id=user_id,
-
-                data=profile_data
-
-            )
-
-
-            return {
-
-                "success": True,
-
-                "message":
-                    "Profile created successfully",
-
-                "profile":
-                    profile,
-
-                "status": 201
-
-            }
-
-
-    except Exception as error:
-
-        return {
-
-            "success": False,
-
-            "error":
-                "Unable to save profile",
-
-            "status": 500,
-
-            "log":
-                str(error)
-
-        }
-
-
-# ============================================================
-# DELETE PROFILE
-# ============================================================
-
-def delete_profile(user_id):
-
-    if not user_id:
-
-        return {
-
-            "success": False,
-
-            "error":
-                "Authentication required",
-
-            "status": 401
-
-        }
-
-
-    try:
-
-        database = get_database()
-
-
-        database.delete_row(
-
-            database_id=DATABASE_ID,
-
-            table_id=TABLE_ID,
-
-            row_id=user_id
+            204
 
         )
 
 
-        return {
+    # ========================================================
+    # API ROOT
+    # ========================================================
 
-            "success": True,
+    if (
 
-            "message":
-                "Profile deleted successfully",
+        method == "GET"
 
-            "status": 200
+        and
 
-        }
+        path == "/"
+
+    ):
+
+        return response(
+
+            context,
+
+            {
+
+                "success": True,
+
+                "service":
+                    "REMADEF Platform API",
+
+                "status":
+                    "online",
+
+                "version":
+                    "2.0.0"
+
+            }
+
+        )
 
 
-    except Exception as error:
+    # ========================================================
+    # HEALTH CHECK
+    # ========================================================
 
-        return {
+    if (
+
+        method == "GET"
+
+        and
+
+        path == "/api/health"
+
+    ):
+
+        return response(
+
+            context,
+
+            {
+
+                "success": True,
+
+                "service":
+                    "REMADEF Platform API",
+
+                "status":
+                    "healthy"
+
+            }
+
+        )
+
+
+    # ========================================================
+    # REGISTER
+    # ========================================================
+
+    if (
+
+        method == "POST"
+
+        and
+
+        path == "/api/register"
+
+    ):
+
+        body = get_body(
+
+            request
+
+        )
+
+
+        if body is None:
+
+            return response(
+
+                context,
+
+                {
+
+                    "success": False,
+
+                    "error":
+                        "Invalid request body"
+
+                },
+
+                400
+
+            )
+
+
+        result = register_user(
+
+            email=body.get(
+
+                "email"
+
+            ),
+
+            password=body.get(
+
+                "password"
+
+            )
+
+        )
+
+
+        log_error(
+
+            context,
+
+            result
+
+        )
+
+
+        return response(
+
+            context,
+
+            {
+
+                key: value
+
+                for key, value in result.items()
+
+                if key not in [
+
+                    "status",
+
+                    "log"
+
+                ]
+
+            },
+
+            result.get(
+
+                "status",
+
+                200
+
+            )
+
+        )
+
+
+    # ========================================================
+    # CURRENT USER
+    # ========================================================
+
+    if (
+
+        method == "GET"
+
+        and
+
+        path == "/api/user"
+
+    ):
+
+        user_id = require_user(
+
+            request
+
+        )
+
+
+        result = get_current_user(
+
+            user_id
+
+        )
+
+
+        log_error(
+
+            context,
+
+            result
+
+        )
+
+
+        return response(
+
+            context,
+
+            {
+
+                key: value
+
+                for key, value in result.items()
+
+                if key not in [
+
+                    "status",
+
+                    "log"
+
+                ]
+
+            },
+
+            result.get(
+
+                "status",
+
+                200
+
+            )
+
+        )
+
+
+    # ========================================================
+    # GET PROFILE
+    # ========================================================
+
+    if (
+
+        method == "GET"
+
+        and
+
+        path == "/api/profile"
+
+    ):
+
+        user_id = require_user(
+
+            request
+
+        )
+
+
+        result = get_profile(
+
+            user_id
+
+        )
+
+
+        log_error(
+
+            context,
+
+            result
+
+        )
+
+
+        return response(
+
+            context,
+
+            {
+
+                key: value
+
+                for key, value in result.items()
+
+                if key not in [
+
+                    "status",
+
+                    "log"
+
+                ]
+
+            },
+
+            result.get(
+
+                "status",
+
+                200
+
+            )
+
+        )
+
+
+    # ========================================================
+    # CREATE / UPDATE PROFILE
+    # ========================================================
+
+    if (
+
+        method in [
+
+            "POST",
+
+            "PUT"
+
+        ]
+
+        and
+
+        path == "/api/profile"
+
+    ):
+
+        user_id = require_user(
+
+            request
+
+        )
+
+
+        body = get_body(
+
+            request
+
+        )
+
+
+        if body is None:
+
+            return response(
+
+                context,
+
+                {
+
+                    "success": False,
+
+                    "error":
+                        "Invalid request body"
+
+                },
+
+                400
+
+            )
+
+
+        result = save_profile(
+
+            user_id,
+
+            body
+
+        )
+
+
+        log_error(
+
+            context,
+
+            result
+
+        )
+
+
+        return response(
+
+            context,
+
+            {
+
+                key: value
+
+                for key, value in result.items()
+
+                if key not in [
+
+                    "status",
+
+                    "log"
+
+                ]
+
+            },
+
+            result.get(
+
+                "status",
+
+                200
+
+            )
+
+        )
+
+
+    # ========================================================
+    # DELETE PROFILE
+    # ========================================================
+
+    if (
+
+        method == "DELETE"
+
+        and
+
+        path == "/api/profile"
+
+    ):
+
+        user_id = require_user(
+
+            request
+
+        )
+
+
+        result = delete_profile(
+
+            user_id
+
+        )
+
+
+        log_error(
+
+            context,
+
+            result
+
+        )
+
+
+        return response(
+
+            context,
+
+            {
+
+                key: value
+
+                for key, value in result.items()
+
+                if key not in [
+
+                    "status",
+
+                    "log"
+
+                ]
+
+            },
+
+            result.get(
+
+                "status",
+
+                200
+
+            )
+
+        )
+
+
+    # ========================================================
+    # UNKNOWN ROUTE
+    # ========================================================
+
+    return response(
+
+        context,
+
+        {
 
             "success": False,
 
             "error":
-                "Unable to delete profile",
+                "Endpoint not found",
 
-            "status": 500,
+            "path":
+                path,
 
-            "log":
-                str(error)
+            "method":
+                method
 
-        }
+        },
+
+        404
+
+    )
