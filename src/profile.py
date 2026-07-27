@@ -1,28 +1,26 @@
 # ============================================================
-# REMADEF PLATFORM API
-# APPWRITE CLOUD FUNCTION
+# REMADEF PROFILE SERVICE
+# Appwrite Cloud Function
 # ============================================================
 
 import json
+import os
+from appwrite.client import Client
+from appwrite.services.tables_db import TablesDB
 
-from .auth import require_user
 
-from .users import (
+# ============================================================
+# CONFIGURATION
+# ============================================================
 
-    register_user,
-
-    get_current_user
-
+DATABASE_ID = os.environ.get(
+    "APPWRITE_DATABASE_ID",
+    "6a66577c000d17565b18"
 )
 
-from .profile import (
-
-    get_profile,
-
-    save_profile,
-
-    delete_profile
-
+TABLE_ID = os.environ.get(
+    "APPWRITE_PROFILE_TABLE_ID",
+    "profiles"
 )
 
 
@@ -31,187 +29,241 @@ from .profile import (
 # ============================================================
 
 CORS_HEADERS = {
-
-    "Access-Control-Allow-Origin":
-
-        "https://enibia1.github.io",
-
-    "Access-Control-Allow-Methods":
-
-        "GET, POST, PUT, DELETE, OPTIONS",
-
-    "Access-Control-Allow-Headers":
-
-        "Content-Type, X-Appwrite-User-Id",
-
-    "Access-Control-Max-Age":
-
-        "86400"
-
+    "Access-Control-Allow-Origin": "https://enibia1.github.io",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, X-Appwrite-User-Id",
+    "Access-Control-Max-Age": "86400"
 }
+
+
+# ============================================================
+# APPWRITE CLIENT
+# ============================================================
+
+def get_client():
+
+    client = Client()
+
+    client.set_endpoint(
+        os.environ.get(
+            "APPWRITE_FUNCTION_ENDPOINT",
+            "https://fra.cloud.appwrite.io/v1"
+        )
+    )
+
+    client.set_project(
+        os.environ.get(
+            "APPWRITE_FUNCTION_PROJECT_ID"
+        )
+    )
+
+    client.set_key(
+        os.environ.get(
+            "APPWRITE_API_KEY"
+        )
+    )
+
+    return client
+
+
+# ============================================================
+# DATABASE
+# ============================================================
+
+def get_database():
+
+    return TablesDB(
+        get_client()
+    )
 
 
 # ============================================================
 # RESPONSE
 # ============================================================
 
-def response(
-
+def send_response(
     context,
-
     data,
-
     status=200
-
 ):
 
     return context.res.json(
-
         data,
-
         status,
-
         CORS_HEADERS
-
     )
 
 
 # ============================================================
-# READ REQUEST BODY
+# BODY
 # ============================================================
 
 def get_body(request):
 
-    body = request.body or {}
+    body = request.body
 
+    if not body:
 
-    if isinstance(
+        return {}
 
-        body,
+    if isinstance(body, dict):
 
-        str
+        return body
 
-    ):
+    if isinstance(body, str):
 
         try:
 
-            body = json.loads(
-
-                body
-
-            )
+            return json.loads(body)
 
         except json.JSONDecodeError:
 
             return None
 
-
-    if not isinstance(
-
-        body,
-
-        dict
-
-    ):
-
-        return None
-
-
-    return body
+    return None
 
 
 # ============================================================
-# LOG ERRORS
+# USER ID
 # ============================================================
 
-def log_error(
+def get_user_id(request):
 
-    context,
+    headers = request.headers or {}
 
-    result
+    return (
 
-):
-
-    if result.get(
-
-        "log"
-
-    ):
-
-        context.log(
-
-            result["log"]
-
+        headers.get(
+            "x-appwrite-user-id"
         )
 
+        or
+
+        headers.get(
+            "X-Appwrite-User-Id"
+        )
+
+    )
+
 
 # ============================================================
-# MAIN
+# ALLOWED PROFILE FIELDS
 # ============================================================
 
-def main(context):
+ALLOWED_FIELDS = {
+
+    "first_name",
+    "last_name",
+    "display_name",
+
+    "date_of_birth",
+    "gender",
+
+    "country",
+    "state",
+    "city",
+
+    "phone",
+
+    "headline",
+    "about",
+    "skills",
+
+    "education_level",
+    "institution"
+
+}
+
+
+# ============================================================
+# CLEAN PROFILE DATA
+# ============================================================
+
+def clean_profile_data(body):
+
+    profile = {}
+
+    for key in ALLOWED_FIELDS:
+
+        if key not in body:
+
+            continue
+
+        value = body[key]
+
+        if key == "skills":
+
+            if not isinstance(value, list):
+
+                continue
+
+            profile[key] = [
+
+                str(skill).strip()
+
+                for skill in value
+
+                if str(skill).strip()
+
+            ][:20]
+
+            continue
+
+        if value is None:
+
+            continue
+
+        if isinstance(value, str):
+
+            value = value.strip()
+
+        profile[key] = value
+
+    return profile
+
+
+# ============================================================
+# GET PROFILE
+# ============================================================
+
+def get_profile(context):
 
     request = context.req
 
+    user_id = get_user_id(request)
 
-    method = (
+    if not user_id:
 
-        request.method
-
-        or
-
-        "GET"
-
-    ).upper()
-
-
-    path = (
-
-        request.path
-
-        or
-
-        "/"
-
-    )
-
-
-    # ========================================================
-    # CORS PREFLIGHT
-    # ========================================================
-
-    if method == "OPTIONS":
-
-        return response(
+        return send_response(
 
             context,
 
             {
-
-                "success": True
-
+                "success": False,
+                "error": "Authentication required"
             },
 
-            204
+            401
 
         )
 
 
-    # ========================================================
-    # API ROOT
-    # ========================================================
+    try:
 
-    if (
+        database = get_database()
 
-        method == "GET"
+        profile = database.get_row(
 
-        and
+            database_id=DATABASE_ID,
 
-        path == "/"
+            table_id=TABLE_ID,
 
-    ):
+            row_id=user_id
 
-        return response(
+        )
+
+
+        return send_response(
 
             context,
 
@@ -219,481 +271,229 @@ def main(context):
 
                 "success": True,
 
-                "service":
-                    "REMADEF Platform API",
-
-                "status":
-                    "online",
-
-                "version":
-                    "2.0.0"
+                "profile": profile
 
             }
 
         )
 
 
-    # ========================================================
-    # HEALTH CHECK
-    # ========================================================
+    except Exception as error:
 
-    if (
+        context.log(
 
-        method == "GET"
+            "PROFILE GET ERROR: "
 
-        and
+            + str(error)
 
-        path == "/api/health"
+        )
 
-    ):
 
-        return response(
+        return send_response(
 
             context,
 
             {
 
-                "success": True,
+                "success": False,
 
-                "service":
-                    "REMADEF Platform API",
+                "error": "Profile not found"
 
-                "status":
-                    "healthy"
+            },
 
-            }
+            404
 
         )
 
 
-    # ========================================================
-    # REGISTER
-    # ========================================================
+# ============================================================
+# SAVE PROFILE
+# ============================================================
 
-    if (
+def save_profile(context):
 
-        method == "POST"
+    request = context.req
 
-        and
+    user_id = get_user_id(request)
 
-        path == "/api/register"
+    if not user_id:
 
-    ):
+        return send_response(
 
-        body = get_body(
+            context,
 
-            request
+            {
+
+                "success": False,
+
+                "error": "Authentication required"
+
+            },
+
+            401
 
         )
 
 
-        if body is None:
+    body = get_body(request)
 
-            return response(
+    if body is None:
+
+        return send_response(
+
+            context,
+
+            {
+
+                "success": False,
+
+                "error": "Invalid request body"
+
+            },
+
+            400
+
+        )
+
+
+    profile_data = clean_profile_data(body)
+
+
+    if not profile_data:
+
+        return send_response(
+
+            context,
+
+            {
+
+                "success": False,
+
+                "error": "No profile data provided"
+
+            },
+
+            400
+
+        )
+
+
+    try:
+
+        database = get_database()
+
+
+        # ====================================================
+        # TRY TO UPDATE EXISTING PROFILE
+        # ====================================================
+
+        try:
+
+            existing = database.get_row(
+
+                database_id=DATABASE_ID,
+
+                table_id=TABLE_ID,
+
+                row_id=user_id
+
+            )
+
+
+            profile = database.update_row(
+
+                database_id=DATABASE_ID,
+
+                table_id=TABLE_ID,
+
+                row_id=user_id,
+
+                data=profile_data
+
+            )
+
+
+            return send_response(
 
                 context,
 
                 {
 
-                    "success": False,
+                    "success": True,
 
-                    "error":
-                        "Invalid request body"
+                    "message": "Profile updated successfully",
 
-                },
+                    "profile": profile
 
-                400
+                }
+
+            )
+
+
+        except Exception:
+
+            # =================================================
+            # CREATE NEW PROFILE
+            # =================================================
+
+            profile_data["user_id"] = user_id
+
+
+            profile = database.create_row(
+
+                database_id=DATABASE_ID,
+
+                table_id=TABLE_ID,
+
+                row_id=user_id,
+
+                data=profile_data
 
             )
 
 
-        result = register_user(
-
-            email=body.get(
-
-                "email"
-
-            ),
-
-            password=body.get(
-
-                "password"
-
-            )
-
-        )
-
-
-        log_error(
-
-            context,
-
-            result
-
-        )
-
-
-        return response(
-
-            context,
-
-            {
-
-                key: value
-
-                for key, value in result.items()
-
-                if key not in [
-
-                    "status",
-
-                    "log"
-
-                ]
-
-            },
-
-            result.get(
-
-                "status",
-
-                200
-
-            )
-
-        )
-
-
-    # ========================================================
-    # CURRENT USER
-    # ========================================================
-
-    if (
-
-        method == "GET"
-
-        and
-
-        path == "/api/user"
-
-    ):
-
-        user_id = require_user(
-
-            request
-
-        )
-
-
-        result = get_current_user(
-
-            user_id
-
-        )
-
-
-        log_error(
-
-            context,
-
-            result
-
-        )
-
-
-        return response(
-
-            context,
-
-            {
-
-                key: value
-
-                for key, value in result.items()
-
-                if key not in [
-
-                    "status",
-
-                    "log"
-
-                ]
-
-            },
-
-            result.get(
-
-                "status",
-
-                200
-
-            )
-
-        )
-
-
-    # ========================================================
-    # GET PROFILE
-    # ========================================================
-
-    if (
-
-        method == "GET"
-
-        and
-
-        path == "/api/profile"
-
-    ):
-
-        user_id = require_user(
-
-            request
-
-        )
-
-
-        result = get_profile(
-
-            user_id
-
-        )
-
-
-        log_error(
-
-            context,
-
-            result
-
-        )
-
-
-        return response(
-
-            context,
-
-            {
-
-                key: value
-
-                for key, value in result.items()
-
-                if key not in [
-
-                    "status",
-
-                    "log"
-
-                ]
-
-            },
-
-            result.get(
-
-                "status",
-
-                200
-
-            )
-
-        )
-
-
-    # ========================================================
-    # CREATE / UPDATE PROFILE
-    # ========================================================
-
-    if (
-
-        method in [
-
-            "POST",
-
-            "PUT"
-
-        ]
-
-        and
-
-        path == "/api/profile"
-
-    ):
-
-        user_id = require_user(
-
-            request
-
-        )
-
-
-        body = get_body(
-
-            request
-
-        )
-
-
-        if body is None:
-
-            return response(
+            return send_response(
 
                 context,
 
                 {
 
-                    "success": False,
+                    "success": True,
 
-                    "error":
-                        "Invalid request body"
+                    "message": "Profile created successfully",
+
+                    "profile": profile
 
                 },
 
-                400
+                201
 
             )
 
 
-        result = save_profile(
+    except Exception as error:
 
-            user_id,
+        context.log(
 
-            body
+            "PROFILE SAVE ERROR: "
 
-        )
-
-
-        log_error(
-
-            context,
-
-            result
+            + str(error)
 
         )
 
 
-        return response(
+        return send_response(
 
             context,
 
             {
 
-                key: value
+                "success": False,
 
-                for key, value in result.items()
-
-                if key not in [
-
-                    "status",
-
-                    "log"
-
-                ]
+                "error": "Unable to save profile"
 
             },
 
-            result.get(
-
-                "status",
-
-                200
-
-            )
+            500
 
         )
-
-
-    # ========================================================
-    # DELETE PROFILE
-    # ========================================================
-
-    if (
-
-        method == "DELETE"
-
-        and
-
-        path == "/api/profile"
-
-    ):
-
-        user_id = require_user(
-
-            request
-
-        )
-
-
-        result = delete_profile(
-
-            user_id
-
-        )
-
-
-        log_error(
-
-            context,
-
-            result
-
-        )
-
-
-        return response(
-
-            context,
-
-            {
-
-                key: value
-
-                for key, value in result.items()
-
-                if key not in [
-
-                    "status",
-
-                    "log"
-
-                ]
-
-            },
-
-            result.get(
-
-                "status",
-
-                200
-
-            )
-
-        )
-
-
-    # ========================================================
-    # UNKNOWN ROUTE
-    # ========================================================
-
-    return response(
-
-        context,
-
-        {
-
-            "success": False,
-
-            "error":
-                "Endpoint not found",
-
-            "path":
-                path,
-
-            "method":
-                method
-
-        },
-
-        404
-
-    )
