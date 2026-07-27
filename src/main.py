@@ -1,7 +1,7 @@
 # ============================================================
 # REMADEF PLATFORM API
 # Appwrite Cloud Function
-# Python 3.14
+# Python 3.12+
 # ============================================================
 
 import json
@@ -44,39 +44,27 @@ def response(
 ):
 
     if body is None:
-
         body = {}
 
     return {
-
-        "statusCode":
-            status_code,
+        "statusCode": status_code,
 
         "headers": {
+            "Content-Type": "application/json",
 
-            "Content-Type":
-                "application/json",
-
-            "Access-Control-Allow-Origin":
-                "*",
+            "Access-Control-Allow-Origin": "*",
 
             "Access-Control-Allow-Headers":
                 "Content-Type, X-Appwrite-Project",
 
             "Access-Control-Allow-Methods":
                 "GET, POST, PUT, PATCH, OPTIONS"
-
         },
 
-        "body":
-            json.dumps(
-
-                body,
-
-                ensure_ascii=False
-
-            )
-
+        "body": json.dumps(
+            body,
+            ensure_ascii=False
+        )
     }
 
 
@@ -86,22 +74,12 @@ def success(
 ):
 
     return response(
-
         200,
-
         {
-
-            "success":
-                True,
-
-            "message":
-                message,
-
-            "data":
-                data
-
+            "success": True,
+            "message": message,
+            "data": data
         }
-
     )
 
 
@@ -111,19 +89,11 @@ def error(
 ):
 
     return response(
-
         status_code,
-
         {
-
-            "success":
-                False,
-
-            "message":
-                message
-
+            "success": False,
+            "message": message
         }
-
     )
 
 
@@ -136,41 +106,28 @@ def get_client():
     client = Client()
 
     client.set_endpoint(
-
         os.environ.get(
-
             "APPWRITE_FUNCTION_ENDPOINT",
-
             "https://fra.cloud.appwrite.io/v1"
-
         )
-
     )
 
     client.set_project(
-
         PROJECT_ID
-
     )
 
     dynamic_key = os.environ.get(
-
         "APPWRITE_FUNCTION_API_KEY"
-
     )
 
     if not dynamic_key:
 
         raise RuntimeError(
-
             "APPWRITE_FUNCTION_API_KEY is missing."
-
         )
 
     client.set_key(
-
         dynamic_key
-
     )
 
     return client
@@ -183,18 +140,14 @@ def get_client():
 def get_account_service():
 
     return Account(
-
         get_client()
-
     )
 
 
 def get_tables_db():
 
     return TablesDB(
-
         get_client()
-
     )
 
 
@@ -202,44 +155,53 @@ def get_tables_db():
 # REQUEST BODY PARSER
 # ============================================================
 
-def parse_json_body(
-    request
-):
+def parse_json_body(request):
 
-    body = request.get(
+    # Prefer Appwrite's parsed JSON body
+    try:
 
-        "body"
+        body_json = request.body_json
 
-    )
+        if isinstance(
+            body_json,
+            dict
+        ):
+
+            return body_json
+
+    except Exception:
+
+        pass
+
+    # Fallback to raw body
+    try:
+
+        body = request.body
+
+    except Exception:
+
+        return {}
 
     if not body:
 
         return {}
 
     if isinstance(
-
         body,
-
         dict
-
     ):
 
         return body
 
     if isinstance(
-
         body,
-
         str
-
     ):
 
         try:
 
             return json.loads(
-
                 body
-
             )
 
         except json.JSONDecodeError:
@@ -311,11 +273,8 @@ def find_profile(
     )
 
     rows = result.get(
-
         "rows",
-
         []
-
     )
 
     if not rows:
@@ -364,9 +323,7 @@ def calculate_completion(
     for field in fields:
 
         value = profile.get(
-
             field
-
         )
 
         if (
@@ -380,19 +337,14 @@ def calculate_completion(
             completed += 1
 
     skills = profile.get(
-
         "skills"
-
     )
 
     if skills:
 
         if isinstance(
-
             skills,
-
             list
-
         ):
 
             if len(skills) > 0:
@@ -404,19 +356,14 @@ def calculate_completion(
             completed += 1
 
     total = len(
-
         fields
-
     ) + 1
 
     return round(
 
         (
-
             completed /
-
             total
-
         ) * 100
 
     )
@@ -435,87 +382,66 @@ def create_profile(
     tables_db = get_tables_db()
 
     now = datetime.now(
-
         timezone.utc
-
     ).isoformat()
 
     profile_data = {
 
         "account_id":
-
             account_id,
 
         "email":
-
             email or "",
 
         "first_name":
-
             "",
 
         "last_name":
-
             "",
 
         "display_name":
-
             "",
 
         "date_of_birth":
-
             "",
 
         "gender":
-
             "",
 
         "country":
-
             "",
 
         "state":
-
             "",
 
         "city":
-
             "",
 
         "phone":
-
             phone or "",
 
         "headline":
-
             "",
 
         "about":
-
             "",
 
         "skills":
-
             "",
 
         "education_level":
-
             "",
 
         "institution":
-
             "",
 
         "profile_completion":
-
             0,
 
         "created_at":
-
             now,
 
         "updated_at":
-
             now
 
     }
@@ -523,19 +449,15 @@ def create_profile(
     return tables_db.create_row(
 
         database_id=
-
             DATABASE_ID,
 
         table_id=
-
             PROFILES_TABLE_ID,
 
         row_id=
-
             "unique()",
 
         data=
-
             profile_data
 
     )
@@ -552,17 +474,13 @@ def update_profile(
     tables_db = get_tables_db()
 
     existing = find_profile(
-
         account_id
-
     )
 
     if not existing:
 
         return create_profile(
-
             account_id
-
         )
 
     row_id = existing["$id"]
@@ -580,17 +498,12 @@ def update_profile(
         if field == "skills":
 
             if isinstance(
-
                 value,
-
                 list
-
             ):
 
                 value = json.dumps(
-
                     value
-
                 )
 
             elif value is None:
@@ -600,49 +513,34 @@ def update_profile(
         update_data[field] = value
 
     merged = {
-
         **existing,
-
         **update_data
-
     }
 
     update_data[
-
         "profile_completion"
-
     ] = calculate_completion(
-
         merged
-
     )
 
     update_data[
-
         "updated_at"
-
     ] = datetime.now(
-
         timezone.utc
-
     ).isoformat()
 
     return tables_db.update_row(
 
         database_id=
-
             DATABASE_ID,
 
         table_id=
-
             PROFILES_TABLE_ID,
 
         row_id=
-
             row_id,
 
         data=
-
             update_data
 
     )
@@ -661,11 +559,8 @@ def register_user(
     email = str(
 
         data.get(
-
             "email",
-
             ""
-
         )
 
     ).strip().lower()
@@ -673,11 +568,8 @@ def register_user(
     password = str(
 
         data.get(
-
             "password",
-
             ""
-
         )
 
     )
@@ -685,11 +577,8 @@ def register_user(
     phone = str(
 
         data.get(
-
             "phone",
-
             ""
-
         )
 
     ).strip()
@@ -719,15 +608,12 @@ def register_user(
             user = account_service.create(
 
                 user_id=
-
                     "unique()",
 
                 email=
-
                     email,
 
                 password=
-
                     password
 
             )
@@ -737,15 +623,12 @@ def register_user(
             user = account_service.create_phone_user(
 
                 user_id=
-
                     "unique()",
 
                 phone=
-
                     phone,
 
                 password=
-
                     password
 
             )
@@ -753,9 +636,7 @@ def register_user(
     except Exception as exc:
 
         message = str(
-
             exc
-
         )
 
         if "already exists" in message.lower():
@@ -768,6 +649,11 @@ def register_user(
 
             )
 
+        print(
+            "ACCOUNT CREATION ERROR:",
+            message
+        )
+
         return error(
 
             "Could not create account.",
@@ -777,23 +663,18 @@ def register_user(
         )
 
     user_id = user.get(
-
         "$id"
-
     )
 
     profile = create_profile(
 
         account_id=
-
             user_id,
 
         email=
-
             email,
 
         phone=
-
             phone
 
     )
@@ -805,33 +686,26 @@ def register_user(
         {
 
             "success":
-
                 True,
 
             "message":
-
                 "Account created successfully.",
 
             "account":
-
                 {
 
                     "id":
-
                         user_id,
 
                     "email":
-
                         email,
 
                     "phone":
-
                         phone
 
                 },
 
             "profile":
-
                 profile
 
         }
@@ -852,11 +726,8 @@ def login_user(
     email = str(
 
         data.get(
-
             "email",
-
             ""
-
         )
 
     ).strip().lower()
@@ -864,11 +735,8 @@ def login_user(
     phone = str(
 
         data.get(
-
             "phone",
-
             ""
-
         )
 
     ).strip()
@@ -876,11 +744,8 @@ def login_user(
     password = str(
 
         data.get(
-
             "password",
-
             ""
-
         )
 
     )
@@ -888,9 +753,7 @@ def login_user(
     if not password:
 
         return error(
-
             "Password is required."
-
         )
 
     if not email and not phone:
@@ -923,11 +786,8 @@ def get_profile(
     account_id = str(
 
         data.get(
-
             "account_id",
-
             ""
-
         )
 
     ).strip()
@@ -957,11 +817,8 @@ def get_profile(
         )
 
     skills = profile.get(
-
         "skills",
-
         ""
-
     )
 
     if isinstance(
@@ -975,17 +832,13 @@ def get_profile(
         try:
 
             profile["skills"] = json.loads(
-
                 skills
-
             )
 
         except json.JSONDecodeError:
 
             profile["skills"] = [
-
                 skills
-
             ]
 
     return success(
@@ -1010,11 +863,8 @@ def save_profile(
     account_id = str(
 
         data.get(
-
             "account_id",
-
             ""
-
         )
 
     ).strip()
@@ -1076,25 +926,12 @@ def route_request(
 
 ):
 
+    # Appwrite Request object
     method = str(
-
-        request.get(
-
-            "method",
-
-            "GET"
-
-        )
-
+        request.method
     ).upper()
 
-    path = request.get(
-
-        "path",
-
-        "/"
-
-    )
+    path = request.path
 
     if method == "OPTIONS":
 
@@ -1113,11 +950,9 @@ def route_request(
             {
 
                 "service":
-
                     "REMADEF Platform API",
 
                 "status":
-
                     "online"
 
             },
@@ -1133,7 +968,6 @@ def route_request(
             {
 
                 "status":
-
                     "healthy"
 
             },
