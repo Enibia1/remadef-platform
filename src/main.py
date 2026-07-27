@@ -1,37 +1,55 @@
 # ============================================================
 # REMADEF PLATFORM API
+# PROFILE MANAGEMENT API
 # ============================================================
 
+import os
 import json
+import re
+from datetime import datetime, timezone
 
-from appwrite.services.users import Users
+from appwrite.client import Client
+from appwrite.services.tables_db import TablesDB
 
-from profile import (
 
-    get_profile_by_account_id,
+# ============================================================
+# CONFIGURATION
+# ============================================================
 
-    create_profile,
+DATABASE_ID = os.environ.get(
+    "APPWRITE_DATABASE_ID",
+    "6a66577c000d17565b18"
+)
 
-    update_profile,
+TABLE_ID = os.environ.get(
+    "APPWRITE_PROFILES_TABLE_ID",
+    "profiles"
+)
 
-    calculate_profile_completion
+PROJECT_ID = os.environ.get(
+    "APPWRITE_PROJECT_ID",
+    "6a634fdc00148a907132"
+)
 
+APPWRITE_ENDPOINT = os.environ.get(
+    "APPWRITE_FUNCTION_ENDPOINT",
+    "https://fra.cloud.appwrite.io/v1"
 )
 
 
 # ============================================================
-# RESPONSE HELPERS
+# HTTP RESPONSE HELPERS
 # ============================================================
 
 def response(
-    data,
-    status=200
+    body,
+    status_code=200
 ):
 
     return {
 
         "statusCode":
-            status,
+            status_code,
 
         "headers": {
 
@@ -41,31 +59,145 @@ def response(
             "Access-Control-Allow-Origin":
                 "*",
 
-            "Access-Control-Allow-Headers":
-                "Content-Type",
-
             "Access-Control-Allow-Methods":
-                "GET, POST, PUT, OPTIONS"
+                "GET, POST, PUT, OPTIONS",
+
+            "Access-Control-Allow-Headers":
+                "Content-Type, X-Appwrite-Project"
 
         },
 
         "body":
             json.dumps(
-
-                data,
-
-                default=str
-
+                body,
+                ensure_ascii=False
             )
 
     }
 
 
+def success(
+    data=None,
+    message="Success",
+    status_code=200
+):
+
+    result = {
+
+        "success":
+            True,
+
+        "message":
+            message
+
+    }
+
+    if data is not None:
+
+        result["data"] = data
+
+    return response(
+        result,
+        status_code
+    )
+
+
+def error(
+    message,
+    status_code=400,
+    details=None
+):
+
+    result = {
+
+        "success":
+            False,
+
+        "message":
+            message
+
+    }
+
+    if details is not None:
+
+        result["details"] = details
+
+    return response(
+        result,
+        status_code
+    )
+
+
 # ============================================================
-# REQUEST BODY
+# APPWRITE CLIENT
 # ============================================================
 
-def get_body(
+def get_client():
+
+    client = Client()
+
+    client.set_endpoint(
+        APPWRITE_ENDPOINT
+    )
+
+    client.set_project(
+        PROJECT_ID
+    )
+
+    dynamic_key = os.environ.get(
+        "APPWRITE_FUNCTION_API_KEY"
+    )
+
+    if not dynamic_key:
+
+        raise RuntimeError(
+            "APPWRITE_FUNCTION_API_KEY is missing."
+        )
+
+    client.set_key(
+        dynamic_key
+    )
+
+    return client
+
+
+# ============================================================
+# TABLES DATABASE
+# ============================================================
+
+def get_tables_db():
+
+    return TablesDB(
+        get_client()
+    )
+
+
+# ============================================================
+# UTILITIES
+# ============================================================
+
+def now_iso():
+
+    return datetime.now(
+        timezone.utc
+    ).isoformat()
+
+
+def clean_string(
+    value,
+    default=""
+):
+
+    if value is None:
+
+        return default
+
+    return str(
+        value
+    ).strip()
+
+
+def parse_json_body(
     req
 ):
 
@@ -92,64 +224,786 @@ def get_body(
 
     except Exception:
 
+        raise ValueError(
+            "Request body must contain valid JSON."
+        )
+
+
+def get_query_parameter(
+    req,
+    name
+):
+
+    query = req.get(
+        "query",
+        {}
+    )
+
+    if not query:
+
+        return None
+
+    return query.get(
+        name
+    )
+
+
+def normalize_skills(
+    skills
+):
+
+    if skills is None:
+
+        return []
+
+    if isinstance(
+        skills,
+        list
+    ):
+
+        result = []
+
+        for skill in skills:
+
+            value = clean_string(
+                skill
+            )
+
+            if value and value not in result:
+
+                result.append(
+                    value
+                )
+
+        return result[:20]
+
+    if isinstance(
+        skills,
+        str
+    ):
+
+        value = skills.strip()
+
+        if not value:
+
+            return []
+
+        try:
+
+            parsed = json.loads(
+                value
+            )
+
+            if isinstance(
+                parsed,
+                list
+            ):
+
+                return normalize_skills(
+                    parsed
+                )
+
+        except Exception:
+
+            pass
+
+        return [
+
+            item.strip()
+
+            for item in value.split(",")
+
+            if item.strip()
+
+        ][:20]
+
+    return []
+
+
+def serialize_skills(
+    skills
+):
+
+    return json.dumps(
+        normalize_skills(
+            skills
+        ),
+        ensure_ascii=False
+    )
+
+
+def deserialize_skills(
+    value
+):
+
+    return normalize_skills(
+        value
+    )
+
+
+# ============================================================
+# PROFILE COMPLETION
+# ============================================================
+
+PROFILE_COMPLETION_FIELDS = [
+
+    "first_name",
+
+    "last_name",
+
+    "display_name",
+
+    "date_of_birth",
+
+    "gender",
+
+    "country",
+
+    "state",
+
+    "city",
+
+    "phone",
+
+    "headline",
+
+    "about",
+
+    "education_level",
+
+    "institution"
+
+]
+
+
+def calculate_profile_completion(
+    profile
+):
+
+    completed = 0
+
+    for field in PROFILE_COMPLETION_FIELDS:
+
+        value = profile.get(
+            field
+        )
+
+        if (
+
+            value is not None
+
+            and str(
+                value
+            ).strip()
+
+        ):
+
+            completed += 1
+
+    skills = normalize_skills(
+        profile.get(
+            "skills"
+        )
+    )
+
+    if skills:
+
+        completed += 1
+
+    total = (
+
+        len(
+            PROFILE_COMPLETION_FIELDS
+        )
+
+        + 1
+
+    )
+
+    return round(
+
+        (
+
+            completed /
+
+            total
+
+        ) * 100
+
+    )
+
+
+# ============================================================
+# PROFILE DATA NORMALIZATION
+# ============================================================
+
+def normalize_profile(
+    profile
+):
+
+    if not profile:
+
         return {}
 
+    result = dict(
+        profile
+    )
+
+    result["skills"] = normalize_skills(
+        profile.get(
+            "skills"
+        )
+    )
+
+    result["profile_completion"] = (
+
+        profile.get(
+            "profile_completion"
+        )
+
+        if profile.get(
+            "profile_completion"
+        ) is not None
+
+        else calculate_profile_completion(
+            result
+        )
+
+    )
+
+    return result
+
 
 # ============================================================
-# GET CURRENT USER
+# FIND PROFILE BY ACCOUNT ID
 # ============================================================
 
-def get_current_user():
+def get_profile_by_account_id(
+    account_id
+):
 
-    # The function's dynamic API key
-    # allows the function to use Appwrite
-    # server-side services.
+    account_id = clean_string(
+        account_id
+    )
 
-    from appwrite.client import Client
+    if not account_id:
 
-    import os
+        return None
 
-    client = Client()
+    tables_db = get_tables_db()
 
-    client.set_endpoint(
+    result = tables_db.list_rows(
 
-        os.environ.get(
+        database_id=
+            DATABASE_ID,
 
-            "APPWRITE_FUNCTION_ENDPOINT",
+        table_id=
+            TABLE_ID,
 
-            "https://fra.cloud.appwrite.io/v1"
+        queries=[
 
+            f'equal("account_id", "{account_id}")'
+
+        ]
+
+    )
+
+    rows = result.get(
+        "rows",
+        []
+    )
+
+    if not rows:
+
+        return None
+
+    return normalize_profile(
+        rows[0]
+    )
+
+
+# ============================================================
+# CREATE PROFILE
+# ============================================================
+
+def create_profile(
+    account_id,
+    email="",
+    phone=""
+):
+
+    account_id = clean_string(
+        account_id
+    )
+
+    if not account_id:
+
+        raise ValueError(
+            "account_id is required."
+        )
+
+    existing_profile = (
+
+        get_profile_by_account_id(
+            account_id
         )
 
     )
 
-    client.set_project(
+    if existing_profile:
 
-        os.environ.get(
+        return existing_profile
 
-            "APPWRITE_PROJECT_ID",
+    now = now_iso()
 
-            "6a634fdc00148a907132"
+    profile_data = {
 
+        "account_id":
+            account_id,
+
+        "email":
+            clean_string(
+                email
+            ),
+
+        "first_name":
+            "",
+
+        "last_name":
+            "",
+
+        "display_name":
+            "",
+
+        "date_of_birth":
+            "",
+
+        "gender":
+            "",
+
+        "country":
+            "",
+
+        "state":
+            "",
+
+        "city":
+            "",
+
+        "phone":
+            clean_string(
+                phone
+            ),
+
+        "headline":
+            "",
+
+        "about":
+            "",
+
+        "skills":
+            "[]",
+
+        "education_level":
+            "",
+
+        "institution":
+            "",
+
+        "profile_completion":
+            0,
+
+        "created_at":
+            now,
+
+        "updated_at":
+            now
+
+    }
+
+    tables_db = get_tables_db()
+
+    created = tables_db.create_row(
+
+        database_id=
+            DATABASE_ID,
+
+        table_id=
+            TABLE_ID,
+
+        row_id=
+            "unique()",
+
+        data=
+            profile_data
+
+    )
+
+    return normalize_profile(
+        created
+    )
+
+
+# ============================================================
+# UPDATE PROFILE
+# ============================================================
+
+def update_profile(
+    account_id,
+    profile_data
+):
+
+    account_id = clean_string(
+        account_id
+    )
+
+    if not account_id:
+
+        raise ValueError(
+            "account_id is required."
+        )
+
+    if not isinstance(
+        profile_data,
+        dict
+    ):
+
+        raise ValueError(
+            "Profile data must be an object."
+        )
+
+    existing_profile = (
+
+        get_profile_by_account_id(
+            account_id
         )
 
     )
 
-    client.set_key(
+    if not existing_profile:
 
-        os.environ.get(
+        create_profile(
+            account_id
+        )
 
-            "APPWRITE_FUNCTION_API_KEY"
+        existing_profile = (
 
+            get_profile_by_account_id(
+                account_id
+            )
+
+        )
+
+    allowed_fields = [
+
+        "email",
+
+        "first_name",
+
+        "last_name",
+
+        "display_name",
+
+        "date_of_birth",
+
+        "gender",
+
+        "country",
+
+        "state",
+
+        "city",
+
+        "phone",
+
+        "headline",
+
+        "about",
+
+        "skills",
+
+        "education_level",
+
+        "institution"
+
+    ]
+
+    update_data = {}
+
+    for field in allowed_fields:
+
+        if field not in profile_data:
+
+            continue
+
+        value = profile_data[field]
+
+        if field == "skills":
+
+            value = serialize_skills(
+                value
+            )
+
+        else:
+
+            value = clean_string(
+                value
+            )
+
+        update_data[field] = value
+
+    merged_profile = dict(
+        existing_profile
+    )
+
+    for field in update_data:
+
+        value = update_data[field]
+
+        if field == "skills":
+
+            merged_profile[field] = (
+
+                deserialize_skills(
+                    value
+                )
+
+            )
+
+        else:
+
+            merged_profile[field] = value
+
+    update_data[
+        "profile_completion"
+    ] = calculate_profile_completion(
+        merged_profile
+    )
+
+    update_data[
+        "updated_at"
+    ] = now_iso()
+
+    tables_db = get_tables_db()
+
+    updated = tables_db.update_row(
+
+        database_id=
+            DATABASE_ID,
+
+        table_id=
+            TABLE_ID,
+
+        row_id=
+            existing_profile["$id"],
+
+        data=
+            update_data
+
+    )
+
+    return normalize_profile(
+        updated
+    )
+
+
+# ============================================================
+# REQUEST HANDLERS
+# ============================================================
+
+def handle_health():
+
+    return success(
+
+        {
+
+            "service":
+                "REMADEF Platform API",
+
+            "status":
+                "healthy",
+
+            "database":
+                DATABASE_ID,
+
+            "table":
+                TABLE_ID
+
+        },
+
+        "REMADEF Platform API is healthy."
+
+    )
+
+
+def handle_get_profile(
+    req
+):
+
+    account_id = get_query_parameter(
+
+        req,
+
+        "account_id"
+
+    )
+
+    if not account_id:
+
+        return error(
+
+            "account_id is required.",
+
+            400
+
+        )
+
+    profile = (
+
+        get_profile_by_account_id(
+            account_id
         )
 
     )
 
-    users = Users(
-        client
+    if not profile:
+
+        return error(
+
+            "Profile not found.",
+
+            404
+
+        )
+
+    return success(
+
+        profile,
+
+        "Profile retrieved successfully."
+
     )
 
-    return users
+
+def handle_create_profile(
+    req
+):
+
+    body = parse_json_body(
+        req
+    )
+
+    account_id = clean_string(
+        body.get(
+            "account_id"
+        )
+    )
+
+    if not account_id:
+
+        return error(
+
+            "account_id is required.",
+
+            400
+
+        )
+
+    profile = create_profile(
+
+        account_id=
+
+            account_id,
+
+        email=
+
+            body.get(
+                "email",
+                ""
+            ),
+
+        phone=
+
+            body.get(
+                "phone",
+                ""
+            )
+
+    )
+
+    return success(
+
+        profile,
+
+        "Profile created successfully.",
+
+        201
+
+    )
+
+
+def handle_update_profile(
+    req
+):
+
+    body = parse_json_body(
+        req
+    )
+
+    account_id = clean_string(
+
+        body.get(
+            "account_id"
+        )
+
+    )
+
+    if not account_id:
+
+        return error(
+
+            "account_id is required.",
+
+            400
+
+        )
+
+    profile_data = body.get(
+        "profile"
+    )
+
+    if profile_data is None:
+
+        profile_data = {
+
+            key:
+                value
+
+            for key, value in body.items()
+
+            if key != "account_id"
+
+        }
+
+    profile = update_profile(
+
+        account_id=
+
+            account_id,
+
+        profile_data=
+
+            profile_data
+
+    )
+
+    return success(
+
+        profile,
+
+        "Profile updated successfully."
+
+    )
 
 
 # ============================================================
@@ -157,294 +1011,212 @@ def get_current_user():
 # ============================================================
 
 def main(
-    req,
-    res
+    context
 ):
+
+    req = context.req
 
     method = (
 
-        req.get(
-            "method"
-        )
+        req.method
 
         or "GET"
 
     ).upper()
 
-
     path = (
 
-        req.get(
-            "path"
-        )
+        req.path
 
         or "/"
 
-    )
+    ).rstrip("/")
 
+    try:
 
-    # --------------------------------------------------------
-    # CORS PREFLIGHT
-    # --------------------------------------------------------
+        # ----------------------------------------------------
+        # CORS PREFLIGHT
+        # ----------------------------------------------------
 
-    if method == "OPTIONS":
-
-        return response(
-            {
-                "success":
-                    True
-            }
-        )
-
-
-    # --------------------------------------------------------
-    # HEALTH CHECK
-    # --------------------------------------------------------
-
-    if (
-
-        path == "/"
-
-        or path == "/api/health"
-
-    ):
-
-        return response(
-
-            {
-
-                "success":
-                    True,
-
-                "service":
-                    "REMADEF Platform API",
-
-                "status":
-                    "online"
-
-            }
-
-        )
-
-
-    # --------------------------------------------------------
-    # GET PROFILE
-    # --------------------------------------------------------
-
-    if (
-
-        path == "/api/profile"
-
-        and method == "GET"
-
-    ):
-
-        account_id = (
-
-            req.get(
-                "headers",
-                {}
-            ).get(
-                "x-account-id"
-            )
-
-        )
-
-
-        if not account_id:
+        if method == "OPTIONS":
 
             return response(
+                {},
+                204
+            )
+
+        # ----------------------------------------------------
+        # ROOT
+        # ----------------------------------------------------
+
+        if (
+
+            method == "GET"
+
+            and path in [
+
+                "",
+
+                "/"
+
+            ]
+
+        ):
+
+            return success(
 
                 {
 
-                    "success":
-                        False,
+                    "name":
+                        "REMADEF Platform API",
 
-                    "error":
-                        "Account ID is required."
+                    "version":
+                        "1.0.0",
+
+                    "status":
+                        "online",
+
+                    "endpoints": [
+
+                        "GET /",
+
+                        "GET /api/health",
+
+                        "GET /api/profile?account_id=...",
+
+                        "POST /api/profile",
+
+                        "PUT /api/profile",
+
+                        "POST /api/profile/create"
+
+                    ]
 
                 },
 
-                400
+                "REMADEF Platform API is online."
 
             )
 
+        # ----------------------------------------------------
+        # HEALTH
+        # ----------------------------------------------------
 
-        profile = (
+        if (
 
-            get_profile_by_account_id(
+            method == "GET"
 
-                account_id
+            and path == "/api/health"
 
+        ):
+
+            return handle_health()
+
+        # ----------------------------------------------------
+        # GET PROFILE
+        # ----------------------------------------------------
+
+        if (
+
+            method == "GET"
+
+            and path == "/api/profile"
+
+        ):
+
+            return handle_get_profile(
+                req
             )
+
+        # ----------------------------------------------------
+        # CREATE PROFILE
+        # ----------------------------------------------------
+
+        if (
+
+            method == "POST"
+
+            and path == "/api/profile/create"
+
+        ):
+
+            return handle_create_profile(
+                req
+            )
+
+        # ----------------------------------------------------
+        # CREATE OR UPDATE PROFILE
+        # ----------------------------------------------------
+
+        if (
+
+            method == "POST"
+
+            and path == "/api/profile"
+
+        ):
+
+            return handle_update_profile(
+                req
+            )
+
+        # ----------------------------------------------------
+        # UPDATE PROFILE
+        # ----------------------------------------------------
+
+        if (
+
+            method == "PUT"
+
+            and path == "/api/profile"
+
+        ):
+
+            return handle_update_profile(
+                req
+            )
+
+        # ----------------------------------------------------
+        # NOT FOUND
+        # ----------------------------------------------------
+
+        return error(
+
+            "Endpoint not found.",
+
+            404
 
         )
 
+    except ValueError as exc:
 
-        if not profile:
+        return error(
 
-            return response(
+            str(
+                exc
+            ),
 
-                {
-
-                    "success":
-                        True,
-
-                    "profile":
-                        None
-
-                }
-
-            )
-
-
-        return response(
-
-            {
-
-                "success":
-                    True,
-
-                "profile":
-                    profile
-
-            }
+            400
 
         )
 
+    except Exception as exc:
 
-    # --------------------------------------------------------
-    # UPDATE PROFILE
-    # --------------------------------------------------------
+        print(
+            "REMADEF API ERROR:",
+            repr(
+                exc
+            )
+        )
 
-    if (
+        return error(
 
-        path == "/api/profile"
+            "Internal server error.",
 
-        and method == "PUT"
+            500,
 
-    ):
-
-        account_id = (
-
-            req.get(
-                "headers",
-                {}
-            ).get(
-                "x-account-id"
+            str(
+                exc
             )
 
         )
-
-
-        if not account_id:
-
-            return response(
-
-                {
-
-                    "success":
-                        False,
-
-                    "error":
-                        "Account ID is required."
-
-                },
-
-                400
-
-            )
-
-
-        profile_data = get_body(
-            req
-        )
-
-
-        if not profile_data:
-
-            return response(
-
-                {
-
-                    "success":
-                        False,
-
-                    "error":
-                        "Profile data is required."
-
-                },
-
-                400
-
-            )
-
-
-        completion = (
-
-            calculate_profile_completion(
-
-                profile_data
-
-            )
-
-        )
-
-
-        profile_data[
-
-            "profile_completion"
-
-        ] = completion
-
-
-        saved_profile = (
-
-            update_profile(
-
-                account_id,
-
-                profile_data
-
-            )
-
-        )
-
-
-        return response(
-
-            {
-
-                "success":
-                    True,
-
-                "message":
-                    "Profile saved successfully.",
-
-                "profile":
-                    saved_profile
-
-            }
-
-        )
-
-
-    # --------------------------------------------------------
-    # UNKNOWN ROUTE
-    # --------------------------------------------------------
-
-    return response(
-
-        {
-
-            "success":
-                False,
-
-            "error":
-                "Route not found."
-
-        },
-
-        404
-
-    )
