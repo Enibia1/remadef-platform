@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+>
+
+<meta
+    name="theme-color"
+    content="#0B1F3A"
+>
+
+<meta
+    name="description"
+    content="REMADEF Messages"
+>
+
+<title>REMADEF Messages</title>
+
+<link
+    rel="stylesheet"
+    href="css/messages.css"
+>
+
+</head>
+
+<body>
+
+<div class="messages-app">
+
+    <!-- ==========================
+         TOP HEADER
+    =========================== -->
+
+    <header class="topbar">
+
+        <button
+            class="menu-button"
+            id="menu-button"
+            type="button"
+        >
+            ☰
+        </button>
+
+        <div class="logo">
+
+            REMADEF
+
+        </div>
+
+        <div class="header-actions">
+
+            <button
+                id="new-chat"
+                class="icon-button"
+                type="button"
+                title="New Chat"
+            >
+                ✏️
+            </button>
+
+            <button
+                id="notifications"
+                class="icon-button"
+                type="button"
+            >
+                🔔
+            </button>
+
+            <a
+                href="profile.html"
+                class="avatar"
+                id="avatar"
+            >
+                U
+            </a>
+
+        </div>
+
+    </header>
+
+    <div class="messages-layout">
+
+        <!-- ==========================
+             CONVERSATION SIDEBAR
+        =========================== -->
+
+        <aside class="sidebar">
+
+            <div class="sidebar-header">
+
+                <h2>
+
+                    Messages
+
+                </h2>
+
+            </div>
+
+            <div class="search-box">
+
+                <input
+                    id="conversation-search"
+                    type="search"
+                    placeholder="Search conversations..."
+                >
+
+            </div>
+
+            <div
+                class="conversation-list"
+                id="conversation-list"
+            >
+
+                <div
+                    class="conversation active"
+                    data-chat="1"
+                >
+
+                    <div class="conversation-avatar">
+
+                        RM
+
+                    </div>
+
+                    <div class="conversation-info">
+
+                        <h3>
+
+                            REMADEF Support
+
+                        </h3>
+
+                        <p>
+
+                            Welcome to REMADEF.
+
+                        </p>
+
+                    </div>
+
+                    <div class="conversation-meta">
+
+                        <span>
+
+                            10:30
+
+                        </span>
+
+                        <span class="badge">
+
+                            1
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+        <!-- ==========================
+             CHAT WINDOW
+        =========================== -->
+
+        <main class="chat-panel">
+
+            <header class="chat-header">
+
+                <div class="chat-user">
+
+                    <div class="conversation-avatar">
+
+                        RM
+
+                    </div>
+
+                    <div>
+
+                        <h3
+                            id="chat-name"
+                        >
+
+                            REMADEF Support
+
+                        </h3>
+
+                        <span
+                            id="chat-status"
+                        >
+
+                            Online
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <div class="chat-actions">
+
+                    <button
+                        class="icon-button"
+                        id="voice-call"
+                        type="button"
+                    >
+                        📞
+                    </button>
+
+                    <button
+                        class="icon-button"
+                        id="video-call"
+                        type="button"
+                    >
+                        🎥
+                    </button>
+
+                    <button
+                        class="icon-button"
+                        id="chat-info"
+                        type="button"
+                    >
+                        ℹ️
+                    </button>
+
+                </div>
+
+            </header>
+
+            <!-- ==========================
+                 MESSAGES
+            =========================== -->
+
+            <section
+                class="chat-messages"
+                id="chat-messages"
+            >
+
+                <div class="message received">
+
+                    <div class="bubble">
+
+                        Welcome to REMADEF.
+
+                    </div>
+
+                    <span class="time">
+
+                        10:30 AM
+
+                    </span>
+
+                </div>
+
+                <div class="message sent">
+
+                    <div class="bubble">
+
+                        Thank you.
+
+                    </div>
+
+                    <span class="time">
+
+                        10:31 AM
+
+                    </span>
+
+                </div>
+
+            </section>
+
+            <!-- ==========================
+                 MESSAGE COMPOSER
+            =========================== -->
+
+            <footer class="composer">
+
+                <button
+                    id="attach-button"
+                    class="icon-button"
+                    type="button"
+                >
+                    📎
+                </button>
+
+                <textarea
+                    id="message-input"
+                    placeholder="Type a message..."
+                    rows="1"
+                ></textarea>
+
+                <button
+                    id="emoji-button"
+                    class="icon-button"
+                    type="button"
+                >
+                    😊
+                </button>
+
+                <button
+                    id="send-button"
+                    class="send-button"
+                    type="button"
+                >
+
+                    Send
+
+                </button>
+
+            </footer>
+
+        </main>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/appwrite@21.1.0"></script>
+
+<script src="api.js"></script>
+
+<script src="js/messages.js"></script>
+
+</body>
+
+</html>
