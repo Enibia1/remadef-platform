@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#071A3D"
+    >
+
+    <meta
+        name="description"
+        content="Search across the REMADEF ecosystem."
+    >
+
+    <title>REMADEF — Search</title>
+
+    <link
+        rel="stylesheet"
+        href="css/search.css"
+    >
+
+</head>
+
+<body>
+
+<div class="search-page">
+
+    <!-- ==========================================
+         HEADER
+    =========================================== -->
+
+    <header class="topbar">
+
+        <a
+            href="home.html"
+            class="logo"
+        >
+
+            REMADEF
+
+        </a>
+
+        <div class="top-actions">
+
+            <a
+                href="notifications.html"
+                class="icon-button"
+                title="Notifications"
+            >
+
+                🔔
+
+            </a>
+
+            <a
+                href="messages.html"
+                class="icon-button"
+                title="Messages"
+            >
+
+                💬
+
+            </a>
+
+            <a
+                href="profile.html"
+                class="avatar"
+                id="avatar"
+            >
+
+                U
+
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- ==========================================
+         SEARCH BAR
+    =========================================== -->
+
+    <section class="search-header">
+
+        <h1>
+
+            Search
+
+        </h1>
+
+        <p>
+
+            Find people, apprenticeships, jobs,
+            businesses, courses and opportunities.
+
+        </p>
+
+        <div class="search-box">
+
+            <button
+                type="button"
+                class="search-icon"
+            >
+
+                🔍
+
+            </button>
+
+            <input
+
+                id="global-search"
+
+                type="search"
+
+                placeholder="Search REMADEF..."
+
+                autocomplete="off"
+
+            >
+
+            <button
+
+                id="clear-search"
+
+                class="clear-button"
+
+                type="button"
+
+            >
+
+                ✕
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- ==========================================
+         SEARCH FILTERS
+    =========================================== -->
+
+    <section class="filter-section">
+
+        <button
+            class="filter active"
+            data-filter="all"
+        >
+
+            All
+
+        </button>
+
+        <button
+            class="filter"
+            data-filter="people"
+        >
+
+            People
+
+        </button>
+
+        <button
+            class="filter"
+            data-filter="learning"
+        >
+
+            Learning
+
+        </button>
+
+        <button
+            class="filter"
+            data-filter="apprenticeships"
+        >
+
+            Apprenticeships
+
+        </button>
+
+        <button
+            class="filter"
+            data-filter="jobs"
+        >
+
+            Jobs
+
+        </button>
+
+        <button
+            class="filter"
+            data-filter="business"
+        >
+
+            Businesses
+
+        </button>
+
+        <button
+            class="filter"
+            data-filter="groups"
+        >
+
+            Groups
+
+        </button>
+
+    </section>
+
+
+    <!-- ==========================================
+         MAIN LAYOUT
+    =========================================== -->
+
+    <main class="search-layout">
+
+        <!-- =========================
+             LEFT COLUMN
+        ========================== -->
+
+        <aside class="recent-panel">
+
+            <div class="panel-title">
+
+                Recent Searches
+
+            </div>
+
+            <div
+                class="recent-list"
+                id="recent-searches"
+            >
+
+                <!-- JS -->
+
+            </div>
+
+
+            <div class="panel-title">
+
+                Trending
+
+            </div>
+
+            <div class="trending-list">
+
+                <button class="trend">
+
+                    #Apprenticeship
+
+                </button>
+
+                <button class="trend">
+
+                    #Engineering
+
+                </button>
+
+                <button class="trend">
+
+                    #Agriculture
+
+                </button>
+
+                <button class="trend">
+
+                    #Healthcare
+
+                </button>
+
+                <button class="trend">
+
+                    #Business
+
+                </button>
+
+            </div>
+
+        </aside>
+
+
+        <!-- =========================
+             RESULTS
+        ========================== -->
+
+        <section class="results-panel">
+
+            <div class="results-header">
+
+                <div>
+
+                    <h2>
+
+                        Search Results
+
+                    </h2>
+
+                    <p id="results-count">
+
+                        Start typing to search.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div
+                id="search-results"
+                class="results-list"
+            >
+
+                <!-- Results inserted by JS -->
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             RIGHT PANEL
+        ========================== -->
+
+        <aside class="suggestions-panel">
+
+            <div class="panel-title">
+
+                Suggested For You
+
+            </div>
+
+            <div
+                class="suggestions-list"
+                id="suggestions"
+            >
+
+                <div class="placeholder-card">
+
+                    Recommendations will appear here.
+
+                </div>
+
+            </div>
+
+            <div class="panel-title">
+
+                Search Tips
+
+            </div>
+
+            <ul class="tips">
+
+                <li>
+
+                    Search by name
+
+                </li>
+
+                <li>
+
+                    Search by skill
+
+                </li>
+
+                <li>
+
+                    Search by institution
+
+                </li>
+
+                <li>
+
+                    Search by company
+
+                </li>
+
+                <li>
+
+                    Search by location
+
+                </li>
+
+            </ul>
+
+        </aside>
+
+    </main>
+
+
+    <!-- ==========================================
+         MOBILE NAVIGATION
+    =========================================== -->
+
+    <nav class="mobile-nav">
+
+        <a href="home.html">
+
+            🏠
+
+            <span>Home</span>
+
+        </a>
+
+        <a
+            href="search.html"
+            class="active"
+        >
+
+            🔍
+
+            <span>Search</span>
+
+        </a>
+
+        <a href="messages.html">
+
+            💬
+
+            <span>Messages</span>
+
+        </a>
+
+        <a href="notifications.html">
+
+            🔔
+
+            <span>Alerts</span>
+
+        </a>
+
+        <a href="profile.html">
+
+            👤
+
+            <span>Profile</span>
+
+        </a>
+
+    </nav>
+
+
+    <!-- ==========================================
+         APPWRITE SDK
+    =========================================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@21.1.0"></script>
+
+    <script src="api.js"></script>
+
+    <script src="js/search.js"></script>
+
+</div>
+
+</body>
+
+</html>
