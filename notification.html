@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <meta
+        name="theme-color"
+        content="#0B1F3A"
+    >
+
+    <meta
+        name="description"
+        content="Your REMADEF notifications."
+    >
+
+    <title>REMADEF Notifications</title>
+
+    <link
+        rel="stylesheet"
+        href="css/notifications.css"
+    >
+
+</head>
+
+<body>
+
+<div class="notifications-app">
+
+    <!-- ==========================================
+         HEADER
+    =========================================== -->
+
+    <header class="topbar">
+
+        <a
+            href="home.html"
+            class="logo"
+        >
+
+            REMADEF
+
+        </a>
+
+        <div class="header-actions">
+
+            <button
+                class="icon-button"
+                id="mark-all-read"
+                type="button"
+                title="Mark all as read"
+            >
+
+                ✓
+
+            </button>
+
+            <button
+                class="icon-button"
+                id="notification-settings"
+                type="button"
+                title="Notification settings"
+            >
+
+                ⚙
+
+            </button>
+
+            <a
+                href="profile.html"
+                class="avatar"
+                id="avatar"
+            >
+
+                U
+
+            </a>
+
+        </div>
+
+    </header>
+
+    <!-- ==========================================
+         MAIN LAYOUT
+    =========================================== -->
+
+    <main class="notifications-main">
+
+        <!-- ======================================
+             PAGE TITLE
+        ======================================= -->
+
+        <section class="page-header">
+
+            <div>
+
+                <h1>
+
+                    Notifications
+
+                </h1>
+
+                <p>
+
+                    Stay updated with learning,
+                    apprenticeships, jobs,
+                    business opportunities and
+                    important platform activity.
+
+                </p>
+
+            </div>
+
+        </section>
+
+        <!-- ======================================
+             SEARCH
+        ======================================= -->
+
+        <section class="search-section">
+
+            <div class="search-box">
+
+                <input
+
+                    type="search"
+
+                    id="notification-search"
+
+                    placeholder="Search notifications..."
+
+                    autocomplete="off"
+
+                >
+
+            </div>
+
+        </section>
+
+        <!-- ======================================
+             FILTERS
+        ======================================= -->
+
+        <section class="filter-section">
+
+            <button
+
+                class="filter-button active"
+
+                data-filter="all"
+
+                type="button"
+
+            >
+
+                All
+
+            </button>
+
+            <button
+
+                class="filter-button"
+
+                data-filter="unread"
+
+                type="button"
+
+            >
+
+                Unread
+
+            </button>
+
+            <button
+
+                class="filter-button"
+
+                data-filter="learning"
+
+                type="button"
+
+            >
+
+                Learning
+
+            </button>
+
+            <button
+
+                class="filter-button"
+
+                data-filter="apprenticeships"
+
+                type="button"
+
+            >
+
+                Apprenticeships
+
+            </button>
+
+            <button
+
+                class="filter-button"
+
+                data-filter="jobs"
+
+                type="button"
+
+            >
+
+                Jobs
+
+            </button>
+
+            <button
+
+                class="filter-button"
+
+                data-filter="business"
+
+                type="button"
+
+            >
+
+                Business
+
+            </button>
+
+            <button
+
+                class="filter-button"
+
+                data-filter="foundation"
+
+                type="button"
+
+            >
+
+                Foundation
+
+            </button>
+
+            <button
+
+                class="filter-button"
+
+                data-filter="system"
+
+                type="button"
+
+            >
+
+                System
+
+            </button>
+
+        </section>
+
+        <!-- ======================================
+             NOTIFICATION SUMMARY
+        ======================================= -->
+
+        <section class="summary-cards">
+
+            <div class="summary-card">
+
+                <span class="summary-label">
+
+                    Total
+
+                </span>
+
+                <h2
+                    id="total-notifications"
+                >
+
+                    0
+
+                </h2>
+
+            </div>
+
+            <div class="summary-card">
+
+                <span class="summary-label">
+
+                    Unread
+
+                </span>
+
+                <h2
+                    id="unread-notifications"
+                >
+
+                    0
+
+                </h2>
+
+            </div>
+
+            <div class="summary-card">
+
+                <span class="summary-label">
+
+                    Today
+
+                </span>
+
+                <h2
+                    id="today-notifications"
+                >
+
+                    0
+
+                </h2>
+
+            </div>
+
+        </section>
+
+        <!-- ======================================
+             NOTIFICATION LIST
+        ======================================= -->
+
+        <section
+            class="notification-list"
+            id="notification-list"
+        >
