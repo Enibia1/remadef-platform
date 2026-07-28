@@ -730,4 +730,357 @@
 
         </section>
 
-            
+
+
+        
+    </main>
+
+</div>
+
+<!-- ==========================================
+     APPWRITE WEB SDK
+========================================== -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/appwrite@21.1.0"
+></script>
+
+<!-- ==========================================
+     REMADEF API CLIENT
+========================================== -->
+
+<script
+    src="api.js"
+></script>
+
+<!-- ==========================================
+     NOTIFICATIONS LOGIC
+========================================== -->
+
+<script
+    src="js/notifications.js"
+></script>
+
+<!-- ==========================================
+     PAGE INITIALIZATION
+========================================== -->
+
+<script>
+
+"use strict";
+
+/* ==========================================
+   APPWRITE CONFIGURATION
+========================================== */
+
+const PROJECT_ID =
+
+    "6a634fdc00148a907132";
+
+const APPWRITE_ENDPOINT =
+
+    "https://fra.cloud.appwrite.io/v1";
+
+const client =
+
+    new Appwrite.Client();
+
+client
+
+    .setEndpoint(
+        APPWRITE_ENDPOINT
+    )
+
+    .setProject(
+        PROJECT_ID
+    );
+
+const account =
+
+    new Appwrite.Account(
+        client
+    );
+
+/* ==========================================
+   CURRENT USER
+========================================== */
+
+async function loadCurrentUser() {
+
+    try {
+
+        const user =
+
+            await account.get();
+
+        const avatar =
+
+            document.getElementById(
+                "avatar"
+            );
+
+        if (avatar) {
+
+            let initial = "U";
+
+            if (user.name) {
+
+                initial =
+
+                    user.name
+
+                        .charAt(0)
+
+                        .toUpperCase();
+
+            }
+
+            else if (user.email) {
+
+                initial =
+
+                    user.email
+
+                        .charAt(0)
+
+                        .toUpperCase();
+
+            }
+
+            avatar.textContent =
+
+                initial;
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+
+            "Authentication Error:",
+
+            error
+
+        );
+
+        window.location.replace(
+
+            "login.html"
+
+        );
+
+    }
+
+}
+
+/* ==========================================
+   PAGE EVENTS
+========================================== */
+
+document
+
+    .getElementById(
+
+        "mark-all-read"
+
+    )
+
+    .addEventListener(
+
+        "click",
+
+        function () {
+
+            alert(
+
+                "Mark all as read will be connected to Appwrite."
+
+            );
+
+        }
+
+    );
+
+document
+
+    .getElementById(
+
+        "notification-settings"
+
+    )
+
+    .addEventListener(
+
+        "click",
+
+        function () {
+
+            window.location.href =
+
+                "settings.html";
+
+        }
+
+    );
+
+/* ==========================================
+   FILTER BUTTONS
+========================================== */
+
+document
+
+    .querySelectorAll(
+
+        ".filter-button"
+
+    )
+
+    .forEach(
+
+        function (
+
+            button
+
+        ) {
+
+            button.addEventListener(
+
+                "click",
+
+                function () {
+
+                    document
+
+                        .querySelectorAll(
+
+                            ".filter-button"
+
+                        )
+
+                        .forEach(
+
+                            function (
+
+                                item
+
+                            ) {
+
+                                item.classList.remove(
+
+                                    "active"
+
+                                );
+
+                            }
+
+                        );
+
+                    button.classList.add(
+
+                        "active"
+
+                    );
+
+                    /*
+
+                    Future:
+
+                    Filter notification cards
+                    using Appwrite Realtime
+                    or local filtering.
+
+                    */
+
+                }
+
+            );
+
+        }
+
+    );
+
+/* ==========================================
+   SEARCH
+========================================== */
+
+document
+
+    .getElementById(
+
+        "notification-search"
+
+    )
+
+    .addEventListener(
+
+        "input",
+
+        function (
+
+            event
+
+        ) {
+
+            const query =
+
+                event.target.value
+
+                    .trim()
+
+                    .toLowerCase();
+
+            document
+
+                .querySelectorAll(
+
+                    ".notification-card"
+
+                )
+
+                .forEach(
+
+                    function (
+
+                        card
+
+                    ) {
+
+                        const text =
+
+                            card.textContent
+
+                                .toLowerCase();
+
+                        card.style.display =
+
+                            text.includes(
+
+                                query
+
+                            )
+
+                                ? ""
+
+                                : "none";
+
+                    }
+
+                );
+
+        }
+
+    );
+
+/* ==========================================
+   INITIALIZE
+========================================== */
+
+loadCurrentUser();
+
+</script>
+
+</body>
+
+</html>
