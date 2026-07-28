@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#071A3D"
+    >
+
+    <meta
+        name="description"
+        content="Learn practical skills through the REMADEF Learning Platform."
+    >
+
+    <title>REMADEF — Learning</title>
+
+    <link
+        rel="stylesheet"
+        href="css/learning.css"
+    >
+
+</head>
+
+<body>
+
+<div class="learning-page">
+
+    <!-- ==========================================
+         HEADER
+    =========================================== -->
+
+    <header class="topbar">
+
+        <a
+            href="home.html"
+            class="logo"
+        >
+
+            REMADEF
+
+        </a>
+
+        <div class="search-box">
+
+            <input
+                type="search"
+                id="course-search"
+                placeholder="Search courses..."
+            >
+
+        </div>
+
+        <div class="top-actions">
+
+            <a
+                href="notifications.html"
+                class="icon-button"
+            >
+
+                🔔
+
+            </a>
+
+            <a
+                href="messages.html"
+                class="icon-button"
+            >
+
+                💬
+
+            </a>
+
+            <a
+                href="profile.html"
+                class="avatar"
+                id="avatar"
+            >
+
+                U
+
+            </a>
+
+        </div>
+
+    </header>
+
+    <!-- ==========================================
+         MAIN LAYOUT
+    =========================================== -->
+
+    <div class="layout">
+
+        <!-- ======================================
+             SIDEBAR
+        ======================================= -->
+
+        <aside class="sidebar">
+
+            <div class="sidebar-title">
+
+                Learning
+
+            </div>
+
+            <nav class="menu">
+
+                <a
+                    href="home.html"
+                >
+
+                    🏠 Home
+
+                </a>
+
+                <a
+                    href="learning.html"
+                    class="active"
+                >
+
+                    📚 My Learning
+
+                </a>
+
+                <a
+                    href="#discover"
+                >
+
+                    🔍 Discover Courses
+
+                </a>
+
+                <a
+                    href="#paths"
+                >
+
+                    🛤 Learning Paths
+
+                </a>
+
+                <a
+                    href="apprenticeships.html"
+                >
+
+                    🛠 Apprenticeship Training
+
+                </a>
+
+                <a
+                    href="#saved"
+                >
+
+                    ⭐ Saved Courses
+
+                </a>
+
+                <a
+                    href="#certificates"
+                >
+
+                    🏅 Certificates
+
+                </a>
+
+                <a
+                    href="#progress"
+                >
+
+                    📈 Progress
+
+                </a>
+
+                <a
+                    href="settings.html"
+                >
+
+                    ⚙ Settings
+
+                </a>
+
+            </nav>
+
+        </aside>
+
+        <!-- ======================================
+             MAIN CONTENT
+        ======================================= -->
+
+        <main class="content">
+
+            <!-- HERO -->
+
+            <section class="hero">
+
+                <div>
+
+                    <h1
+                        id="welcome-title"
+                    >
+
+                        Welcome Back
+
+                    </h1>
+
+                    <p>
+
+                        Continue building practical
+                        skills for education,
+                        employment and business.
+
+                    </p>
+
+                    <button
+                        id="continue-learning"
+                        class="primary-button"
+                    >
+
+                        Continue Learning
+
+                    </button>
+
+                </div>
+
+                <div class="progress-card">
+
+                    <h3>
+
+                        Overall Progress
+
+                    </h3>
+
+                    <div class="progress">
+
+                        <div
+                            id="overall-progress"
+                            class="progress-fill"
+                        ></div>
+
+                    </div>
+
+                    <span
+                        id="progress-text"
+                    >
+
+                        0%
+
+                    </span>
+
+                </div>
+
+            </section>
+
+            <!-- ======================================
+                 LEARNING CATEGORIES
+            ======================================= -->
+
+            <section
+                class="section"
+                id="discover"
+            >
+
+                <div class="section-header">
+
+                    <h2>
+
+                        Learning Categories
+
+                    </h2>
+
+                    <a href="#">
+
+                        View All
+
+                    </a>
+
+                </div>
+
+                <div class="categories">
+
+                    <div class="category-card">
+
+                        💻
+
+                        <span>
+
+                            Technology
+
+                        </span>
+
+                    </div>
+
+                    <div class="category-card">
+
+                        💼
+
+                        <span>
+
+                            Business
+
+                        </span>
+
+                    </div>
+
+                    <div class="category-card">
+
+                        💰
+
+                        <span>
+
+                            Finance
+
+                        </span>
+
+                    </div>
+
+                    <div class="category-card">
+
+                        🌾
+
+                        <span>
+
+                            Agriculture
+
+                        </span>
+
+                    </div>
+
+                    <div class="category-card">
+
+                        🏭
+
+                        <span>
+
+                            Manufacturing
+
+                        </span>
+
+                    </div>
+
+                    <div class="category-card">
+
+                        🏥
+
+                        <span>
+
+                            Healthcare
+
+                        </span>
+
+                    </div>
+
+                    <div class="category-card">
+
+                        🏗
+
+                        <span>
+
+                            Construction
+
+                        </span>
+
+                    </div>
+
+                    <div class="category-card">
+
+                        🎨
+
+                        <span>
+
+                            Creative Arts
+
+                        </span>
+
+                    </div>
+
+                    <div class="category-card">
+
+                        🚚
+
+                        <span>
+
+                            Trade & Logistics
+
+                        </span>
+
+                    </div>
+
+                    <div class="category-card">
+
+                        🤖
+
+                        <span>
+
+                            AI & Data
+
+                        </span>
+
+                    </div>
+
+                    <div class="category-card">
+
+                        📈
+
+                        <span>
+
+                            Entrepreneurship
+
+                        </span>
+
+                    </div>
+
+                    <div class="category-card">
+
+                        🌍
+
+                        <span>
+
+                            Digital Skills
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- ======================================
+                 FEATURED COURSES
+            ======================================= -->
+
+            <section class="section">
+
+                <div class="section-header">
+
+                    <h2>
+
+                        Featured Courses
+
+                    </h2>
+
+                    <a href="#">
+
+                        Browse All
+
+                    </a>
+
+                </div>
+
+                <div
+                    id="featured-courses"
+                    class="courses-grid"
+                >
+
+                    <!-- Loaded by JS -->
+
+                </div>
+
+            </section>
+
+            <!-- ======================================
+                 CONTINUE LEARNING
+            ======================================= -->
+
+            <section class="section">
+
+                <div class="section-header">
+
+                    <h2>
+
+                        Continue Learning
+
+                    </h2>
+
+                </div>
+
+                <div
+                    id="continue-list"
+                    class="continue-grid"
+                >
+
+                    <!-- JS -->
+
+                </div>
+
+            </section>
+
+            <!-- ======================================
+                 LIVE SESSIONS
+            ======================================= -->
+
+            <section class="section">
+
+                <div class="section-header">
+
+                    <h2>
+
+                        Upcoming Live Classes
+
+                    </h2>
+
+                </div>
+
+                <div
+                    id="live-sessions"
+                    class="live-list"
+                >
+
+                    <!-- JS -->
+
+                </div>
+
+            </section>
+
+            <!-- ======================================
+                 CERTIFICATES
+            ======================================= -->
+
+            <section
+                class="section"
+                id="certificates"
+            >
+
+                <div class="section-header">
+
+                    <h2>
+
+                        Certificates
+
+                    </h2>
+
+                </div>
+
+                <div
+                    id="certificate-list"
+                    class="certificate-grid"
+                >
+
+                    <!-- JS -->
+
+                </div>
+
+            </section>
+
+        </main>
+
+        <!-- ======================================
+             RIGHT SIDEBAR
+        ======================================= -->
+
+        <aside class="right-sidebar">
+
+            <div class="widget">
+
+                <h3>
+
+                    Daily Goal
+
+                </h3>
+
+                <p>
+
+                    Study for
+                    <strong>1 hour</strong>
+
+                </p>
+
+            </div>
+
+            <div class="widget">
+
+                <h3>
+
+                    Learning Streak
+
+                </h3>
+
+                <h2
+                    id="learning-streak"
+                >
+
+                    🔥 0 Days
+
+                </h2>
+
+            </div>
+
+            <div class="widget">
+
+                <h3>
+
+                    Statistics
+
+                </h3>
+
+                <ul>
+
+                    <li>
+
+                        Courses Enrolled:
+                        <strong
+                            id="courses-enrolled"
+                        >
+
+                            0
+
+                        </strong>
+
+                    </li>
+
+                    <li>
+
+                        Courses Completed:
+                        <strong
+                            id="courses-completed"
+                        >
+
+                            0
+
+                        </strong>
+
+                    </li>
+
+                    <li>
+
+                        Certificates:
+                        <strong
+                            id="certificate-count"
+                        >
+
+                            0
+
+                        </strong>
+
+                    </li>
+
+                    <li>
+
+                        Hours Learned:
+                        <strong
+                            id="learning-hours"
+                        >
+
+                            0
+
+                        </strong>
+
+                    </li>
+
+                </ul>
+
+            </div>
+
+            <div class="widget">
+
+                <h3>
+
+                    Announcements
+
+                </h3>
+
+                <div
+                    id="announcements"
+                >
+
+                    Loading...
+
+                </div>
+
+            </div>
+
+        </aside>
+
+    </div>
+
+    <!-- ==========================================
+         MOBILE NAVIGATION
+    =========================================== -->
+
+    <nav class="mobile-nav">
+
+        <a href="home.html">
+
+            🏠
+
+            <span>
+
+                Home
+
+            </span>
+
+        </a>
+
+        <a href="search.html">
+
+            🔍
+
+            <span>
+
+                Search
+
+            </span>
+
+        </a>
+
+        <a
+            href="learning.html"
+            class="active"
+        >
+
+            📚
+
+            <span>
+
+                Learning
+
+            </span>
+
+        </a>
+
+        <a href="messages.html">
+
+            💬
+
+            <span>
+
+                Messages
+
+            </span>
+
+        </a>
+
+        <a href="profile.html">
+
+            👤
+
+            <span>
+
+                Profile
+
+            </span>
+
+        </a>
+
+    </nav>
+
+</div>
+
+<!-- ==========================================
+     APPWRITE SDK
+========================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/appwrite@21.1.0"></script>
+
+<script src="api.js"></script>
+
+<script src="js/learning.js"></script>
+
+</body>
+
+</html>
