@@ -1,0 +1,499 @@
+/* =====================================================
+   REMADEF PROFILE COMPLETION CSS
+   ===================================================== */
+
+
+
+:root {
+
+    --rema-def-navy: #0B1F3A;
+
+    --rema-def-blue: #163A63;
+
+    --white: #ffffff;
+
+    --light-bg: #f5f7fb;
+
+    --border: #d9e0ea;
+
+    --text: #1c1c1c;
+
+    --muted: #6b7280;
+
+    --success: #1b8f4d;
+
+}
+
+
+
+
+
+/* =====================================================
+   GLOBAL
+   ===================================================== */
+
+
+* {
+
+    box-sizing: border-box;
+
+    margin: 0;
+
+    padding: 0;
+
+}
+
+
+
+body {
+
+    font-family:
+
+    Arial,
+
+    Helvetica,
+
+    sans-serif;
+
+    background: var(--light-bg);
+
+    color: var(--text);
+
+    min-height: 100vh;
+
+}
+
+
+
+
+
+/* =====================================================
+   HEADER
+   ===================================================== */
+
+
+.profile-header {
+
+    background: var(--rema-def-navy);
+
+    color: var(--white);
+
+    padding: 18px 25px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+}
+
+
+
+.logo h1 {
+
+    font-size: 24px;
+
+    letter-spacing: 1px;
+
+}
+
+
+
+.logo span {
+
+    font-size: 13px;
+
+    opacity: .8;
+
+}
+
+
+
+.profile-header nav {
+
+    display: flex;
+
+    gap: 15px;
+
+}
+
+
+
+.profile-header a {
+
+    color: white;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+}
+
+
+
+
+
+/* =====================================================
+   MAIN CONTAINER
+   ===================================================== */
+
+
+.profile-container {
+
+    max-width: 850px;
+
+    margin: 25px auto;
+
+    padding: 15px;
+
+}
+
+
+
+
+
+/* =====================================================
+   COMPLETION CARD
+   ===================================================== */
+
+
+.completion-card {
+
+    background: white;
+
+    border-radius: 12px;
+
+    padding: 25px;
+
+    margin-bottom: 20px;
+
+    box-shadow: 0 4px 15px rgba(0,0,0,.08);
+
+}
+
+
+
+.completion-card h2 {
+
+    color: var(--rema-def-navy);
+
+    margin-bottom: 10px;
+
+}
+
+
+
+.completion-card p {
+
+    color: var(--muted);
+
+    margin-bottom: 20px;
+
+}
+
+
+
+
+
+/* =====================================================
+   PROGRESS
+   ===================================================== */
+
+
+.progress-wrapper {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+}
+
+
+
+.progress-bar {
+
+    flex: 1;
+
+    height: 12px;
+
+    background: #e5e7eb;
+
+    border-radius: 20px;
+
+    overflow: hidden;
+
+}
+
+
+
+.progress-fill {
+
+    height: 100%;
+
+    width: 0%;
+
+    background: var(--rema-def-navy);
+
+    transition: width .4s ease;
+
+}
+
+
+
+#progressText {
+
+    font-weight: bold;
+
+}
+
+
+
+
+
+/* =====================================================
+   FORM SECTIONS
+   ===================================================== */
+
+
+.profile-section {
+
+    background: white;
+
+    border-radius: 12px;
+
+    padding: 25px;
+
+    margin-bottom: 20px;
+
+    box-shadow: 0 4px 15px rgba(0,0,0,.06);
+
+}
+
+
+
+.profile-section h3 {
+
+    color: var(--rema-def-navy);
+
+    margin-bottom: 20px;
+
+    font-size: 20px;
+
+}
+
+
+
+
+
+/* =====================================================
+   FORM CONTROLS
+   ===================================================== */
+
+
+.form-group {
+
+    margin-bottom: 18px;
+
+}
+
+
+
+.form-group label {
+
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-weight: 600;
+
+}
+
+
+
+input,
+
+textarea,
+
+select {
+
+    width: 100%;
+
+    padding: 13px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 8px;
+
+    font-size: 15px;
+
+    outline: none;
+
+}
+
+
+
+input:focus,
+
+textarea:focus,
+
+select:focus {
+
+    border-color: var(--rema-def-navy);
+
+}
+
+
+
+textarea {
+
+    resize: vertical;
+
+}
+
+
+
+
+
+/* =====================================================
+   BUTTON
+   ===================================================== */
+
+
+.save-section {
+
+    text-align: center;
+
+    margin-bottom: 30px;
+
+}
+
+
+
+#saveProfile {
+
+    width: 100%;
+
+    max-width: 300px;
+
+    padding: 15px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: var(--rema-def-navy);
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+}
+
+
+
+#saveProfile:hover {
+
+    background: var(--rema-def-blue);
+
+}
+
+
+
+
+
+/* =====================================================
+   LOADING OVERLAY
+   ===================================================== */
+
+
+.loading-overlay {
+
+    position: fixed;
+
+    top: 0;
+
+    left: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    background: rgba(11,31,58,.75);
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    z-index: 999;
+
+}
+
+
+
+.loading-overlay div {
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 12px;
+
+}
+
+
+
+.hidden {
+
+    display: none;
+
+}
+
+
+
+
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+
+@media(max-width:600px){
+
+
+    .profile-header {
+
+        flex-direction: column;
+
+        gap: 15px;
+
+        text-align: center;
+
+    }
+
+
+    .profile-container {
+
+        padding: 10px;
+
+    }
+
+
+    .profile-section,
+
+    .completion-card {
+
+        padding: 18px;
+
+    }
+
+
+}
