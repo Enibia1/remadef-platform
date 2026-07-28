@@ -3,28 +3,19 @@
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta 
-        name="viewport" 
-        content="width=device-width, initial-scale=1.0"
-    >
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta 
-        name="theme-color" 
-        content="#0B1F3A"
-    >
-
-    <title>
-        Complete Profile | REMADEF
-    </title>
+<meta name="theme-color" content="#0B1F3A">
 
 
-    <!-- REMADEF CSS -->
-    <link 
-        rel="stylesheet" 
-        href="css/profile-completion.css"
-    >
+<title>
+REMADEF | Complete Profile
+</title>
+
+
+<link rel="stylesheet" href="css/profile-completion.css">
 
 
 </head>
@@ -33,226 +24,552 @@
 <body>
 
 
-<!-- ================================
-     HEADER
-================================ -->
+<!-- HEADER -->
 
 <header class="profile-header">
 
 
-    <div class="logo-container">
+<div class="logo">
 
-        <h1>
-            REMADEF
-        </h1>
+<h1>
+REMADEF
+</h1>
 
-        <span>
-            Profile Completion
-        </span>
+<span>
+Complete Profile
+</span>
 
-    </div>
-
-
-    <nav>
-
-        <a href="home.html">
-            Home
-        </a>
+</div>
 
 
-        <a href="profile.html">
-            Profile
-        </a>
+<nav>
+
+<a href="home.html">
+Home
+</a>
 
 
-    </nav>
+<a href="profile.html">
+Profile
+</a>
+
+
+</nav>
 
 
 </header>
 
 
 
-<!-- ================================
-     MAIN CONTAINER
-================================ -->
 
+
+<!-- MAIN -->
 
 <main class="profile-container">
 
 
 
-    <!-- PROFILE COMPLETION CARD -->
+<section class="completion-card">
 
-    <section class="completion-card">
 
+<h2>
+Build Your REMADEF Identity
+</h2>
 
-        <h2>
-            Complete Your Profile
-        </h2>
 
+<p>
+Complete your profile to access opportunities.
+</p>
 
-        <p>
-            Build your verified REMADEF identity.
-        </p>
 
 
+<div class="progress-wrapper">
 
-        <div class="progress-wrapper">
 
+<div class="progress-bar">
 
-            <div class="progress-bar">
+<div 
+id="profileProgress"
+class="progress-fill">
+</div>
 
+</div>
 
-                <div 
-                    id="profileProgress"
-                    class="progress-fill"
-                >
-                </div>
 
+<span id="progressText">
+0%
+</span>
 
-            </div>
 
+</div>
 
-            <span id="progressText">
 
-                0%
+</section>
 
-            </span>
 
 
-        </div>
 
 
+<form id="profileForm">
 
-    </section>
 
 
 
 
+<!-- BASIC INFORMATION -->
 
-    <!-- ================================
-         PROFILE FORM
-    ================================= -->
 
+<section class="profile-section">
 
-    <form 
-        id="profileForm"
-        class="profile-form"
-    >
 
+<h3>
+Basic Information
+</h3>
 
 
-        <!-- BASIC INFORMATION -->
 
-        <section 
-            id="basicInformation"
-            class="profile-section"
-        >
+<div class="form-group">
 
-            <h3>
-                Basic Information
-            </h3>
+<label>
+First Name
+</label>
 
+<input
+type="text"
+id="first_name"
+name="first_name"
+required
+>
 
-            <!-- Part 1B will be inserted here -->
+</div>
 
 
-        </section>
 
 
+<div class="form-group">
 
+<label>
+Last Name
+</label>
 
+<input
+type="text"
+id="last_name"
+name="last_name"
+required
+>
 
-        <!-- CONTACT LOCATION -->
+</div>
 
 
-        <section 
-            id="contactLocation"
-            class="profile-section"
-        >
 
-            <h3>
-                Contact & Location
-            </h3>
 
+<div class="form-group">
 
-            <!-- Part 1C will be inserted here -->
+<label>
+Display Name
+</label>
 
 
-        </section>
+<input
+type="text"
+id="display_name"
+name="display_name"
+placeholder="Public name"
+>
 
+</div>
 
 
 
 
-        <!-- OPPORTUNITY PROFILE -->
+<div class="form-group">
 
+<label>
+Date of Birth
+</label>
 
-        <section 
-            id="opportunityProfile"
-            class="profile-section"
-        >
 
-            <h3>
-                Opportunity Profile
-            </h3>
+<input
+type="date"
+id="date_of_birth"
+name="date_of_birth"
+>
 
+</div>
 
-            <!-- Part 1D will be inserted here -->
 
 
-        </section>
 
+<div class="form-group">
 
+<label>
+Gender
+</label>
 
 
+<select
+id="gender"
+name="gender"
+>
 
-        <!-- EDUCATION MEDIA -->
 
+<option value="">
+Select gender
+</option>
 
-        <section 
-            id="educationMedia"
-            class="profile-section"
-        >
 
-            <h3>
-                Education & Media
-            </h3>
+<option value="male">
+Male
+</option>
 
 
-            <!-- Part 1E will be inserted here -->
+<option value="female">
+Female
+</option>
 
 
-        </section>
+<option value="prefer_not_to_say">
+Prefer not to say
+</option>
 
 
+</select>
 
 
+</div>
 
-        <!-- SAVE AREA -->
 
+</section>
 
-        <section 
-            class="save-section"
-        >
 
 
-            <button
-                type="submit"
-                id="saveProfile"
-            >
 
-                Save Profile
 
-            </button>
 
 
-        </section>
+<!-- CONTACT LOCATION -->
 
 
+<section class="profile-section">
 
-    </form>
 
+<h3>
+Contact & Location
+</h3>
+
+
+
+
+<div class="form-group">
+
+<label>
+Email
+</label>
+
+
+<input
+type="email"
+id="email"
+name="email"
+readonly
+>
+
+</div>
+
+
+
+
+
+<div class="form-group">
+
+<label>
+Phone
+</label>
+
+
+<input
+type="tel"
+id="phone"
+name="phone"
+>
+
+</div>
+
+
+
+
+
+<div class="form-group">
+
+<label>
+Country
+</label>
+
+
+<input
+type="text"
+id="country"
+name="country"
+>
+
+</div>
+
+
+
+
+
+<div class="form-group">
+
+<label>
+State
+</label>
+
+
+<input
+type="text"
+id="state"
+name="state"
+>
+
+</div>
+
+
+
+
+
+<div class="form-group">
+
+<label>
+City
+</label>
+
+
+<input
+type="text"
+id="city"
+name="city"
+>
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+<!-- OPPORTUNITY PROFILE -->
+
+
+<section class="profile-section">
+
+
+<h3>
+Opportunity Profile
+</h3>
+
+
+
+
+<div class="form-group">
+
+<label>
+Professional Headline
+</label>
+
+
+<input
+type="text"
+id="headline"
+name="headline"
+placeholder="Example: Software Developer"
+>
+
+</div>
+
+
+
+
+
+<div class="form-group">
+
+
+<label>
+About
+</label>
+
+
+<textarea
+id="about"
+name="about"
+rows="5"
+placeholder="Tell people about yourself"
+></textarea>
+
+
+</div>
+
+
+
+
+
+<div class="form-group">
+
+
+<label>
+Skills
+</label>
+
+
+<input
+type="text"
+id="skills"
+name="skills"
+placeholder="Example: Python, Marketing, Design"
+>
+
+
+</div>
+
+
+
+
+</section>
+
+
+
+
+
+
+
+
+<!-- EDUCATION -->
+
+
+<section class="profile-section">
+
+
+<h3>
+Education
+</h3>
+
+
+
+
+<div class="form-group">
+
+
+<label>
+Education Level
+</label>
+
+
+<select
+id="education_level"
+name="education_level"
+>
+
+
+<option value="">
+Select level
+</option>
+
+
+<option value="secondary">
+Secondary School
+</option>
+
+
+<option value="ond">
+OND
+</option>
+
+
+<option value="hnd">
+HND
+</option>
+
+
+<option value="bsc">
+BSc
+</option>
+
+
+<option value="msc">
+MSc
+</option>
+
+
+<option value="phd">
+PhD
+</option>
+
+
+</select>
+
+
+</div>
+
+
+
+
+
+<div class="form-group">
+
+
+<label>
+Institution
+</label>
+
+
+<input
+type="text"
+id="institution"
+name="institution"
+>
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+<!-- SAVE -->
+
+
+<section class="save-section">
+
+
+<button
+type="submit"
+id="saveProfile"
+>
+
+Save Profile
+
+</button>
+
+
+</section>
+
+
+
+
+</form>
 
 
 
@@ -262,26 +579,26 @@
 
 
 
-<!-- ================================
-     LOADING OVERLAY
-================================ -->
+
+
+
+<!-- LOADING -->
 
 
 <div 
-    id="loadingOverlay"
-    class="loading-overlay hidden"
+id="loadingOverlay"
+class="loading-overlay hidden"
 >
 
 
-    <div class="loader">
+<div>
+
+<p>
+Saving profile...
+</p>
 
 
-        <p>
-            Saving profile...
-        </p>
-
-
-    </div>
+</div>
 
 
 </div>
@@ -291,23 +608,18 @@
 
 
 
-<!-- ================================
-     APPWRITE SDK
-================================ -->
+
+<!-- APPWRITE SDK -->
 
 
-<script 
-src="https://cdn.jsdelivr.net/npm/appwrite@17.0.0">
-</script>
+<script src="https://cdn.jsdelivr.net/npm/appwrite@17.0.0"></script>
 
 
 
+<!-- REMADEF PROFILE JS -->
 
-<!-- REMADEF JS -->
 
-<script 
-src="js/profile-completion.js">
-</script>
+<script src="js/profile-completion.js"></script>
 
 
 
