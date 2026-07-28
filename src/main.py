@@ -99,18 +99,23 @@ def response(
     )
 
     return {
+
         "statusCode": status_code,
 
         "headers": {
-            "Content-Type": "application/json",
 
-            "Access-Control-Allow-Origin": "*",
+            "Content-Type":
+                "application/json",
+
+            "Access-Control-Allow-Origin":
+                "*",
 
             "Access-Control-Allow-Headers":
                 "Content-Type, X-Appwrite-Project",
 
             "Access-Control-Allow-Methods":
                 "GET, POST, PUT, PATCH, OPTIONS"
+
         },
 
         "body": json.dumps(
@@ -118,6 +123,7 @@ def response(
             ensure_ascii=False,
             default=str
         )
+
     }
 
 
@@ -148,7 +154,6 @@ def error(
             "message": message
         }
     )
-
 
 # ============================================================
 # APPWRITE CLIENT
@@ -186,6 +191,7 @@ def get_client(context):
     return client
 
 
+
 # ============================================================
 # APPWRITE SERVICES
 # ============================================================
@@ -197,11 +203,31 @@ def get_account_service(context):
     )
 
 
+
+# ============================================================
+# CURRENT USER
+# ============================================================
+
+def get_current_user(context):
+
+    account_service = get_account_service(
+        context
+    )
+
+    user = account_service.get()
+
+    return convert_to_dict(
+        user
+    )
+
+
+
 def get_tables_db(context):
 
     return TablesDB(
         get_client(context)
     )
+
 
 
 # ============================================================
@@ -212,22 +238,32 @@ def parse_json_body(request):
 
     body = request.body
 
+
     if not body:
+
         return {}
 
+
+
     if isinstance(body, dict):
+
         return body
+
+
 
     if isinstance(body, str):
 
         try:
+
             return json.loads(body)
 
         except json.JSONDecodeError:
+
             return {}
 
-    return {}
 
+
+    return {}
 
 # ============================================================
 # PROFILE FIELDS
@@ -275,7 +311,9 @@ def find_profile(
         table_id=PROFILES_TABLE_ID,
 
         queries=[
+
             f'equal("account_id", "{account_id}")'
+
         ]
 
     )
@@ -284,6 +322,7 @@ def find_profile(
         result
     )
 
+
     if not isinstance(
         result,
         dict
@@ -291,15 +330,20 @@ def find_profile(
 
         return None
 
+
     rows = result.get(
         "rows",
         []
     )
 
+
     if not rows:
+
         return None
 
+
     return rows[0]
+
 
 
 # ============================================================
@@ -328,13 +372,16 @@ def calculate_completion(
 
     ]
 
+
     completed = 0
+
 
     for field in fields:
 
         value = profile.get(
             field
         )
+
 
         if (
 
@@ -346,9 +393,12 @@ def calculate_completion(
 
             completed += 1
 
+
+
     skills = profile.get(
         "skills"
     )
+
 
     if skills:
 
@@ -358,19 +408,31 @@ def calculate_completion(
         ):
 
             if len(skills) > 0:
+
                 completed += 1
+
 
         elif str(skills).strip():
 
             completed += 1
 
+
+
     total = len(fields) + 1
 
+
     return round(
+
         (
+
             completed / total
+
         ) * 100
+
     )
+
+
+
 
 
 # ============================================================
@@ -393,9 +455,12 @@ def create_profile(
         context
     )
 
+
     now = datetime.now(
         timezone.utc
     ).isoformat()
+
+
 
     profile_data = {
 
@@ -439,6 +504,8 @@ def create_profile(
 
     }
 
+
+
     profile = tables_db.create_row(
 
         database_id=DATABASE_ID,
@@ -451,9 +518,12 @@ def create_profile(
 
     )
 
+
+
     return convert_to_dict(
         profile
     )
+
 
 
 # ============================================================
@@ -474,70 +544,126 @@ def update_profile(
         context
     )
 
+
+
     existing = find_profile(
+
         account_id,
+
         context
+
     )
+
+
 
     if not existing:
 
+
         return create_profile(
+
             account_id,
+
             context=context
+
         )
+
+
 
     row_id = existing.get(
         "$id"
     )
 
+
+
     if not row_id:
 
         raise RuntimeError(
+
             "Profile row ID is missing."
+
         )
+
+
 
     update_data = {}
 
+
+
     for field in PROFILE_FIELDS:
 
+
         if field not in profile_data:
+
             continue
+
+
 
         value = profile_data[field]
 
+
+
         if field == "skills":
 
+
             if isinstance(
+
                 value,
+
                 list
+
             ):
+
 
                 value = json.dumps(
                     value
                 )
 
+
             elif value is None:
 
                 value = ""
 
+
+
         update_data[field] = value
 
+
+
+
     merged = {
+
         **existing,
+
         **update_data
+
     }
 
-    update_data[
-        "profile_completion"
-    ] = calculate_completion(
-        merged
-    )
+
+
 
     update_data[
+
+        "profile_completion"
+
+    ] = calculate_completion(
+
+        merged
+
+    )
+
+
+
+    update_data[
+
         "updated_at"
+
     ] = datetime.now(
+
         timezone.utc
+
     ).isoformat()
+
+
 
     updated_profile = tables_db.update_row(
 
@@ -551,11 +677,178 @@ def update_profile(
 
     )
 
+
+
     return convert_to_dict(
+
         updated_profile
+
     )
 
 
+
+# ============================================================
+# GET CURRENT PROFILE
+# ============================================================
+
+def get_current_profile(context):
+
+    try:
+
+        user = get_current_user(
+            context
+        )
+
+
+        account_id = user.get(
+            "$id"
+        )
+
+
+        if not account_id:
+
+            return error(
+
+                "User authentication failed.",
+
+                401
+
+            )
+
+
+
+        profile = find_profile(
+
+            account_id,
+
+            context
+
+        )
+
+
+
+        if not profile:
+
+
+            return error(
+
+                "Profile not found.",
+
+                404
+
+            )
+
+
+
+        return success(
+
+            profile,
+
+            "Profile loaded successfully."
+
+        )
+
+
+
+    except Exception as exc:
+
+
+        context.error(
+
+            f"GET PROFILE ERROR: {str(exc)}"
+
+        )
+
+
+        return error(
+
+            "Unable to load profile.",
+
+            500
+
+        )
+
+
+
+# ============================================================
+# UPDATE CURRENT PROFILE
+# ============================================================
+
+def update_current_profile(
+
+    data,
+
+    context
+
+):
+
+    try:
+
+
+        user = get_current_user(
+            context
+        )
+
+
+
+        account_id = user.get(
+            "$id"
+        )
+
+
+
+        if not account_id:
+
+
+            return error(
+
+                "User authentication failed.",
+
+                401
+
+            )
+
+
+
+        updated = update_profile(
+
+            account_id,
+
+            data,
+
+            context
+
+        )
+
+
+
+        return success(
+
+            updated,
+
+            "Profile updated successfully."
+
+        )
+
+
+
+    except Exception as exc:
+
+
+        context.error(
+
+            f"UPDATE PROFILE ERROR: {str(exc)}"
+
+        )
+
+
+        return error(
+
+            "Unable to update profile.",
+
+            500
+
+        )
 
 # ============================================================
 # REGISTER USER
@@ -567,27 +860,36 @@ def register_user(
 ):
 
     email = str(
+
         data.get(
             "email",
             ""
         ) or ""
+
     ).strip().lower()
 
 
+
     password = str(
+
         data.get(
             "password",
             ""
         ) or ""
+
     )
 
 
+
     phone = str(
+
         data.get(
             "phone",
             ""
         ) or ""
+
     ).strip()
+
 
 
     # ========================================================
@@ -597,15 +899,21 @@ def register_user(
     if not email and not phone:
 
         return error(
+
             "Email or phone number is required."
+
         )
+
 
 
     if len(password) < 8:
 
         return error(
+
             "Password must contain at least 8 characters."
+
         )
+
 
 
     # ========================================================
@@ -614,49 +922,57 @@ def register_user(
 
     if phone:
 
-        # Remove spaces, hyphens and brackets
 
         phone = (
+
             phone
+
             .replace(" ", "")
+
             .replace("-", "")
+
             .replace("(", "")
+
             .replace(")", "")
+
         )
 
 
-        # 08037537614
-        # becomes
-        # +2348037537614
 
         if phone.startswith("0"):
+
 
             phone = "+234" + phone[1:]
 
 
-        # 2348037537614
-        # becomes
-        # +2348037537614
 
         elif phone.startswith("234"):
+
 
             phone = "+" + phone
 
 
-        # Validate final Nigerian format
 
         if not phone.startswith("+234"):
 
+
             return error(
+
                 "Please enter a valid Nigerian phone number."
+
             )
+
 
 
         if len(phone) != 14:
 
+
             return error(
+
                 "Please enter a valid Nigerian phone number."
+
             )
+
 
 
     # ========================================================
@@ -664,8 +980,11 @@ def register_user(
     # ========================================================
 
     account_service = get_account_service(
+
         context
+
     )
+
 
 
     # ========================================================
@@ -674,7 +993,9 @@ def register_user(
 
     try:
 
+
         if email:
+
 
             user = account_service.create(
 
@@ -687,11 +1008,9 @@ def register_user(
             )
 
 
+
         else:
 
-            # IMPORTANT:
-            # Appwrite Python SDK uses create_phone()
-            # NOT create_phone_user()
 
             user = account_service.create_phone(
 
@@ -704,7 +1023,9 @@ def register_user(
             )
 
 
+
     except Exception as exc:
+
 
         context.error(
 
@@ -717,79 +1038,6 @@ def register_user(
         )
 
 
-        message = str(
-            exc
-        ).lower()
-
-
-        if (
-
-            "already exists"
-            in
-            message
-
-            or
-
-            "user_already_exists"
-            in
-            message
-
-        ):
-
-            return error(
-
-                "An account with these credentials already exists.",
-
-                409
-
-            )
-
-
-        if (
-
-            "invalid `phone`"
-            in
-            message
-
-            or
-
-            "invalid phone"
-            in
-            message
-
-        ):
-
-            return error(
-
-                "Please enter a valid Nigerian phone number.",
-
-                400
-
-            )
-
-
-        if (
-
-            "invalid `email`"
-            in
-            message
-
-            or
-
-            "invalid email"
-            in
-            message
-
-        ):
-
-            return error(
-
-                "Please enter a valid email address.",
-
-                400
-
-            )
-
 
         return error(
 
@@ -800,61 +1048,50 @@ def register_user(
         )
 
 
+
     # ========================================================
     # EXTRACT USER ID
     # ========================================================
 
-    try:
+    user_data = convert_to_dict(
 
-        user_data = convert_to_dict(
-            user
-        )
+        user
+
+    )
 
 
-        user_id = (
 
-            user_data.get(
-                "$id"
-            )
+    user_id = (
 
-            or
+        user_data.get(
 
-            user_data.get(
-                "id"
-            )
+            "$id"
 
         )
 
+        or
 
-        if not user_id:
+        user_data.get(
 
-            raise RuntimeError(
-
-                "Account was created but no user ID was returned."
-
-            )
-
-
-    except Exception as exc:
-
-        context.error(
-
-            "User ID extraction failed: "
-
-            f"{type(exc).__name__}: "
-
-            f"{str(exc)}"
+            "id"
 
         )
+
+    )
+
+
+
+    if not user_id:
 
 
         return error(
 
-            "Account was created, but the user ID could not be retrieved.",
+            "Account ID could not be retrieved.",
 
             500
 
         )
+
 
 
     # ========================================================
@@ -862,6 +1099,7 @@ def register_user(
     # ========================================================
 
     try:
+
 
         profile = create_profile(
 
@@ -878,24 +1116,22 @@ def register_user(
 
     except Exception as exc:
 
+
         context.error(
 
-            "Profile creation failed: "
-
-            f"{type(exc).__name__}: "
-
-            f"{str(exc)}"
+            f"Profile creation failed: {str(exc)}"
 
         )
 
 
         return error(
 
-            "Account was created, but the profile could not be created.",
+            "Account was created, but profile failed.",
 
             500
 
         )
+
 
 
     # ========================================================
@@ -908,32 +1144,45 @@ def register_user(
 
         {
 
+
             "success": True,
 
+
             "message":
+
                 "Account and profile created successfully.",
+
+
 
             "account":
 
-                {
+            {
 
-                    "id":
-                        user_id,
+                "id":
 
-                    "email":
-                        email,
+                    user_id,
 
-                    "phone":
-                        phone
 
-                },
+                "email":
+
+                    email,
+
+
+                "phone":
+
+                    phone
+
+            },
+
 
             "profile":
+
                 profile
 
         }
 
     )
+
 
 # ============================================================
 # HEALTH CHECK
@@ -946,9 +1195,12 @@ def health_check():
         {
 
             "service":
+
                 "REMADEF Platform API",
 
+
             "status":
+
                 "healthy"
 
         },
@@ -956,6 +1208,7 @@ def health_check():
         "REMADEF Platform API is running."
 
     )
+
 
 
 # ============================================================
@@ -975,11 +1228,13 @@ def route_request(
     path = request.path
 
 
+
     # ========================================================
     # CORS PREFLIGHT
     # ========================================================
 
     if method == "OPTIONS":
+
 
         return response(
 
@@ -990,11 +1245,13 @@ def route_request(
                 "success": True,
 
                 "message":
+
                     "CORS preflight successful."
 
             }
 
         )
+
 
 
     # ========================================================
@@ -1009,7 +1266,9 @@ def route_request(
 
     ):
 
+
         return health_check()
+
 
 
     # ========================================================
@@ -1024,9 +1283,14 @@ def route_request(
 
     ):
 
+
         data = parse_json_body(
+
             request
+
         )
+
+
 
         return register_user(
 
@@ -1037,6 +1301,59 @@ def route_request(
         )
 
 
+
+    # ========================================================
+    # GET PROFILE
+    # ========================================================
+
+    if (
+
+        method == "GET"
+
+        and path == "/api/profile"
+
+    ):
+
+
+        return get_current_profile(
+
+            context
+
+        )
+
+
+
+    # ========================================================
+    # UPDATE PROFILE
+    # ========================================================
+
+    if (
+
+        method in ["PUT", "PATCH"]
+
+        and path == "/api/profile"
+
+    ):
+
+
+        data = parse_json_body(
+
+            request
+
+        )
+
+
+
+        return update_current_profile(
+
+            data,
+
+            context
+
+        )
+
+
+
     return error(
 
         "Route not found.",
@@ -1044,6 +1361,7 @@ def route_request(
         404
 
     )
+
 
 
 # ============================================================
@@ -1058,6 +1376,7 @@ def main(
 
     try:
 
+
         return route_request(
 
             context.req,
@@ -1067,7 +1386,9 @@ def main(
         )
 
 
+
     except Exception as exc:
+
 
         context.error(
 
@@ -1079,9 +1400,15 @@ def main(
 
         )
 
+
+
         context.error(
+
             traceback.format_exc()
+
         )
+
+
 
         return error(
 
@@ -1090,3 +1417,5 @@ def main(
             500
 
         )
+
+
