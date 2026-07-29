@@ -1741,10 +1741,6 @@ if method == "POST" and path == "/api/register":
     return register_user(data)
 
 
-        request
-
-    )
-
     return create_conversation(
 
         data,
