@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#071A3D">
+    <title>REMADEF | Apprenticeship & Workforce Protection Hub</title>
+    
+    <!-- Base Home UI Layout & Module Extensions -->
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/apprenticeships.css">
+    
+    <!-- Third-Party Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@21.1.0"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-left">
+            <button id="sidebarToggle" class="menu-toggle" type="button">
+                <i data-lucide="panel-left"></i>
+            </button>
+            <div class="brand" id="brandButton">
+                <img src="assets/logo/remadef-logo.svg" alt="REMADEF" class="brand-logo">
+                <span class="brand-name">REMADEF</span>
+            </div>
+        </div>
+        
+        <div class="search-wrapper">
+            <i data-lucide="search"></i>
+            <input type="search" id="globalSearch" placeholder="Search trades, master crafts, verified apprentices, guarantors...">
+        </div>
+        
+        <div class="header-right">
+            <button class="notification-btn" type="button">
+                <i data-lucide="bell"></i>
+                <span id="notificationBadge" class="badge">0</span>
+            </button>
+            <a href="profile.html" class="avatar" id="avatar">A</a>
+        </div>
+    </header>
+
+    <!-- LAYOUT -->
+    <div class="layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">PLATFORM</div>
+            <nav class="sidebar-nav">
+                <a href="home.html"><i data-lucide="house"></i><span>Home</span></a>
+                <a href="profile.html"><i data-lucide="user"></i><span>My Profile</span></a>
+                <a href="messages.html"><i data-lucide="message-circle"></i><span>Messages</span><span id="messageBadge" class="menu-badge">0</span></a>
+                <a href="learning.html"><i data-lucide="graduation-cap"></i><span>Learning</span></a>
+                <a href="apprenticeships.html" class="active"><i data-lucide="hammer"></i><span>Apprenticeships</span></a>
+                <a href="jobs.html"><i data-lucide="briefcase-business"></i><span>Jobs</span></a>
+                <a href="business.html"><i data-lucide="building-2"></i><span>Business</span></a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="profile-progress">
+                    <div class="progress-header">
+                        <span>Fidelity Score</span>
+                        <span id="sidebarFidelityScore" class="role-badge green">98% AAA</span>
+                    </div>
+                    <button class="complete-profile-btn" onclick="openGuarantorModal()">
+                        Manage Guarantors
+                    </button>
+                </div>
+                <div class="copyright">© 2026 REMADEF</div>
+            </div>
+        </aside>
+
+        <!-- MAIN WORKSPACE -->
+        <main class="main">
+
+            <!-- WELCOME & ACTION HEADER -->
+            <section class="welcome">
+                <div class="welcome-content">
+                    <h1>Apprenticeship & Workforce Protection Hub</h1>
+                    <p>Alternative pathways for practical trades, handyman skills, and manufacturing—backed by Fidelity Risk Tracking and verified Nigerian Guarantor Networks.</p>
+                </div>
+                <div class="welcome-actions">
+                    <button class="action-btn secondary-btn" onclick="openSkillLogModal()">
+                        <i data-lucide="file-check-2"></i>
+                        <span>Log Skill Milestone</span>
+                    </button>
+                    <button class="action-btn post-job-btn" onclick="openEnrollPathwayModal()">
+                        <i data-lucide="compass"></i>
+                        <span>Apply (JAMB-Alt Pathway)</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- SHARED ADMISSION PORTAL BANNER (LOCKED GATEWAY) -->
+            <section id="sharedAdmissionBanner" class="admission-portal-card">
+                <div class="admission-portal-badge">
+                    <i data-lucide="graduation-cap"></i>
+                    <span>SHARED ADMISSION PORTAL</span>
+                </div>
+                <div class="admission-portal-body">
+                    <div class="admission-portal-info">
+                        <h2>Apprenticeship & Unified Learning Admission Desk</h2>
+                        <p>Pursue practical trades, technical certifications, and direct JAMB-alternative pathways. Access both operational workshop placements and digital classroom modules under one unified transcript.</p>
+                        <div class="admission-meta">
+                            <span><i data-lucide="lock"></i> Requires Registered REMADEF Account</span>
+                            <span><i data-lucide="shield-check"></i> Guarantor-Backed Admission</span>
+                        </div>
+                    </div>
+                    <div class="admission-portal-action">
+                        <!-- Dynamic Button: Switches state based on user authentication in js/apprenticeships.js -->
+                        <button id="admissionPortalBtn" class="action-btn primary-btn btn-lg" onclick="handleAdmissionPortalAccess()">
+                            <i data-lucide="key-round"></i>
+                            <span id="admissionBtnText">Check Admission Eligibility</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- METRICS & PROTECTION DASHBOARD CARDS -->
+            <section class="dashboard-cards">
+                <div class="dashboard-card">
+                    <div class="card-icon blue">
+                        <i data-lucide="shield-check"></i>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-title">Fidelity Protection</span>
+                        <h2>Tier-1 Risk Shield</h2>
+                        <small>Anti-Shrinkage & Espionage</small>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-icon green">
+                        <i data-lucide="user-check"></i>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-title">Guarantor Coverage</span>
+                        <h2 id="guarantorStatus">2 Verified</h2>
+                        <small>Insurance-Backed Placement</small>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-icon orange">
+                        <i data-lucide="award"></i>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-title">Verified Skills</span>
+                        <h2 id="verifiedSkillCount">14 Signed</h2>
+                        <small>Master Mentor Authenticated</small>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-icon purple">
+                        <i data-lucide="trending-up"></i>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-title">Entrepreneur Pathway</span>
+                        <h2>Phase 2: Transition</h2>
+                        <small>To Jobs & Business Hubs</small>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODULE TABS -->
+            <div class="tab-navigation">
+                <button class="tab-btn active" onclick="switchApprenticeTab('opportunities')"><i data-lucide="briefcase"></i> Postings & Programs</button>
+                <button class="tab-btn" onclick="switchApprenticeTab('fidelity')"><i data-lucide="shield-alert"></i> Fidelity & Risk Tracker</button>
+                <button class="tab-btn" onclick="switchApprenticeTab('skill-logs')"><i data-lucide="file-text"></i> Skill Verification Logs</button>
+                <button class="tab-btn" onclick="switchApprenticeTab('mentors')"><i data-lucide="users"></i> Mentors & Master Craftsmen</button>
+            </div>
+
+            <!-- TAB 1: OPPORTUNITIES & ALTERNATIVE ADMISSION PATHWAYS -->
+            <div id="tab-opportunities" class="tab-content active">
+                
+                <!-- FILTERS -->
+                <section class="dashboard-section" style="margin-bottom: 20px;">
+                    <div class="jobs-filter-bar">
+                        <div class="filter-group">
+                            <i data-lucide="search"></i>
+                            <input type="text" id="apprenticeSearch" placeholder="Search trades (Solar, Fabrication, Electrical, Plumbing, CNC)..." onkeyup="renderApprenticeFeed()">
+                        </div>
+
+                        <div class="filter-group">
+                            <select id="tradeCategoryFilter" onchange="renderApprenticeFeed()">
+                                <option value="">All Trade Categories</option>
+                                <option value="Handyman & Maintenance">Handyman & Maintenance</option>
+                                <option value="Industrial Manufacturing">Industrial Manufacturing</option>
+                                <option value="Automotive & Agro-Tech">Automotive & Agro-Tech</option>
+                                <option value="Construction & Building">Construction & Building</option>
+                                <option value="Renewable Energy">Renewable Energy (Solar)</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <select id="pathwayFilter" onchange="renderApprenticeFeed()">
+                                <option value="">All Admission Tracks</option>
+                                <option value="JAMB-Alternative">JAMB-Alternative (High School Graduates)</option>
+                                <option value="Skill-Upgrade">Experienced Handyman Upgrade</option>
+                                <option value="Direct-Entrepreneurship">Apprenticeship to Business Track</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="dashboard-grid">
+                    <section class="dashboard-section col-span-2">
+                        <div class="section-header">
+                            <h2>Open Apprenticeship Programs</h2>
+                            <small>Verified workplace placements with mentorship and insurance coverage</small>
+                        </div>
+                        <div id="apprenticeFeed" class="apprentice-grid">
+                            <!-- Injected dynamically via JS -->
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- TAB 2: FIDELITY RANKING & BUSINESS PROTECTION TRACKER -->
+            <div id="tab-fidelity" class="tab-content hidden">
+                <div class="dashboard-grid">
+                    <section class="dashboard-section col-span-2">
+                        <div class="section-header">
+                            <h2>Business Protection & Shrinkage Shield</h2>
+                            <small>Real-time risk scoring, inventory handling integrity, and non-disclosure tracking</small>
+                        </div>
+                        
+                        <div class="fidelity-summary-box">
+                            <div class="fidelity-gauge-wrapper">
+                                <div class="fidelity-score-display">98<small>/100</small></div>
+                                <span class="badge-trust">AAA - Ultra High Trust</span>
+                            </div>
+                            <div class="fidelity-metrics">
+                                <div class="f-metric">
+                                    <span>Zero Shrinkage Rating</span>
+                                    <strong>100%</strong>
+                                </div>
+                                <div class="f-metric">
+                                    <span>Data/IP Compliance</span>
+                                    <strong>Passed (NDA Active)</strong>
+                                </div>
+                                <div class="f-metric">
+                                    <span>Guarantor Bond Backing</span>
+                                    <strong>₦2,500,000 Coverage</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="protection-logs-card">
+                            <h3>Active Protection Audit Log</h3>
+                            <ul class="audit-list" id="auditLogList">
+                                <li>
+                                    <i data-lucide="shield-check" class="text-green"></i>
+                                    <div>
+                                        <strong>Weekly Inventory Audit Signed Off</strong>
+                                        <p>Remora Logistics Hub — 0 Stock Variance Reported</p>
+                                        <small>July 26, 2026</small>
+                                    </div>
+                                </li>
+                                <li>
+                                    <i data-lucide="lock" class="text-blue"></i>
+                                    <div>
+                                        <strong>Proprietary Process Agreement Executed</strong>
+                                        <p>Nexus Global Sourcing — Anti-Espionage & IP Covenant</p>
+                                        <small>July 02, 2026</small>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- TAB 3: SKILL VERIFICATION LOGS -->
+            <div id="tab-skill-logs" class="tab-content hidden">
+                <section class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Verifiable Practical Skill Logs</h2>
+                        <small>Every logged skill is digitally verified by a master mentor and exported to your Job/Business profile</small>
+                    </div>
+                    <div class="skill-logs-grid" id="skillLogsContainer">
+                        <!-- Dynamic Skill Cards -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- TAB 4: MENTORS & MASTER CRAFTSMEN -->
+            <div id="tab-mentors" class="tab-content hidden">
+                <section class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Assigned Mentors & Master Craftsmen</h2>
+                        <small>Direct supervision and weekly practical evaluations</small>
+                    </div>
+                    <div class="mentors-grid" id="mentorsContainer">
+                        <!-- Dynamic Mentors -->
+                    </div>
+                </section>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<!-- MODAL 1: JAMB-ALTERNATIVE ADMISSION ENROLLMENT (PORTAL GATEWAY) -->
+<div id="enrollPathwayModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>Shared Admission Portal Application</h3>
+            <button type="button" class="close-btn" onclick="closeEnrollPathwayModal()">&times;</button>
+        </div>
+        <form id="enrollForm" onsubmit="handleEnrollSubmit(event)">
+            <p class="modal-intro">Skip traditional academic bottlenecks. Gain hands-on trade skills backed by insurance, digital learning coursework, and direct pathways to launch your own business.</p>
+            
+            <div class="form-group">
+                <label>Educational Status / Background</label>
+                <select id="apprenticeStatus" class="filter-input" required>
+                    <option value="JAMB Candidate (Seeking Practical Pathway)">JAMB Candidate (Seeking Practical Pathway)</option>
+                    <option value="Secondary School Graduate (SSCE)">Secondary School Graduate (SSCE)</option>
+                    <option value="Practicing Handyman (Seeking Certification)">Practicing Handyman (Seeking Certification)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Preferred Trade / Industry Focus</label>
+                <select id="apprenticeTrade" class="filter-input" required>
+                    <option value="Renewable Energy & Solar Installation">Renewable Energy & Solar Installation</option>
+                    <option value="Industrial Machining & Fabrication">Industrial Machining & Fabrication</option>
+                    <option value="Automotive Diagnostics & Mechatronics">Automotive Diagnostics & Mechatronics</option>
+                    <option value="Electrical & Automation Systems">Electrical & Automation Systems</option>
+                    <option value="Commercial Plumbing & Pipefitting">Commercial Plumbing & Pipefitting</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Target Outcome</label>
+                <select id="apprenticeOutcome" class="filter-input" required>
+                    <option value="Direct Job Placement">Direct Job Placement in Sourcing/Business Hubs</option>
+                    <option value="Entrepreneurship Startup Support">Launch Independent Business / Workshop</option>
+                </select>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="action-btn" onclick="closeEnrollPathwayModal()">Cancel</button>
+                <button type="submit" class="action-btn primary-btn">Submit Unified Admission Request</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL 2: GUARANTOR & INSURANCE VERIFICATION -->
+<div id="guarantorModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>Add / Verify Guarantor</h3>
+            <button type="button" class="close-btn" onclick="closeGuarantorModal()">&times;</button>
+        </div>
+        <form id="guarantorForm" onsubmit="handleGuarantorSubmit(event)">
+            <p class="modal-intro">Guarantors provide official verification to protect host businesses from shrinkage and theft, guaranteeing immediate job access upon graduation without personal connections.</p>
+            
+            <div class="form-group">
+                <label>Guarantor Full Name</label>
+                <input type="text" id="guarantorName" class="filter-input" required placeholder="e.g. Chief Zebedee Ohaeri">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Relationship / Role</label>
+                    <input type="text" id="guarantorRole" class="filter-input" required placeholder="e.g. Community Leader, Employer, Clergy">
+                </div>
+                <div class="form-group">
+                    <label>NIN / Official ID Number</label>
+                    <input type="text" id="guarantorNIN" class="filter-input" required placeholder="11-Digit NIN Number">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Phone / WhatsApp Number</label>
+                    <input type="text" id="guarantorPhone" class="filter-input" required placeholder="+234...">
+                </div>
+                <div class="form-group">
+                    <label>State of Residence</label>
+                    <select id="guarantorState" class="filter-input" required>
+                        <option value="Lagos">Lagos</option>
+                        <option value="Imo">Imo</option>
+                        <option value="Abuja">Abuja (FCT)</option>
+                        <option value="Anambra">Anambra</option>
+                        <option value="Kano">Kano</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="action-btn" onclick="closeGuarantorModal()">Cancel</button>
+                <button type="submit" class="action-btn primary-btn">Submit Guarantor Verification</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL 3: LOG PRACTICAL SKILL MILESTONE -->
+<div id="skillLogModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>Log Practical Skill Milestone</h3>
+            <button type="button" class="close-btn" onclick="closeSkillLogModal()">&times;</button>
+        </div>
+        <form id="skillLogForm" onsubmit="handleSkillLogSubmit(event)">
+            <div class="form-group">
+                <label>Trade Skill Executed</label>
+                <input type="text" id="skillName" class="filter-input" required placeholder="e.g. 5KVA Hybrid Inverter Wiring & Battery Balancing">
+            </div>
+
+            <div class="form-group">
+                <label>Supervising Mentor / Master Craftsman</label>
+                <input type="text" id="skillMentor" class="filter-input" required placeholder="e.g. Engr. K. Chetachi (Nexus Technical)">
+            </div>
+
+            <div class="form-group">
+                <label>Practical Execution Proof / Description</label>
+                <textarea id="skillDesc" class="filter-input textarea-input" rows="3" required placeholder="Detail the practical job carried out, tools used, and safety/quality standards met..."></textarea>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="action-btn" onclick="closeSkillLogModal()">Cancel</button>
+                <button type="submit" class="action-btn primary-btn">Submit for Mentor Sign-Off</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODULE SCRIPTS -->
+<script src="js/api.js"></script>
+<script src="js/apprenticeships.js"></script>
+<script>
+    lucide.createIcons();
+</script>
+
+</body>
+</html>
