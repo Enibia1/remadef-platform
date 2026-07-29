@@ -896,6 +896,259 @@ def update_current_profile(
         )
 
 # ============================================================
+# HOME DASHBOARD
+# ============================================================
+
+def get_dashboard(context):
+
+    try:
+
+        user = get_current_user(
+            context
+        )
+
+        account_id = user.get(
+            "$id"
+        )
+
+        profile = find_profile(
+            account_id,
+            context
+        )
+
+        completion = 0
+
+        if profile:
+
+            completion = profile.get(
+                "profile_completion",
+                0
+            )
+
+        dashboard = {
+
+            "profile_completion":
+                completion,
+
+            "learning":
+                0,
+
+            "applications":
+                0,
+
+            "opportunities":
+                0,
+
+            "messages":
+                0,
+
+            "notifications":
+                0
+
+        }
+
+        return success(
+
+            dashboard,
+
+            "Dashboard loaded successfully."
+
+        )
+
+    except Exception as exc:
+
+        context.error(
+
+            f"DASHBOARD ERROR: {str(exc)}"
+
+        )
+
+        return error(
+
+            "Unable to load dashboard.",
+
+            500
+
+        )
+
+
+# ============================================================
+# NOTIFICATIONS
+# ============================================================
+
+def get_notifications(context):
+
+    try:
+
+        return success(
+
+            [],
+
+            "Notifications loaded successfully."
+
+        )
+
+    except Exception as exc:
+
+        context.error(
+
+            f"NOTIFICATIONS ERROR: {str(exc)}"
+
+        )
+
+        return error(
+
+            "Unable to load notifications.",
+
+            500
+
+        )
+
+
+# ============================================================
+# MESSAGES
+# ============================================================
+
+def get_messages(context):
+
+    try:
+
+        return success(
+
+            [],
+
+            "Messages loaded successfully."
+
+        )
+
+    except Exception as exc:
+
+        context.error(
+
+            f"MESSAGES ERROR: {str(exc)}"
+
+        )
+
+        return error(
+
+            "Unable to load messages.",
+
+            500
+
+        )
+
+
+# ============================================================
+# CONVERSATIONS
+# ============================================================
+
+def get_conversations(context):
+
+    try:
+
+        return success(
+
+            [],
+
+            "Conversations loaded successfully."
+
+        )
+
+    except Exception as exc:
+
+        context.error(
+
+            f"CONVERSATIONS ERROR: {str(exc)}"
+
+        )
+
+        return error(
+
+            "Unable to load conversations.",
+
+            500
+
+        )
+
+
+# ============================================================
+# CREATE CONVERSATION
+# ============================================================
+
+def create_conversation(
+
+    data,
+
+    context
+
+):
+
+    try:
+
+        return success(
+
+            {},
+
+            "Conversation created successfully."
+
+        )
+
+    except Exception as exc:
+
+        context.error(
+
+            f"CREATE CONVERSATION ERROR: {str(exc)}"
+
+        )
+
+        return error(
+
+            "Unable to create conversation.",
+
+            500
+
+        )
+
+
+# ============================================================
+# SEND MESSAGE
+# ============================================================
+
+def send_message(
+
+    data,
+
+    context
+
+):
+
+    try:
+
+        return success(
+
+            {},
+
+            "Message sent successfully."
+
+        )
+
+    except Exception as exc:
+
+        context.error(
+
+            f"SEND MESSAGE ERROR: {str(exc)}"
+
+        )
+
+        return error(
+
+            "Unable to send message.",
+
+            500
+
+        )
+
+# ============================================================
 # REGISTER USER
 # ============================================================
 
@@ -1368,44 +1621,162 @@ def route_request(
 
 
 
-    # ========================================================
-    # UPDATE PROFILE
-    # ========================================================
+# ========================================================
+# UPDATE PROFILE
+# ========================================================
 
-    if (
+if (
 
-        method in ["PUT", "PATCH"]
+    method in ["PUT", "PATCH"]
 
-        and path == "/api/profile"
+    and path == "/api/profile"
 
-    ):
+):
 
+    data = parse_json_body(
 
-        data = parse_json_body(
-
-            request
-
-        )
-
-
-
-        return update_current_profile(
-
-            data,
-
-            context
-
-        )
-
-
-
-    return error(
-
-        "Route not found.",
-
-        404
+        request
 
     )
+
+    return update_current_profile(
+
+        data,
+
+        context
+
+    )
+
+
+# ========================================================
+# DASHBOARD
+# ========================================================
+
+if (
+
+    method == "GET"
+
+    and path == "/api/dashboard"
+
+):
+
+    return get_dashboard(
+
+        context
+
+    )
+
+
+# ========================================================
+# NOTIFICATIONS
+# ========================================================
+
+if (
+
+    method == "GET"
+
+    and path == "/api/notifications"
+
+):
+
+    return get_notifications(
+
+        context
+
+    )
+
+
+# ========================================================
+# MESSAGES
+# ========================================================
+
+if (
+
+    method == "GET"
+
+    and path == "/api/messages"
+
+):
+
+    return get_messages(
+
+        context
+
+    )
+
+
+if (
+
+    method == "POST"
+
+    and path == "/api/messages"
+
+):
+
+    data = parse_json_body(
+
+        request
+
+    )
+
+    return send_message(
+
+        data,
+
+        context
+
+    )
+
+
+# ========================================================
+# CONVERSATIONS
+# ========================================================
+
+if (
+
+    method == "GET"
+
+    and path == "/api/conversations"
+
+):
+
+    return get_conversations(
+
+        context
+
+    )
+
+
+if (
+
+    method == "POST"
+
+    and path == "/api/conversations"
+
+):
+
+    data = parse_json_body(
+
+        request
+
+    )
+
+    return create_conversation(
+
+        data,
+
+        context
+
+    )
+
+
+return error(
+
+    "Route not found.",
+
+    404
+
+)
 
 
 
