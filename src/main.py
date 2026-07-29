@@ -35,6 +35,51 @@ PROFILES_TABLE_ID = os.environ.get(
 
 
 # ============================================================
+# REMADEF PLATFORM TABLES
+# ============================================================
+
+CONVERSATIONS_TABLE_ID = os.environ.get(
+    "APPWRITE_CONVERSATIONS_TABLE_ID",
+    "conversations"
+)
+
+MEMBERS_TABLE_ID = os.environ.get(
+    "APPWRITE_MEMBERS_TABLE_ID",
+    "conversation_members"
+)
+
+MESSAGES_TABLE_ID = os.environ.get(
+    "APPWRITE_MESSAGES_TABLE_ID",
+    "messages"
+)
+
+NOTIFICATIONS_TABLE_ID = os.environ.get(
+    "APPWRITE_NOTIFICATIONS_TABLE_ID",
+    "notifications"
+)
+
+LEARNING_TABLE_ID = os.environ.get(
+    "APPWRITE_LEARNING_TABLE_ID",
+    "learning"
+)
+
+APPLICATIONS_TABLE_ID = os.environ.get(
+    "APPWRITE_APPLICATIONS_TABLE_ID",
+    "applications"
+)
+
+JOBS_TABLE_ID = os.environ.get(
+    "APPWRITE_JOBS_TABLE_ID",
+    "jobs"
+)
+
+BUSINESSES_TABLE_ID = os.environ.get(
+    "APPWRITE_BUSINESSES_TABLE_ID",
+    "businesses"
+)
+
+
+# ============================================================
 # JSON SERIALIZATION
 # ============================================================
 
