@@ -1,0 +1,1572 @@
+/* ==========================================================
+   REMADEF MESSAGES
+   Part 1
+   Global • Layout • Header • Sidebar
+========================================================== */
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+html{
+scroll-behavior:smooth;
+}
+
+body{
+
+font-family:
+Arial,
+Helvetica,
+sans-serif;
+
+background:#F4F7FB;
+
+color:#1D1D1D;
+
+height:100vh;
+
+overflow:hidden;
+
+}
+
+a{
+
+text-decoration:none;
+
+color:inherit;
+
+}
+
+button{
+
+font:inherit;
+
+cursor:pointer;
+
+border:none;
+
+outline:none;
+
+background:none;
+
+}
+
+input,
+textarea{
+
+font:inherit;
+
+outline:none;
+
+}
+
+/* ==========================================================
+   APP
+========================================================== */
+
+.messages-app{
+
+height:100vh;
+
+display:flex;
+
+flex-direction:column;
+
+background:#F4F7FB;
+
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.topbar{
+
+height:64px;
+
+background:#0B1F3A;
+
+color:#FFFFFF;
+
+display:flex;
+
+align-items:center;
+
+justify-content:space-between;
+
+padding:0 20px;
+
+box-shadow:
+
+0 2px 8px rgba(0,0,0,.15);
+
+z-index:100;
+
+}
+
+.topbar-left{
+
+display:flex;
+
+align-items:center;
+
+gap:16px;
+
+}
+
+.topbar-right{
+
+display:flex;
+
+align-items:center;
+
+gap:12px;
+
+}
+
+.logo{
+
+font-size:22px;
+
+font-weight:700;
+
+letter-spacing:1px;
+
+color:#FFFFFF;
+
+}
+
+.icon-button{
+
+width:42px;
+
+height:42px;
+
+border-radius:50%;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+background:transparent;
+
+color:#FFFFFF;
+
+transition:.25s;
+
+font-size:18px;
+
+}
+
+.icon-button:hover{
+
+background:rgba(255,255,255,.15);
+
+}
+
+.profile-avatar{
+
+width:42px;
+
+height:42px;
+
+border-radius:50%;
+
+background:#FFFFFF;
+
+color:#0B1F3A;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+font-weight:bold;
+
+font-size:16px;
+
+}
+
+/* ==========================================================
+   MAIN LAYOUT
+========================================================== */
+
+.messages-layout{
+
+flex:1;
+
+display:flex;
+
+overflow:hidden;
+
+}
+
+/* ==========================================================
+   SIDEBAR
+========================================================== */
+
+.sidebar{
+
+width:360px;
+
+background:#FFFFFF;
+
+border-right:1px solid #E5E7EB;
+
+display:flex;
+
+flex-direction:column;
+
+overflow:hidden;
+
+}
+
+.sidebar-header{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+padding:20px;
+
+border-bottom:1px solid #ECECEC;
+
+}
+
+.sidebar-header h2{
+
+font-size:22px;
+
+color:#0B1F3A;
+
+}
+
+.primary-button{
+
+background:#0B1F3A;
+
+color:#FFFFFF;
+
+padding:10px 18px;
+
+border-radius:8px;
+
+font-weight:600;
+
+transition:.25s;
+
+}
+
+.primary-button:hover{
+
+background:#12335D;
+
+}
+
+/* ==========================================================
+   SEARCH
+========================================================== */
+
+.conversation-search{
+
+padding:18px;
+
+border-bottom:1px solid #ECECEC;
+
+}
+
+.conversation-search input{
+
+width:100%;
+
+padding:12px 16px;
+
+border:1px solid #D8D8D8;
+
+border-radius:10px;
+
+background:#F8F9FB;
+
+}
+
+.conversation-search input:focus{
+
+border-color:#0B1F3A;
+
+background:#FFFFFF;
+
+}
+
+/* ==========================================================
+   FILTERS
+========================================================== */
+
+.conversation-filters{
+
+display:flex;
+
+gap:10px;
+
+padding:15px 18px;
+
+overflow-x:auto;
+
+border-bottom:1px solid #ECECEC;
+
+}
+
+.filter{
+
+padding:8px 16px;
+
+border-radius:20px;
+
+background:#EEF2F7;
+
+white-space:nowrap;
+
+transition:.25s;
+
+font-size:14px;
+
+}
+
+.filter:hover{
+
+background:#DCE5F2;
+
+}
+
+.filter.active{
+
+background:#0B1F3A;
+
+color:#FFFFFF;
+
+}
+
+/* ==========================================================
+   CONVERSATIONS
+========================================================== */
+
+.conversation-list{
+
+flex:1;
+
+overflow-y:auto;
+
+}
+
+.conversation{
+
+display:flex;
+
+align-items:center;
+
+gap:15px;
+
+padding:16px 18px;
+
+cursor:pointer;
+
+transition:.25s;
+
+border-bottom:1px solid #F0F0F0;
+
+}
+
+.conversation:hover{
+
+background:#F7F9FC;
+
+}
+
+.conversation.active{
+
+background:#EAF1FB;
+
+}
+
+.conversation-avatar{
+
+width:54px;
+
+height:54px;
+
+border-radius:50%;
+
+background:#0B1F3A;
+
+color:#FFFFFF;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+font-weight:bold;
+
+font-size:18px;
+
+flex-shrink:0;
+
+}
+
+.conversation-details{
+
+flex:1;
+
+min-width:0;
+
+}
+
+.conversation-title{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+margin-bottom:6px;
+
+}
+
+.conversation-title span:first-child{
+
+font-weight:600;
+
+color:#0B1F3A;
+
+}
+
+.conversation-time{
+
+font-size:12px;
+
+color:#888888;
+
+}
+
+.conversation-preview{
+
+font-size:14px;
+
+color:#666666;
+
+white-space:nowrap;
+
+overflow:hidden;
+
+text-overflow:ellipsis;
+
+}
+
+.conversation-meta{
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+}
+
+.unread-badge{
+
+min-width:22px;
+
+height:22px;
+
+padding:0 6px;
+
+background:#E53935;
+
+color:#FFFFFF;
+
+border-radius:999px;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+font-size:12px;
+
+font-weight:bold;
+
+}
+
+/* ==========================================================
+   SCROLLBAR
+========================================================== */
+
+.conversation-list::-webkit-scrollbar{
+
+width:8px;
+
+}
+
+.conversation-list::-webkit-scrollbar-thumb{
+
+background:#D2D8E2;
+
+border-radius:20px;
+
+}
+
+.conversation-list::-webkit-scrollbar-track{
+
+background:transparent;
+
+}
+
+/* ==========================================================
+   REMADEF MESSAGES
+   Part 2
+   Chat Panel • Messages • Composer
+========================================================== */
+
+/* ==========================================================
+   CHAT PANEL
+========================================================== */
+
+.chat-panel{
+
+flex:1;
+
+display:flex;
+
+flex-direction:column;
+
+background:#F8FAFD;
+
+overflow:hidden;
+
+}
+
+/* ==========================================================
+   CHAT HEADER
+========================================================== */
+
+.chat-header{
+
+height:72px;
+
+background:#FFFFFF;
+
+display:flex;
+
+align-items:center;
+
+justify-content:space-between;
+
+padding:0 24px;
+
+border-bottom:1px solid #E6EAF0;
+
+}
+
+.chat-user{
+
+display:flex;
+
+align-items:center;
+
+gap:14px;
+
+}
+
+.chat-user-info h2{
+
+font-size:20px;
+
+color:#0B1F3A;
+
+margin-bottom:4px;
+
+}
+
+.chat-user-info span{
+
+font-size:13px;
+
+color:#28A745;
+
+}
+
+/* ==========================================================
+   PRIVACY BANNER
+========================================================== */
+
+.privacy-banner{
+
+background:#EEF6FF;
+
+border-bottom:1px solid #D8E8FF;
+
+padding:16px 22px;
+
+font-size:14px;
+
+color:#324A66;
+
+}
+
+.privacy-banner i{
+
+display:block;
+
+margin-bottom:12px;
+
+line-height:1.6;
+
+}
+
+.device-copy-option{
+
+display:flex;
+
+align-items:center;
+
+gap:10px;
+
+font-size:14px;
+
+font-weight:500;
+
+}
+
+/* ==========================================================
+   PINNED MESSAGE
+========================================================== */
+
+.pinned-message{
+
+display:flex;
+
+align-items:center;
+
+gap:12px;
+
+padding:14px 22px;
+
+background:#FFF8E6;
+
+border-bottom:1px solid #FFE08A;
+
+font-size:14px;
+
+}
+
+.pinned-message button{
+
+margin-left:auto;
+
+padding:8px 14px;
+
+border-radius:6px;
+
+background:#0B1F3A;
+
+color:#FFFFFF;
+
+}
+
+/* ==========================================================
+   MESSAGE AREA
+========================================================== */
+
+.chat-messages{
+
+flex:1;
+
+overflow-y:auto;
+
+padding:25px;
+
+display:flex;
+
+flex-direction:column;
+
+gap:18px;
+
+}
+
+.chat-messages::-webkit-scrollbar{
+
+width:8px;
+
+}
+
+.chat-messages::-webkit-scrollbar-thumb{
+
+background:#D4DAE4;
+
+border-radius:20px;
+
+}
+
+/* ==========================================================
+   DATE DIVIDER
+========================================================== */
+
+.date-divider{
+
+align-self:center;
+
+padding:8px 18px;
+
+background:#EAEFF6;
+
+border-radius:20px;
+
+font-size:13px;
+
+color:#666666;
+
+}
+
+/* ==========================================================
+   MESSAGE
+========================================================== */
+
+.message{
+
+display:flex;
+
+width:100%;
+
+}
+
+.message.sent{
+
+justify-content:flex-end;
+
+}
+
+.message.received{
+
+justify-content:flex-start;
+
+}
+
+.message-content{
+
+max-width:72%;
+
+display:flex;
+
+flex-direction:column;
+
+gap:6px;
+
+}
+
+.bubble{
+
+padding:14px 18px;
+
+border-radius:18px;
+
+font-size:15px;
+
+line-height:1.6;
+
+word-wrap:break-word;
+
+}
+
+.message.sent .bubble{
+
+background:#0B1F3A;
+
+color:#FFFFFF;
+
+border-bottom-right-radius:6px;
+
+}
+
+.message.received .bubble{
+
+background:#FFFFFF;
+
+color:#222222;
+
+border-bottom-left-radius:6px;
+
+box-shadow:
+
+0 2px 8px rgba(0,0,0,.06);
+
+}
+
+.message-meta{
+
+display:flex;
+
+gap:12px;
+
+font-size:12px;
+
+color:#7A7A7A;
+
+padding:0 8px;
+
+}
+
+/* ==========================================================
+   REACTIONS
+========================================================== */
+
+.message-reactions{
+
+display:flex;
+
+gap:8px;
+
+margin-top:6px;
+
+}
+
+.reaction{
+
+padding:4px 10px;
+
+background:#FFFFFF;
+
+border-radius:20px;
+
+font-size:13px;
+
+box-shadow:
+
+0 1px 4px rgba(0,0,0,.08);
+
+}
+
+/* ==========================================================
+   TYPING INDICATOR
+========================================================== */
+
+.typing-indicator{
+
+display:flex;
+
+align-items:center;
+
+gap:5px;
+
+padding:14px 24px;
+
+font-size:14px;
+
+color:#666666;
+
+}
+
+.typing-indicator span{
+
+width:8px;
+
+height:8px;
+
+border-radius:50%;
+
+background:#0B1F3A;
+
+animation:
+
+typing 1.4s infinite;
+
+}
+
+.typing-indicator span:nth-child(2){
+
+animation-delay:.2s;
+
+}
+
+.typing-indicator span:nth-child(3){
+
+animation-delay:.4s;
+
+}
+
+@keyframes typing{
+
+0%,100%{
+
+opacity:.3;
+
+transform:translateY(0);
+
+}
+
+50%{
+
+opacity:1;
+
+transform:translateY(-4px);
+
+}
+
+}
+
+/* ==========================================================
+   REPLY PREVIEW
+========================================================== */
+
+.reply-preview{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+padding:14px 20px;
+
+background:#EEF4FF;
+
+border-top:1px solid #D9E5F9;
+
+}
+
+.reply-preview strong{
+
+display:block;
+
+margin-bottom:4px;
+
+color:#0B1F3A;
+
+}
+
+.reply-preview p{
+
+font-size:14px;
+
+color:#666666;
+
+}
+
+.reply-preview button{
+
+font-size:18px;
+
+color:#777777;
+
+}
+
+/* ==========================================================
+   COMPOSER
+========================================================== */
+
+.composer{
+
+display:flex;
+
+align-items:flex-end;
+
+gap:12px;
+
+padding:18px;
+
+background:#FFFFFF;
+
+border-top:1px solid #E6EAF0;
+
+}
+
+.composer textarea{
+
+flex:1;
+
+min-height:48px;
+
+max-height:160px;
+
+resize:none;
+
+padding:14px 18px;
+
+border:1px solid #D7DCE5;
+
+border-radius:16px;
+
+background:#F8FAFD;
+
+line-height:1.5;
+
+}
+
+.composer textarea:focus{
+
+border-color:#0B1F3A;
+
+background:#FFFFFF;
+
+}
+
+.send-button{
+
+background:#0B1F3A;
+
+color:#FFFFFF;
+
+padding:13px 22px;
+
+border-radius:12px;
+
+font-weight:600;
+
+transition:.25s;
+
+}
+
+.send-button:hover{
+
+background:#12335D;
+
+}
+
+/* ==========================================================
+   REMADEF MESSAGES
+   Part 3
+   Emoji • Attachment Menu • Information Panel
+   Loading • Empty State • Utilities • Responsive
+========================================================== */
+
+/* ==========================================================
+   EMOJI PICKER
+========================================================== */
+
+.emoji-picker{
+
+position:absolute;
+
+bottom:90px;
+
+right:90px;
+
+width:300px;
+
+padding:18px;
+
+background:#FFFFFF;
+
+border-radius:16px;
+
+box-shadow:
+
+0 10px 30px rgba(0,0,0,.15);
+
+display:grid;
+
+grid-template-columns:repeat(6,1fr);
+
+gap:12px;
+
+font-size:24px;
+
+z-index:1000;
+
+}
+
+.emoji-picker span{
+
+cursor:pointer;
+
+transition:.2s;
+
+}
+
+.emoji-picker span:hover{
+
+transform:scale(1.2);
+
+}
+
+/* ==========================================================
+   ATTACHMENT MENU
+========================================================== */
+
+.attachment-menu{
+
+position:absolute;
+
+bottom:90px;
+
+left:20px;
+
+width:240px;
+
+background:#FFFFFF;
+
+border-radius:16px;
+
+box-shadow:
+
+0 10px 30px rgba(0,0,0,.15);
+
+padding:14px;
+
+display:flex;
+
+flex-direction:column;
+
+gap:10px;
+
+z-index:1000;
+
+}
+
+.attachment-menu button{
+
+display:flex;
+
+align-items:center;
+
+gap:12px;
+
+padding:12px 16px;
+
+border-radius:10px;
+
+background:#F5F7FB;
+
+transition:.25s;
+
+font-size:15px;
+
+}
+
+.attachment-menu button:hover{
+
+background:#E8EEF8;
+
+}
+
+/* ==========================================================
+   CONVERSATION INFO PANEL
+========================================================== */
+
+.conversation-info-panel{
+
+position:absolute;
+
+top:64px;
+
+right:0;
+
+width:340px;
+
+height:calc(100vh - 64px);
+
+background:#FFFFFF;
+
+border-left:1px solid #E5E7EB;
+
+padding:24px;
+
+overflow-y:auto;
+
+box-shadow:
+
+-4px 0 12px rgba(0,0,0,.08);
+
+z-index:500;
+
+}
+
+.conversation-info-panel h2{
+
+font-size:22px;
+
+color:#0B1F3A;
+
+margin-bottom:20px;
+
+}
+
+.conversation-info-panel h3{
+
+margin:20px 0 10px;
+
+color:#0B1F3A;
+
+}
+
+.conversation-info-panel p{
+
+margin-bottom:10px;
+
+font-size:14px;
+
+line-height:1.6;
+
+}
+
+.conversation-info-panel ul{
+
+list-style:none;
+
+padding:0;
+
+margin:0;
+
+}
+
+.conversation-info-panel li{
+
+padding:10px 0;
+
+border-bottom:1px solid #ECECEC;
+
+}
+
+.conversation-info-panel button{
+
+width:100%;
+
+padding:12px;
+
+margin-top:10px;
+
+background:#0B1F3A;
+
+color:#FFFFFF;
+
+border-radius:10px;
+
+}
+
+/* ==========================================================
+   LOADING
+========================================================== */
+
+.loading-overlay{
+
+position:fixed;
+
+inset:0;
+
+background:rgba(11,31,58,.45);
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+z-index:3000;
+
+}
+
+.loading-card{
+
+background:#FFFFFF;
+
+padding:30px;
+
+border-radius:16px;
+
+text-align:center;
+
+min-width:260px;
+
+}
+
+.spinner{
+
+width:48px;
+
+height:48px;
+
+margin:0 auto 18px;
+
+border:4px solid #DCE5F2;
+
+border-top:4px solid #0B1F3A;
+
+border-radius:50%;
+
+animation:spin 1s linear infinite;
+
+}
+
+@keyframes spin{
+
+100%{
+
+transform:rotate(360deg);
+
+}
+
+}
+
+/* ==========================================================
+   EMPTY STATE
+========================================================== */
+
+.empty-state{
+
+position:absolute;
+
+inset:0;
+
+display:flex;
+
+flex-direction:column;
+
+align-items:center;
+
+justify-content:center;
+
+text-align:center;
+
+padding:40px;
+
+background:#F8FAFD;
+
+}
+
+.empty-state h2{
+
+color:#0B1F3A;
+
+margin-bottom:14px;
+
+}
+
+.empty-state p{
+
+max-width:420px;
+
+line-height:1.7;
+
+margin-bottom:24px;
+
+color:#666666;
+
+}
+
+/* ==========================================================
+   UTILITIES
+========================================================== */
+
+.hidden{
+
+display:none !important;
+
+}
+
+.fade-in{
+
+animation:fadeIn .25s ease;
+
+}
+
+@keyframes fadeIn{
+
+from{
+
+opacity:0;
+
+transform:translateY(8px);
+
+}
+
+to{
+
+opacity:1;
+
+transform:none;
+
+}
+
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width:992px){
+
+.sidebar{
+
+width:300px;
+
+}
+
+.conversation-info-panel{
+
+width:300px;
+
+}
+
+}
+
+@media (max-width:768px){
+
+.messages-layout{
+
+flex-direction:column;
+
+}
+
+.sidebar{
+
+position:absolute;
+
+left:-100%;
+
+top:64px;
+
+height:calc(100vh - 64px);
+
+width:100%;
+
+transition:.3s;
+
+z-index:2000;
+
+}
+
+.sidebar.show{
+
+left:0;
+
+}
+
+.chat-panel{
+
+width:100%;
+
+}
+
+.chat-header{
+
+padding:0 16px;
+
+}
+
+.chat-messages{
+
+padding:16px;
+
+}
+
+.message-content{
+
+max-width:88%;
+
+}
+
+.composer{
+
+padding:12px;
+
+gap:8px;
+
+}
+
+.composer textarea{
+
+min-height:44px;
+
+}
+
+.send-button{
+
+padding:12px 18px;
+
+}
+
+.emoji-picker{
+
+left:50%;
+
+right:auto;
+
+transform:translateX(-50%);
+
+width:90%;
+
+}
+
+.attachment-menu{
+
+left:50%;
+
+transform:translateX(-50%);
+
+width:90%;
+
+}
+
+.conversation-info-panel{
+
+width:100%;
+
+}
+
+}
+
+@media (max-width:480px){
+
+.logo{
+
+font-size:18px;
+
+}
+
+.chat-user-info h2{
+
+font-size:17px;
+
+}
+
+.icon-button{
+
+width:38px;
+
+height:38px;
+
+}
+
+.profile-avatar{
+
+width:38px;
+
+height:38px;
+
+}
+
+.conversation-avatar{
+
+width:46px;
+
+height:46px;
+
+font-size:16px;
+
+}
+
+.bubble{
+
+font-size:14px;
+
+}
+
+}
