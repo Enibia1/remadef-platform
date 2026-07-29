@@ -1,0 +1,294 @@
+/* ==========================================================
+   REMADEF BUSINESS PAGES & DIRECTORY EXTENSION STYLES
+   (css/business.css)
+   ========================================================== */
+
+/* ----------------------------------------------------------
+   1. DIRECTORY GRID & COMPANY CARDS
+   ---------------------------------------------------------- */
+.col-span-2 {
+    grid-column: span 2 / span 2;
+}
+
+@media (max-width: 900px) {
+    .col-span-2 {
+        grid-column: span 1 / span 1;
+    }
+}
+
+.company-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+    margin-top: 14px;
+}
+
+.company-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border, #E2E8F0);
+    border-radius: 16px;
+    padding: 20px;
+    transition: var(--transition, all 0.2s ease);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    cursor: pointer;
+    position: relative;
+}
+
+.company-card:hover {
+    border-color: #2563EB;
+    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.08);
+    transform: translateY(-2px);
+}
+
+.company-card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.company-card-logo {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    object-fit: cover;
+    background: #F1F5F9;
+    border: 1px solid var(--border, #E2E8F0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: var(--navy, #071A3D);
+    font-size: 20px;
+}
+
+.company-card-meta h3 {
+    font-size: 16px;
+    color: var(--navy, #071A3D);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.company-card-meta p {
+    font-size: 13px;
+    color: var(--muted, #64748B);
+    margin-top: 2px;
+}
+
+.company-card-body {
+    font-size: 13px;
+    color: var(--text, #0F172A);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.company-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border, #E2E8F0);
+    padding-top: 12px;
+    font-size: 12px;
+    color: var(--muted, #64748B);
+}
+
+/* ----------------------------------------------------------
+   2. LINKEDIN-STYLE PAGE VIEW HERO
+   ---------------------------------------------------------- */
+.company-page-view {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.back-nav-bar {
+    display: flex;
+    align-items: center;
+}
+
+.company-hero-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border, #E2E8F0);
+    border-radius: 18px;
+    overflow: hidden;
+    position: relative;
+}
+
+.company-cover-photo {
+    height: 180px;
+    background: linear-gradient(135deg, #071A3D 0%, #1E3A8A 50%, #2563EB 100%);
+    width: 100%;
+}
+
+.company-hero-body {
+    padding: 0 28px 28px 28px;
+    position: relative;
+}
+
+.company-logo-wrapper {
+    margin-top: -50px;
+    margin-bottom: 16px;
+}
+
+.company-logo-lg {
+    width: 100px;
+    height: 100px;
+    border-radius: 18px;
+    border: 4px solid #FFFFFF;
+    background: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    object-fit: cover;
+}
+
+.company-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.company-title-row h1 {
+    font-size: 26px;
+    color: var(--navy, #071A3D);
+    font-weight: 800;
+}
+
+.verified-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #DCFCE7;
+    color: #166534;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.verified-badge i {
+    width: 14px;
+    height: 14px;
+}
+
+.company-tagline {
+    font-size: 15px;
+    color: var(--muted, #64748B);
+    margin-top: 6px;
+}
+
+.company-meta-pills {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--muted, #64748B);
+}
+
+.company-meta-pills span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.company-meta-pills i {
+    width: 16px;
+    height: 16px;
+    color: #2563EB;
+}
+
+.hero-actions-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+/* ----------------------------------------------------------
+   3. PAGE CONTENT LAYOUT GRID & BLOCKS
+   ---------------------------------------------------------- */
+.company-page-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 850px) {
+    .company-page-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.company-main-content,
+.company-sidebar-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.company-card-block {
+    background: #FFFFFF;
+    border: 1px solid var(--border, #E2E8F0);
+    border-radius: 16px;
+    padding: 24px;
+}
+
+.company-card-block h3 {
+    font-size: 18px;
+    color: var(--navy, #071A3D);
+    font-weight: 700;
+    margin-bottom: 14px;
+    border-bottom: 1px solid var(--border, #E2E8F0);
+    padding-bottom: 10px;
+}
+
+.about-text {
+    font-size: 14px;
+    color: var(--text, #0F172A);
+    line-height: 1.7;
+    white-space: pre-line;
+}
+
+.services-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.service-chip {
+    background: #EEF4FF;
+    color: #1E40AF;
+    border: 1px solid #BFDBFE;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 14px;
+}
+
+.detail-item:last-child {
+    margin-bottom: 0;
+}
+
+.detail-item small {
+    font-size: 11px;
+    color: var(--muted, #64748B);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detail-item strong {
+    font-size: 14px;
+    color: var(--navy, #071A3D);
+}
