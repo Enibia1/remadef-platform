@@ -1,0 +1,367 @@
+/* ==========================================================
+   REMADEF JOBS & GIGS EXTENSION STYLES (css/jobs.css)
+   ========================================================== */
+
+/* ----------------------------------------------------------
+   1. ROLE TOGGLE & SYSTEM BADGES
+   ---------------------------------------------------------- */
+.role-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    background: #2563EB;
+    color: #FFFFFF;
+    border-radius: 999px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.post-job-btn {
+    background: #2563EB;
+    color: #FFFFFF !important;
+    border: none;
+    font-weight: 600;
+    padding: 12px 20px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: var(--transition, all 0.2s ease);
+}
+
+.post-job-btn:hover {
+    background: #1D4ED8;
+    transform: translateY(-1px);
+}
+
+/* ----------------------------------------------------------
+   2. FILTER & SEARCH CONTROL BAR
+   ---------------------------------------------------------- */
+.jobs-filter-bar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #FFFFFF;
+    border: 1px solid var(--border, #E2E8F0);
+    border-radius: 12px;
+    padding: 8px 14px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-group input,
+.filter-group select {
+    border: none;
+    outline: none;
+    width: 100%;
+    background: transparent;
+    font-size: 14px;
+    color: var(--text, #0F172A);
+}
+
+/* ----------------------------------------------------------
+   3. JOB CARDS & FEED CONTAINER
+   ---------------------------------------------------------- */
+.jobs-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 14px;
+}
+
+.job-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border, #E2E8F0);
+    border-radius: 16px;
+    padding: 20px;
+    transition: var(--transition, all 0.2s ease);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.job-card:hover {
+    border-color: #2563EB;
+    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.08);
+    transform: translateY(-2px);
+}
+
+.job-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.job-badges {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.badge-tag {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    text-transform: uppercase;
+}
+
+.badge-gig { 
+    background: #DCFCE7; 
+    color: #166534; 
+}
+
+.badge-fixed { 
+    background: #E0E7FF; 
+    color: #3730A3; 
+}
+
+.badge-hourly { 
+    background: #FEF3C7; 
+    color: #92400E; 
+}
+
+.job-title {
+    font-size: 18px;
+    color: var(--navy, #071A3D);
+    font-weight: 700;
+    margin-top: 2px;
+}
+
+.job-description {
+    color: var(--muted, #64748B);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.job-footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border, #E2E8F0);
+    padding-top: 14px;
+    margin-top: 6px;
+}
+
+.job-budget {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--navy, #071A3D);
+}
+
+.job-distance {
+    font-size: 12px;
+    color: #2563EB;
+    font-weight: 600;
+}
+
+/* ----------------------------------------------------------
+   4. ESCROW & OTP HANDOFF PANEL
+   ---------------------------------------------------------- */
+.active-contract-card {
+    background: #FAFBFD;
+    border: 1px solid var(--border, #E2E8F0);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.contract-status-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-dot-active {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #10B981;
+}
+
+.contract-title {
+    font-weight: 700;
+    color: var(--navy, #071A3D);
+}
+
+.contract-amount-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+}
+
+.otp-box {
+    background: #FEF3C7;
+    border: 1px dashed #D97706;
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+}
+
+.otp-code {
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: 6px;
+    color: #B45309;
+    margin: 8px 0;
+    font-family: monospace;
+}
+
+.otp-warning {
+    font-size: 11px;
+    color: #92400E;
+    line-height: 1.4;
+}
+
+.width-full {
+    width: 100%;
+    justify-content: center;
+}
+
+/* ----------------------------------------------------------
+   5. MODAL & COMMISSION BREAKDOWN PANEL
+   ---------------------------------------------------------- */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(7, 26, 61, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-card {
+    background: #FFFFFF;
+    border-radius: 18px;
+    width: 90%;
+    max-width: 560px;
+    padding: 24px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h3 {
+    color: var(--navy, #071A3D);
+    font-size: 20px;
+}
+
+.close-btn {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--muted, #64748B);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.filter-input {
+    padding: 12px;
+    border: 1px solid var(--border, #E2E8F0);
+    border-radius: 10px;
+    outline: none;
+    font-size: 14px;
+    background: #FFFFFF;
+    color: var(--text, #0F172A);
+}
+
+.filter-input:focus {
+    border-color: #2563EB;
+}
+
+.textarea-input {
+    resize: vertical;
+}
+
+.commission-breakdown {
+    background: #F8FAFC;
+    border: 1px solid var(--border, #E2E8F0);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 16px;
+}
+
+.breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+.breakdown-divider {
+    border: none;
+    border-top: 1px dashed var(--border, #E2E8F0);
+    margin: 8px 0;
+}
+
+.text-muted { color: var(--muted, #64748B); }
+.text-success { color: #15803D; }
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.primary-btn {
+    background: #2563EB;
+    color: #FFFFFF !important;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ----------------------------------------------------------
+   6. RESPONSIVE BREAKPOINTS
+   ---------------------------------------------------------- */
+@media (max-width: 640px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .jobs-filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-group {
+        min-width: 100%;
+    }
+}
