@@ -22,14 +22,14 @@
 
     <title>REMADEF Dashboard</title>
 
-    <!-- Home Styles -->
     <link
         rel="stylesheet"
         href="css/home.css"
     >
 
-    <!-- Appwrite -->
     <script src="https://cdn.jsdelivr.net/npm/appwrite@21.1.0"></script>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
 
 </head>
 
@@ -37,22 +37,18 @@
 
 <div class="app">
 
-    <!-- ==========================================
-         HEADER
-    =========================================== -->
+    <!-- HEADER -->
 
     <header class="header">
-
-        <!-- Left -->
 
         <div class="header-left">
 
             <button
                 id="sidebarToggle"
-                class="menu-button"
-                aria-label="Toggle Sidebar"
+                class="menu-toggle"
+                type="button"
             >
-                ☰
+                <i data-lucide="panel-left"></i>
             </button>
 
             <div
@@ -60,82 +56,110 @@
                 id="brandButton"
             >
 
-                <div class="brand-logo">
-                    R
-                </div>
+                <img
+                    src="assets/logo/remadef-logo.svg"
+                    alt="REMADEF"
+                    class="brand-logo"
+                >
 
-                <span class="brand-text">
+                <span class="brand-name">
+
                     REMADEF
+
                 </span>
+
+                <i data-lucide="chevron-down"></i>
 
             </div>
 
-            <!-- Logo Dropdown -->
-
             <div
-                class="brand-dropdown"
                 id="brandDropdown"
+                class="brand-dropdown"
             >
 
                 <a href="profile.html">
+
+                    <i data-lucide="user"></i>
+
                     My Account
+
                 </a>
 
                 <a href="#">
+
+                    <i data-lucide="settings"></i>
+
                     Settings
+
                 </a>
 
                 <a href="#">
+
+                    <i data-lucide="palette"></i>
+
                     Appearance
+
                 </a>
 
                 <a href="#">
+
+                    <i data-lucide="languages"></i>
+
                     Language
+
                 </a>
 
                 <a href="#">
+
+                    <i data-lucide="circle-help"></i>
+
                     Help Centre
+
                 </a>
 
                 <a
                     href="#"
                     id="logoutBtn"
                 >
+
+                    <i data-lucide="log-out"></i>
+
                     Logout
+
                 </a>
 
             </div>
 
         </div>
 
-        <!-- Search -->
+        <div class="search-wrapper">
 
-        <div class="header-search">
+            <i data-lucide="search"></i>
 
             <input
                 type="search"
-                placeholder="Search opportunities, jobs, learning..."
                 id="globalSearch"
+                placeholder="Search opportunities, jobs, learning..."
             >
 
         </div>
 
-        <!-- Right -->
-
         <div class="header-right">
 
             <button
-                class="notification-button"
-                aria-label="Notifications"
+                class="notification-btn"
+                type="button"
             >
 
-                🔔
+                <i data-lucide="bell"></i>
 
                 <span
-                    class="notification-badge"
-                    id="notificationCount"
+                    id="notificationBadge"
+                    class="badge"
                 >
+
                     0
+
                 </span>
 
             </button>
@@ -145,20 +169,20 @@
                 class="avatar"
                 id="avatar"
             >
+
                 U
+
             </a>
 
         </div>
 
     </header>
 
-    <!-- ==========================================
-         LAYOUT
-    =========================================== -->
+    <!-- LAYOUT -->
 
     <div class="layout">
 
-        <!-- Sidebar -->
+        <!-- SIDEBAR -->
 
         <aside
             class="sidebar"
@@ -167,7 +191,7 @@
 
             <div class="sidebar-title">
 
-                Platform
+                PLATFORM
 
             </div>
 
@@ -178,100 +202,164 @@
                     class="active"
                 >
 
-                    <span class="icon">
-                        🏠
-                    </span>
+                    <i data-lucide="house"></i>
 
-                    <span class="text">
+                    <span>
+
                         Home
+
                     </span>
 
                 </a>
 
-                <a href="profile.html">
+                <a
+                    href="profile.html"
+                >
 
-                    <span class="icon">
-                        👤
-                    </span>
+                    <i data-lucide="user"></i>
 
-                    <span class="text">
+                    <span>
+
                         My Profile
+
                     </span>
 
                 </a>
 
-                <a href="messages.html">
+                <a
+                    href="messages.html"
+                >
 
-                    <span class="icon">
-                        💬
-                    </span>
+                    <i data-lucide="message-circle"></i>
 
-                    <span class="text">
+                    <span>
+
                         Messages
+
                     </span>
 
                     <span
-                        class="menu-badge"
                         id="messageBadge"
+                        class="menu-badge"
                     >
+
                         0
+
                     </span>
 
                 </a>
 
-                <a href="learning.html">
+                <a
+                    href="learning.html"
+                >
 
-                    <span class="icon">
-                        🎓
-                    </span>
+                    <i data-lucide="graduation-cap"></i>
 
-                    <span class="text">
+                    <span>
+
                         Learning
+
                     </span>
 
                 </a>
 
-                <a href="apprenticeships.html">
+                <a
+                    href="apprenticeships.html"
+                >
 
-                    <span class="icon">
-                        🛠
-                    </span>
+                    <i data-lucide="hammer"></i>
 
-                    <span class="text">
+                    <span>
+
                         Apprenticeships
+
                     </span>
 
                 </a>
 
-                <a href="jobs.html">
+                <a
+                    href="jobs.html"
+                >
 
-                    <span class="icon">
-                        💼
-                    </span>
+                    <i data-lucide="briefcase-business"></i>
 
-                    <span class="text">
+                    <span>
+
                         Jobs
+
                     </span>
 
                 </a>
 
-                <a href="business.html">
+                <a
+                    href="business.html"
+                >
 
-                    <span class="icon">
-                        🤝
-                    </span>
+                    <i data-lucide="building-2"></i>
 
-                    <span class="text">
+                    <span>
+
                         Business
+
                     </span>
 
                 </a>
 
             </nav>
 
+            <div class="sidebar-footer">
+
+                <div class="profile-progress">
+
+                    <div class="progress-header">
+
+                        <span>
+
+                            Profile
+
+                        </span>
+
+                        <span
+                            id="sidebarCompletion"
+                        >
+
+                            0%
+
+                        </span>
+
+                    </div>
+
+                    <div class="progress-bar">
+
+                        <div
+                            id="progressFill"
+                            class="progress-fill"
+                        ></div>
+
+                    </div>
+
+                    <button
+                        class="complete-profile-btn"
+                        onclick="location.href='profile.html'"
+                    >
+
+                        Complete Now
+
+                    </button>
+
+                </div>
+
+                <div class="copyright">
+
+                    © 2026 REMADEF
+
+                </div>
+
+            </div>
+
         </aside>
 
-        <!-- Main Content -->
+        <!-- MAIN -->
 
         <main class="main">
             <!-- ==========================================
@@ -280,265 +368,353 @@
 
 <section class="welcome">
 
-    <div>
+    <div class="welcome-content">
 
         <h1 id="welcomeTitle">
+
             Welcome back!
+
         </h1>
 
         <p>
-            Your gateway to learning, work, business and economic opportunities.
+
+            Your gateway to learning, apprenticeships, jobs, business and economic participation.
+
         </p>
 
     </div>
 
-    <div class="status-card">
+    <div class="platform-status">
 
         <span class="status-dot"></span>
 
         <span id="apiStatus">
-            Checking platform...
+
+            Connecting to REMADEF...
+
         </span>
 
     </div>
 
 </section>
 
-
 <!-- ==========================================
-     DASHBOARD CARDS
+     DASHBOARD SUMMARY
 ========================================== -->
 
-<section class="dashboard-grid">
+<section class="dashboard-cards">
 
     <div class="dashboard-card">
 
-        <h3>Profile Completion</h3>
+        <div class="card-icon blue">
 
-        <div
-            class="dashboard-value"
-            id="profileCompletion"
-        >
-            0%
+            <i data-lucide="user-check"></i>
+
+        </div>
+
+        <div class="card-content">
+
+            <span class="card-title">
+
+                Profile
+
+            </span>
+
+            <h2 id="profileCompletion">
+
+                0%
+
+            </h2>
+
+            <small>
+
+                Completion
+
+            </small>
+
         </div>
 
     </div>
 
     <div class="dashboard-card">
 
-        <h3>Messages</h3>
+        <div class="card-icon green">
 
-        <div
-            class="dashboard-value"
-            id="messageCount"
-        >
-            0
+            <i data-lucide="book-open"></i>
+
+        </div>
+
+        <div class="card-content">
+
+            <span class="card-title">
+
+                Learning
+
+            </span>
+
+            <h2 id="learningCount">
+
+                0
+
+            </h2>
+
+            <small>
+
+                Active Courses
+
+            </small>
+
         </div>
 
     </div>
 
     <div class="dashboard-card">
 
-        <h3>Applications</h3>
+        <div class="card-icon orange">
 
-        <div
-            class="dashboard-value"
-            id="applicationCount"
-        >
-            0
+            <i data-lucide="briefcase-business"></i>
+
+        </div>
+
+        <div class="card-content">
+
+            <span class="card-title">
+
+                Applications
+
+            </span>
+
+            <h2 id="applicationCount">
+
+                0
+
+            </h2>
+
+            <small>
+
+                Submitted
+
+            </small>
+
         </div>
 
     </div>
 
     <div class="dashboard-card">
 
-        <h3>Learning</h3>
+        <div class="card-icon purple">
 
-        <div
-            class="dashboard-value"
-            id="learningCount"
-        >
-            0
+            <i data-lucide="message-circle"></i>
+
+        </div>
+
+        <div class="card-content">
+
+            <span class="card-title">
+
+                Messages
+
+            </span>
+
+            <h2 id="dashboardMessages">
+
+                0
+
+            </h2>
+
+            <small>
+
+                Unread
+
+            </small>
+
         </div>
 
     </div>
 
 </section>
 
-
 <!-- ==========================================
-     MAIN CONTENT
+     MAIN GRID
 ========================================== -->
 
-<div class="content-grid">
+<div class="dashboard-grid">
 
-    <!-- LEFT -->
+    <!-- LEFT COLUMN -->
 
-    <section class="section">
+    <section class="dashboard-section">
 
         <div class="section-header">
 
             <h2>
+
                 Opportunity Dashboard
+
             </h2>
 
-            <a
-                href="#"
-                class="section-link"
-            >
+            <a href="#">
+
                 View All
+
             </a>
 
         </div>
 
-
         <div class="opportunity-list">
 
-            <div
+            <article
                 class="opportunity-card"
                 onclick="location.href='learning.html'"
             >
 
                 <div class="opportunity-icon">
-                    🎓
+
+                    <i data-lucide="book-open"></i>
+
                 </div>
 
                 <div>
 
                     <h3>
+
                         Learning
+
                     </h3>
 
                     <p>
-                        Continue learning and gain practical skills.
+
+                        Discover courses designed for practical skills.
+
                     </p>
 
                 </div>
 
-            </div>
+            </article>
 
-
-            <div
+            <article
                 class="opportunity-card"
                 onclick="location.href='apprenticeships.html'"
             >
 
                 <div class="opportunity-icon">
-                    🛠
+
+                    <i data-lucide="hammer"></i>
+
                 </div>
 
                 <div>
 
                     <h3>
+
                         Apprenticeships
+
                     </h3>
 
                     <p>
-                        Find practical apprenticeship opportunities.
+
+                        Connect with apprenticeship opportunities.
+
                     </p>
 
                 </div>
 
-            </div>
+            </article>
 
-
-            <div
+            <article
                 class="opportunity-card"
                 onclick="location.href='jobs.html'"
             >
 
                 <div class="opportunity-icon">
-                    💼
+
+                    <i data-lucide="briefcase-business"></i>
+
                 </div>
 
                 <div>
 
                     <h3>
+
                         Jobs
+
                     </h3>
 
                     <p>
-                        Discover employment opportunities.
+
+                        Find employment opportunities.
+
                     </p>
 
                 </div>
 
-            </div>
+            </article>
 
-
-            <div
+            <article
                 class="opportunity-card"
                 onclick="location.href='business.html'"
             >
 
                 <div class="opportunity-icon">
-                    🤝
+
+                    <i data-lucide="building-2"></i>
+
                 </div>
 
                 <div>
 
                     <h3>
+
                         Business
+
                     </h3>
 
                     <p>
-                        Connect with businesses and partners.
+
+                        Connect with businesses and entrepreneurs.
+
                     </p>
 
                 </div>
 
-            </div>
+            </article>
 
         </div>
 
-
-        <!-- ==========================================
-             FUTURE ADS (HIDDEN)
-        ========================================== -->
+        <!-- Hidden Sponsored Block -->
 
         <section
             id="sponsoredSection"
-            class="sponsored hidden"
+            class="sponsored-section hidden"
         >
 
-            <div class="section-header">
+            <div class="sponsored-label">
 
-                <h2>
-                    Sponsored
-                </h2>
-
-                <span class="coming-soon">
-                    Coming Soon
-                </span>
+                Sponsored
 
             </div>
 
             <div class="sponsored-card">
 
-                <div class="sponsored-badge">
-                    Sponsored
+                <img
+                    src="assets/images/placeholders/sponsored-placeholder.webp"
+                    alt="Sponsored"
+                >
+
+                <div>
+
+                    <h3>
+
+                        Advertisement Space
+
+                    </h3>
+
+                    <p>
+
+                        Future sponsored opportunities will appear here.
+
+                    </p>
+
                 </div>
-
-                <h3>
-                    Your Advertisement Could Be Here
-                </h3>
-
-                <p>
-
-                    Future sponsored learning,
-                    jobs,
-                    apprenticeships,
-                    businesses
-                    and services
-                    will appear here.
-
-                </p>
-
-                <button disabled>
-
-                    Learn More
-
-                </button>
 
             </div>
 
@@ -546,10 +722,9 @@
 
     </section>
 
+    <!-- RIGHT COLUMN -->
 
-    <!-- RIGHT -->
-
-    <aside class="section">
+    <aside class="dashboard-section">
 
         <div class="section-header">
 
@@ -565,214 +740,233 @@
 
             <div class="activity-item">
 
-                ✅ Welcome to REMADEF
+                <i data-lucide="circle-check"></i>
+
+                <span>
+
+                    Welcome to REMADEF
+
+                </span>
 
             </div>
 
             <div class="activity-item">
 
-                👤 Complete your profile
+                <i data-lucide="user"></i>
+
+                <span>
+
+                    Complete your profile
+
+                </span>
 
             </div>
 
             <div class="activity-item">
 
-                🎓 Explore learning opportunities
+                <i data-lucide="book-open"></i>
+
+                <span>
+
+                    Start learning
+
+                </span>
 
             </div>
 
             <div class="activity-item">
 
-                💼 Discover jobs
+                <i data-lucide="briefcase-business"></i>
+
+                <span>
+
+                    Apply for jobs
+
+                </span>
 
             </div>
 
             <div class="activity-item">
 
-                🤝 Build your business network
+                <i data-lucide="building-2"></i>
 
+                <span>
+
+                    Build your business network
+
+                </span>
+               
             </div>
 
         </div>
-
     </aside>
 
 </div>
 <!-- ==========================================
-     LOWER DASHBOARD
+     WELCOME
 ========================================== -->
 
-<div class="bottom-grid">
+<section class="welcome">
 
-    <!-- Quick Actions -->
+    <div class="welcome-content">
 
-    <section class="section">
+        <h1 id="welcomeTitle">
 
-        <div class="section-header">
+            Welcome back!
 
-            <h2>Quick Actions</h2>
+        </h1>
 
-        </div>
+        <p>
 
-        <div class="quick-actions">
+            Your gateway to learning, apprenticeships, jobs, business and economic participation.
 
-            <button
-                class="action-button"
-                onclick="location.href='profile.html'"
-            >
-                Complete My Profile
-            </button>
-
-            <button
-                class="action-button"
-                onclick="location.href='messages.html'"
-            >
-                Open Messages
-            </button>
-
-            <button
-                class="action-button"
-                onclick="location.href='learning.html'"
-            >
-                Continue Learning
-            </button>
-
-            <button
-                class="action-button"
-                onclick="location.href='jobs.html'"
-            >
-                Browse Jobs
-            </button>
-
-            <button
-                class="action-button"
-                onclick="location.href='apprenticeships.html'"
-            >
-                Find Apprenticeships
-            </button>
-
-            <button
-                class="action-button"
-                onclick="location.href='business.html'"
-            >
-                Business Network
-            </button>
-
-        </div>
-
-    </section>
-
-    <!-- Statistics -->
-
-    <section class="section">
-
-        <div class="section-header">
-
-            <h2>My Statistics</h2>
-
-        </div>
-
-        <div class="statistics-grid">
-
-            <div class="stat-card">
-
-                <span class="stat-title">Applications</span>
-
-                <span
-                    class="stat-number"
-                    id="statsApplications"
-                >
-                    0
-                </span>
-
-            </div>
-
-            <div class="stat-card">
-
-                <span class="stat-title">Certificates</span>
-
-                <span
-                    class="stat-number"
-                    id="statsCertificates"
-                >
-                    0
-                </span>
-
-            </div>
-
-            <div class="stat-card">
-
-                <span class="stat-title">Connections</span>
-
-                <span
-                    class="stat-number"
-                    id="statsConnections"
-                >
-                    0
-                </span>
-
-            </div>
-
-            <div class="stat-card">
-
-                <span class="stat-title">Learning Hours</span>
-
-                <span
-                    class="stat-number"
-                    id="statsHours"
-                >
-                    0
-                </span>
-
-            </div>
-
-        </div>
-
-    </section>
-
-</div>
-
-<!-- Upcoming Events -->
-
-<section class="section upcoming-events">
-
-    <div class="section-header">
-
-        <h2>Upcoming Events</h2>
+        </p>
 
     </div>
 
-    <div class="event-list">
+    <div class="platform-status">
 
-        <div class="event-item">
+        <span class="status-dot"></span>
 
-            <strong>Orientation</strong>
+        <span id="apiStatus">
 
-            <span>No upcoming event</span>
+            Connecting to REMADEF...
+
+        </span>
+
+    </div>
+
+</section>
+
+<!-- ==========================================
+     DASHBOARD SUMMARY
+========================================== -->
+
+<section class="dashboard-cards">
+
+    <div class="dashboard-card">
+
+        <div class="card-icon blue">
+
+            <i data-lucide="user-check"></i>
 
         </div>
 
-        <div class="event-item">
+        <div class="card-content">
 
-            <strong>Learning Sessions</strong>
+            <span class="card-title">
 
-            <span>No upcoming event</span>
+                Profile
+
+            </span>
+
+            <h2 id="profileCompletion">
+
+                0%
+
+            </h2>
+
+            <small>
+
+                Completion
+
+            </small>
 
         </div>
 
-        <div class="event-item">
+    </div>
 
-            <strong>Application Deadlines</strong>
+    <div class="dashboard-card">
 
-            <span>No upcoming deadline</span>
+        <div class="card-icon green">
+
+            <i data-lucide="book-open"></i>
 
         </div>
 
-        <div class="event-item">
+        <div class="card-content">
 
-            <strong>Business Events</strong>
+            <span class="card-title">
 
-            <span>No upcoming event</span>
+                Learning
+
+            </span>
+
+            <h2 id="learningCount">
+
+                0
+
+            </h2>
+
+            <small>
+
+                Active Courses
+
+            </small>
+
+        </div>
+
+    </div>
+
+    <div class="dashboard-card">
+
+        <div class="card-icon orange">
+
+            <i data-lucide="briefcase-business"></i>
+
+        </div>
+
+        <div class="card-content">
+
+            <span class="card-title">
+
+                Applications
+
+            </span>
+
+            <h2 id="applicationCount">
+
+                0
+
+            </h2>
+
+            <small>
+
+                Submitted
+
+            </small>
+
+        </div>
+
+    </div>
+
+    <div class="dashboard-card">
+
+        <div class="card-icon purple">
+
+            <i data-lucide="message-circle"></i>
+
+        </div>
+
+        <div class="card-content">
+
+            <span class="card-title">
+
+                Messages
+
+            </span>
+
+            <h2 id="dashboardMessages">
+
+                0
+
+            </h2>
+
+            <small>
+
+                Unread
+
+            </small>
 
         </div>
 
@@ -780,19 +974,592 @@
 
 </section>
 
-</main>
-
-</div>
-
-</div>
-
 <!-- ==========================================
-     JAVASCRIPT
+     MAIN GRID
 ========================================== -->
+
+<div class="dashboard-grid">
+
+    <!-- LEFT COLUMN -->
+
+    <section class="dashboard-section">
+
+        <div class="section-header">
+
+            <h2>
+
+                Opportunity Dashboard
+
+            </h2>
+
+            <a href="#">
+
+                View All
+
+            </a>
+
+        </div>
+
+        <div class="opportunity-list">
+
+            <article
+                class="opportunity-card"
+                onclick="location.href='learning.html'"
+            >
+
+                <div class="opportunity-icon">
+
+                    <i data-lucide="book-open"></i>
+
+                </div>
+
+                <div>
+
+                    <h3>
+
+                        Learning
+
+                    </h3>
+
+                    <p>
+
+                        Discover courses designed for practical skills.
+
+                    </p>
+
+                </div>
+
+            </article>
+
+            <article
+                class="opportunity-card"
+                onclick="location.href='apprenticeships.html'"
+            >
+
+                <div class="opportunity-icon">
+
+                    <i data-lucide="hammer"></i>
+
+                </div>
+
+                <div>
+
+                    <h3>
+
+                        Apprenticeships
+
+                    </h3>
+
+                    <p>
+
+                        Connect with apprenticeship opportunities.
+
+                    </p>
+
+                </div>
+
+            </article>
+
+            <article
+                class="opportunity-card"
+                onclick="location.href='jobs.html'"
+            >
+
+                <div class="opportunity-icon">
+
+                    <i data-lucide="briefcase-business"></i>
+
+                </div>
+
+                <div>
+
+                    <h3>
+
+                        Jobs
+
+                    </h3>
+
+                    <p>
+
+                        Find employment opportunities.
+
+                    </p>
+
+                </div>
+
+            </article>
+
+            <article
+                class="opportunity-card"
+                onclick="location.href='business.html'"
+            >
+
+                <div class="opportunity-icon">
+
+                    <i data-lucide="building-2"></i>
+
+                </div>
+
+                <div>
+
+                    <h3>
+
+                        Business
+
+                    </h3>
+
+                    <p>
+
+                        Connect with businesses and entrepreneurs.
+
+                    </p>
+
+                </div>
+
+            </article>
+
+        </div>
+
+        <!-- Hidden Sponsored Block -->
+
+        <section
+            id="sponsoredSection"
+            class="sponsored-section hidden"
+        >
+
+            <div class="sponsored-label">
+
+                Sponsored
+
+            </div>
+
+            <div class="sponsored-card">
+
+                <img
+                    src="assets/images/placeholders/sponsored-placeholder.webp"
+                    alt="Sponsored"
+                >
+
+                <div>
+
+                    <h3>
+
+                        Advertisement Space
+
+                    </h3>
+
+                    <p>
+
+                        Future sponsored opportunities will appear here.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </section>
+
+    <!-- RIGHT COLUMN -->
+
+    <aside class="dashboard-section">
+
+        <div class="section-header">
+
+            <h2>
+
+                Recent Activity
+
+            </h2>
+
+        </div>
+
+        <div class="activity-list">
+
+            <div class="activity-item">
+
+                <i data-lucide="circle-check"></i>
+
+                <span>
+
+                    Welcome to REMADEF
+
+                </span>
+
+            </div>
+
+            <div class="activity-item">
+
+                <i data-lucide="user"></i>
+
+                <span>
+
+                    Complete your profile
+
+                </span>
+
+            </div>
+
+            <div class="activity-item">
+
+                <i data-lucide="book-open"></i>
+
+                <span>
+
+                    Start learning
+
+                </span>
+
+            </div>
+
+            <div class="activity-item">
+
+                <i data-lucide="briefcase-business"></i>
+
+                <span>
+
+                    Apply for jobs
+
+                </span>
+
+            </div>
+
+            <div class="activity-item">
+
+                <i data-lucide="building-2"></i>
+
+                <span>
+
+                    Build your business network
+
+                </span>
+
+            </div>
+
+        </div>
+    </aside>
+
+</div>
+        <!-- ==========================================
+             LOWER DASHBOARD
+        ========================================== -->
+
+        <div class="bottom-grid">
+
+            <!-- QUICK ACTIONS -->
+
+            <section class="dashboard-section">
+
+                <div class="section-header">
+
+                    <h2>
+
+                        Quick Actions
+
+                    </h2>
+
+                </div>
+
+                <div class="quick-actions">
+
+                    <button
+                        class="action-btn"
+                        onclick="location.href='profile.html'"
+                    >
+
+                        <i data-lucide="user-round"></i>
+
+                        <span>
+
+                            Complete Profile
+
+                        </span>
+
+                    </button>
+
+                    <button
+                        class="action-btn"
+                        onclick="location.href='messages.html'"
+                    >
+
+                        <i data-lucide="message-circle"></i>
+
+                        <span>
+
+                            Open Messages
+
+                        </span>
+
+                    </button>
+
+                    <button
+                        class="action-btn"
+                        onclick="location.href='learning.html'"
+                    >
+
+                        <i data-lucide="book-open"></i>
+
+                        <span>
+
+                            Continue Learning
+
+                        </span>
+
+                    </button>
+
+                    <button
+                        class="action-btn"
+                        onclick="location.href='jobs.html'"
+                    >
+
+                        <i data-lucide="briefcase-business"></i>
+
+                        <span>
+
+                            Browse Jobs
+
+                        </span>
+
+                    </button>
+
+                    <button
+                        class="action-btn"
+                        onclick="location.href='business.html'"
+                    >
+
+                        <i data-lucide="building-2"></i>
+
+                        <span>
+
+                            Business Network
+
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </section>
+
+            <!-- STATISTICS -->
+
+            <section class="dashboard-section">
+
+                <div class="section-header">
+
+                    <h2>
+
+                        My Statistics
+
+                    </h2>
+
+                </div>
+
+                <div class="statistics-grid">
+
+                    <div class="stat-card">
+
+                        <i data-lucide="briefcase-business"></i>
+
+                        <h3 id="statApplications">
+
+                            0
+
+                        </h3>
+
+                        <p>
+
+                            Applications
+
+                        </p>
+
+                    </div>
+
+                    <div class="stat-card">
+
+                        <i data-lucide="badge-check"></i>
+
+                        <h3 id="statCertificates">
+
+                            0
+
+                        </h3>
+
+                        <p>
+
+                            Certificates
+
+                        </p>
+
+                    </div>
+
+                    <div class="stat-card">
+
+                        <i data-lucide="users"></i>
+
+                        <h3 id="statConnections">
+
+                            0
+
+                        </h3>
+
+                        <p>
+
+                            Connections
+
+                        </p>
+
+                    </div>
+
+                    <div class="stat-card">
+
+                        <i data-lucide="clock-3"></i>
+
+                        <h3 id="statHours">
+
+                            0
+
+                        </h3>
+
+                        <p>
+
+                            Learning Hours
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+        <!-- UPCOMING EVENTS -->
+
+        <section class="dashboard-section upcoming-events">
+
+            <div class="section-header">
+
+                <h2>
+
+                    Upcoming Events
+
+                </h2>
+
+            </div>
+
+            <div class="event-list">
+
+                <div class="event-item">
+
+                    <i data-lucide="calendar-days"></i>
+
+                    <div>
+
+                        <strong>
+
+                            Orientation
+
+                        </strong>
+
+                        <p>
+
+                            No upcoming event
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="event-item">
+
+                    <i data-lucide="graduation-cap"></i>
+
+                    <div>
+
+                        <strong>
+
+                            Learning Sessions
+
+                        </strong>
+
+                        <p>
+
+                            No upcoming session
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="event-item">
+
+                    <i data-lucide="briefcase-business"></i>
+
+                    <div>
+
+                        <strong>
+
+                            Job Deadlines
+
+                        </strong>
+
+                        <p>
+
+                            No active deadline
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="event-item">
+
+                    <i data-lucide="building-2"></i>
+
+                    <div>
+
+                        <strong>
+
+                            Business Events
+
+                        </strong>
+
+                        <p>
+
+                            No upcoming event
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        </main>
+
+    </div>
+
+</div>
 
 <script src="js/api.js"></script>
 
 <script src="js/home.js"></script>
+
+<script>
+
+    lucide.createIcons();
+
+</script>
 
 </body>
 
