@@ -1727,35 +1727,19 @@ if (
 
     )
 
+# =======================================================
+# HEALTH
+# =======================================================
+if method == "GET" and path == "/api/health":
+    return health_check()
 
-# ========================================================
-# CONVERSATIONS
-# ========================================================
+# =======================================================
+# REGISTER
+# =======================================================
+if method == "POST" and path == "/api/register":
+    data = parse_json_body(request)
+    return register_user(data)
 
-if (
-
-    method == "GET"
-
-    and path == "/api/conversations"
-
-):
-
-    return get_conversations(
-
-        context
-
-    )
-
-
-if (
-
-    method == "POST"
-
-    and path == "/api/conversations"
-
-):
-
-    data = parse_json_body(
 
         request
 
@@ -1777,7 +1761,6 @@ return error(
     404
 
 )
-
 
 
 # ============================================================
