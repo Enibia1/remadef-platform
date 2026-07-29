@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#071A3D">
+    <title>REMADEF | Business Pages & Enterprise Hub</title>
+    
+    <!-- Base Home UI Layout & Module Extensions -->
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/business.css">
+    
+    <!-- Third-Party Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@21.1.0"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-left">
+            <button id="sidebarToggle" class="menu-toggle" type="button">
+                <i data-lucide="panel-left"></i>
+            </button>
+            <div class="brand" id="brandButton">
+                <img src="assets/logo/remadef-logo.svg" alt="REMADEF" class="brand-logo">
+                <span class="brand-name">REMADEF</span>
+            </div>
+        </div>
+        
+        <div class="search-wrapper">
+            <i data-lucide="search"></i>
+            <input type="search" id="globalSearch" placeholder="Search businesses, suppliers, enterprises, trade partners...">
+        </div>
+        
+        <div class="header-right">
+            <button class="notification-btn" type="button">
+                <i data-lucide="bell"></i>
+                <span id="notificationBadge" class="badge">0</span>
+            </button>
+            <a href="profile.html" class="avatar" id="avatar">U</a>
+        </div>
+    </header>
+
+    <!-- LAYOUT -->
+    <div class="layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">PLATFORM</div>
+            <nav class="sidebar-nav">
+                <a href="home.html"><i data-lucide="house"></i><span>Home</span></a>
+                <a href="profile.html"><i data-lucide="user"></i><span>My Profile</span></a>
+                <a href="messages.html"><i data-lucide="message-circle"></i><span>Messages</span><span id="messageBadge" class="menu-badge">0</span></a>
+                <a href="learning.html"><i data-lucide="graduation-cap"></i><span>Learning</span></a>
+                <a href="apprenticeships.html"><i data-lucide="hammer"></i><span>Apprenticeships</span></a>
+                <a href="jobs.html"><i data-lucide="briefcase-business"></i><span>Jobs</span></a>
+                <a href="business.html" class="active"><i data-lucide="building-2"></i><span>Business</span></a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="profile-progress">
+                    <div class="progress-header">
+                        <span>Directory View</span>
+                        <span id="dirViewLabel" class="role-badge">All Hubs</span>
+                    </div>
+                    <button class="complete-profile-btn" id="myCompanyBtn" onclick="toggleCompanyPageMode()">
+                        My Business Page
+                    </button>
+                </div>
+                <div class="copyright">© 2026 REMADEF</div>
+            </div>
+        </aside>
+
+        <!-- MAIN WORKSPACE -->
+        <main class="main">
+
+            <!-- WELCOME & CREATE BUSINESS PAGE ACTION -->
+            <section class="welcome">
+                <div class="welcome-content">
+                    <h1 id="bizWelcomeTitle">Enterprise Directory & Business Pages</h1>
+                    <p>Discover, verify, and source from top-tier registered commercial partners, suppliers, and institutions.</p>
+                </div>
+                <button class="action-btn post-job-btn" onclick="openCreateBusinessModal()">
+                    <i data-lucide="plus-circle"></i>
+                    <span>Create Company Page</span>
+                </button>
+            </section>
+
+            <!-- BUSINESS HUB METRICS -->
+            <section class="dashboard-cards">
+                <div class="dashboard-card">
+                    <div class="card-icon blue">
+                        <i data-lucide="building-2"></i>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-title">Verified Pages</span>
+                        <h2 id="totalCompaniesCount">0</h2>
+                        <small>Active Directory Entities</small>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-icon green">
+                        <i data-lucide="badge-check"></i>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-title">CAC / Verified</span>
+                        <h2 id="verifiedRatio">100%</h2>
+                        <small>Compliance Checked</small>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-icon orange">
+                        <i data-lucide="truck"></i>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-title">Trade Partners</span>
+                        <h2 id="tradePartnersCount">0</h2>
+                        <small>Supply Chain Suppliers</small>
+                    </div>
+                </div>
+
+                <div class="dashboard-card">
+                    <div class="card-icon purple">
+                        <i data-lucide="users"></i>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-title">Total Workforce</span>
+                        <h2 id="workforceCount">0+</h2>
+                        <small>Apprentices & Talent</small>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FILTERS & CATEGORY CONTROLS -->
+            <section class="dashboard-section">
+                <div class="jobs-filter-bar">
+                    <div class="filter-group">
+                        <i data-lucide="search"></i>
+                        <input type="text" id="bizSearchKeyword" placeholder="Search company name, industry, or specialized services..." onkeyup="renderBusinessDirectory()">
+                    </div>
+
+                    <div class="filter-group">
+                        <select id="industryFilter" onchange="renderBusinessDirectory()">
+                            <option value="">All Industries</option>
+                            <option value="Trade & Logistics">Trade & Logistics</option>
+                            <option value="Vocational Training">Vocational Training</option>
+                            <option value="Real Estate & Infrastructure">Real Estate & Infrastructure</option>
+                            <option value="Manufacturing & Sourcing">Manufacturing & Sourcing</option>
+                            <option value="Technology & Cloud Services">Technology & Cloud Services</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <select id="bizStateFilter" onchange="renderBusinessDirectory()">
+                            <option value="">All Locations</option>
+                            <option value="Lagos">Lagos</option>
+                            <option value="Kano">Kano</option>
+                            <option value="Imo">Imo (Owerri)</option>
+                            <option value="Anambra">Anambra</option>
+                            <option value="Abuja">Abuja (FCT)</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MAIN DIRECTORY OR SELECTED LINKEDIN-STYLE PAGE DISPLAY -->
+            <div id="directoryViewContainer" class="dashboard-grid">
+
+                <!-- LEFT COLUMN: BUSINESS CARDS FEED -->
+                <section class="dashboard-section col-span-2">
+                    <div class="section-header">
+                        <h2>Company Directory</h2>
+                        <small id="bizFeedSubtitle">Showing registered enterprise partners</small>
+                    </div>
+                    <div id="companyList" class="company-grid">
+                        <!-- Dynamic Company Cards rendered via JS -->
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- LINKEDIN-STYLE COMPANY SHOWCASE PAGE CONTAINER (DYNAMICALLY UNHIDDEN UPON SELECTION) -->
+            <section id="companyPageContainer" class="company-page-view hidden">
+                
+                <!-- BACK TO DIRECTORY HEADER -->
+                <div class="back-nav-bar">
+                    <button class="action-btn" onclick="closeCompanyPage()">
+                        <i data-lucide="arrow-left"></i>
+                        <span>Back to Directory</span>
+                    </button>
+                </div>
+
+                <!-- LINKEDIN PROFILE HERO HEADER BANNER -->
+                <div class="company-hero-card">
+                    <div class="company-cover-photo" id="pageCoverPhoto"></div>
+                    <div class="company-hero-body">
+                        <div class="company-logo-wrapper">
+                            <img id="pageLogo" src="assets/logo/placeholder-company.svg" alt="Company Logo" class="company-logo-lg">
+                        </div>
+                        <div class="company-hero-main">
+                            <div class="company-title-row">
+                                <h1 id="pageTitle">Company Name</h1>
+                                <span id="pageVerifiedBadge" class="verified-badge"><i data-lucide="badge-check"></i> Verified Entity</span>
+                            </div>
+                            <p id="pageTagline" class="company-tagline">Tagline or short operational summary goes here.</p>
+                            <div class="company-meta-pills">
+                                <span><i data-lucide="building"></i> <span id="pageIndustry">Industry</span></span>
+                                <span><i data-lucide="map-pin"></i> <span id="pageLocation">Location</span></span>
+                                <span><i data-lucide="users"></i> <span id="pageEmployees">1-10 employees</span></span>
+                                <span><i data-lucide="globe"></i> <a href="#" id="pageWebsite" target="_blank">Website</a></span>
+                            </div>
+                            <div class="hero-actions-row">
+                                <button class="action-btn primary-btn" onclick="initiateB2BInquiry()">
+                                    <i data-lucide="message-square"></i> Send B2B Sourcing Inquiry
+                                </button>
+                                <button class="action-btn" id="followCompanyBtn" onclick="toggleFollowCompany()">
+                                    <i data-lucide="plus"></i> <span id="followBtnText">Follow</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LINKEDIN-STYLE CONTENT GRID -->
+                <div class="company-page-grid">
+                    
+                    <!-- LEFT/MAIN TAB CONTENT -->
+                    <div class="company-main-content">
+                        <!-- ABOUT SECTION -->
+                        <div class="company-card-block">
+                            <h3>About</h3>
+                            <p id="pageAbout" class="about-text">Comprehensive operational description of the company...</p>
+                        </div>
+
+                        <!-- SERVICES & OFFERINGS -->
+                        <div class="company-card-block">
+                            <h3>Specialities & Sourcing Solutions</h3>
+                            <div id="pageServices" class="services-chips">
+                                <!-- Service badges injected via JS -->
+                            </div>
+                        </div>
+
+                        <!-- ACTIVE GIGS / OPENINGS POSTED BY THIS BUSINESS -->
+                        <div class="company-card-block">
+                            <h3>Active Postings & Procurement Requests</h3>
+                            <div id="companyJobsList" class="jobs-container">
+                                <p class="text-muted">No open postings from this business at the moment.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT SIDEBAR INFO -->
+                    <div class="company-sidebar-content">
+                        <div class="company-card-block">
+                            <h3>Corporate Details</h3>
+                            <div class="detail-item">
+                                <small>Official Address</small>
+                                <strong id="pageAddress">Egbeda, Alimosho, Lagos</strong>
+                            </div>
+                            <div class="detail-item">
+                                <small>Corporate Email</small>
+                                <strong id="pageEmail">office@remadef.com</strong>
+                            </div>
+                            <div class="detail-item">
+                                <small>Contact Phone / WhatsApp</small>
+                                <strong id="pagePhone">+2348037537614</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+    </div>
+</div>
+
+<!-- MODAL: CREATE / EDIT COMPANY PAGE -->
+<div id="createBusinessModal" class="modal-backdrop hidden">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>Create Business Page</h3>
+            <button type="button" class="close-btn" onclick="closeCreateBusinessModal()">&times;</button>
+        </div>
+        <form id="createBusinessForm" onsubmit="handleCreateBusinessSubmit(event)">
+            <div class="form-group">
+                <label>Company Name</label>
+                <input type="text" id="bizTitle" class="filter-input" required placeholder="e.g. Nexus Global Trading Limited">
+            </div>
+
+            <div class="form-group">
+                <label>Tagline / Headline</label>
+                <input type="text" id="bizTagline" class="filter-input" required placeholder="e.g. Vertically Integrated Trade Corridors & Supply Chain Hubs">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Industry</label>
+                    <select id="bizIndustry" class="filter-input" required>
+                        <option value="Trade & Logistics">Trade & Logistics</option>
+                        <option value="Vocational Training">Vocational Training</option>
+                        <option value="Real Estate & Infrastructure">Real Estate & Infrastructure</option>
+                        <option value="Manufacturing & Sourcing">Manufacturing & Sourcing</option>
+                        <option value="Technology & Cloud Services">Technology & Cloud Services</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Location (State)</label>
+                    <select id="bizState" class="filter-input" required>
+                        <option value="Lagos">Lagos</option>
+                        <option value="Kano">Kano</option>
+                        <option value="Imo">Imo (Owerri)</option>
+                        <option value="Anambra">Anambra</option>
+                        <option value="Abuja">Abuja (FCT)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Corporate Address</label>
+                    <input type="text" id="bizAddress" class="filter-input" required placeholder="e.g. Egbeda, Alimosho, Lagos">
+                </div>
+                <div class="form-group">
+                    <label>Company Size</label>
+                    <select id="bizSize" class="filter-input" required>
+                        <option value="1-10 employees">1-10 employees</option>
+                        <option value="11-50 employees">11-50 employees</option>
+                        <option value="51-200 employees">51-200 employees</option>
+                        <option value="500+ employees">500+ employees</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Corporate Email</label>
+                    <input type="email" id="bizEmail" class="filter-input" required placeholder="e.g. office@remadef.com">
+                </div>
+                <div class="form-group">
+                    <label>Phone / WhatsApp</label>
+                    <input type="text" id="bizPhone" class="filter-input" required placeholder="e.g. +2348037537614">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Specialties (comma-separated)</label>
+                <input type="text" id="bizServices" class="filter-input" required placeholder="e.g. Group Sourcing, Dry Ports, Special Economic Zones, Logistics">
+            </div>
+
+            <div class="form-group">
+                <label>About Company</label>
+                <textarea id="bizAbout" class="filter-input textarea-input" rows="4" required placeholder="Describe your corporate background, operations, and services..."></textarea>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="action-btn" onclick="closeCreateBusinessModal()">Cancel</button>
+                <button type="submit" class="action-btn primary-btn">Publish Company Page</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODULE SCRIPTS -->
+<script src="js/api.js"></script>
+<script src="js/business.js"></script>
+<script>
+    lucide.createIcons();
+</script>
+
+</body>
+</html>
