@@ -2,767 +2,337 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#071A3D">
+    <title>REMADEF | Unified Learning & Admission Hub</title>
+    
+    <!-- Platform Base & Learning Specific CSS -->
+    <link rel="stylesheet" href="css/home.css">
+    <link rel="stylesheet" href="css/apprenticeships.css">
+    
+    <!-- Third-Party Icon Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@21.1.0"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        /* Supplementary Learning Page Styles */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+        .category-card {
+            background: #FFFFFF;
+            border: 1px solid var(--border, #E2E8F0);
+            border-radius: 14px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
 
-    <meta
-        name="theme-color"
-        content="#071A3D"
-    >
+        .category-card:hover {
+            border-color: #2563EB;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+        }
 
-    <meta
-        name="description"
-        content="Learn practical skills through the REMADEF Learning Platform."
-    >
+        .category-icon {
+            width: 36px;
+            height: 36px;
+            background: #EFF6FF;
+            color: #2563EB;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    <title>REMADEF — Learning</title>
+        .category-card h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--navy, #071A3D);
+        }
 
-    <link
-        rel="stylesheet"
-        href="css/learning.css"
-    >
+        .category-card p {
+            font-size: 12px;
+            color: var(--muted, #64748B);
+        }
 
+        .course-card {
+            background: #FFFFFF;
+            border: 1px solid var(--border, #E2E8F0);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .course-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .course-level-badge {
+            background: #F1F5F9;
+            color: #334155;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        .admission-badge {
+            font-size: 11px;
+            font-weight: 700;
+            color: #1E40AF;
+            background: #DBEAFE;
+            padding: 2px 8px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .course-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--navy, #071A3D);
+        }
+
+        .course-instructor {
+            font-size: 12px;
+            color: var(--muted, #64748B);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .course-desc {
+            font-size: 13px;
+            color: #334155;
+            line-height: 1.5;
+        }
+
+        .course-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #E2E8F0;
+            padding-top: 10px;
+            font-size: 12px;
+            color: var(--muted, #64748B);
+        }
+
+        .live-session-item, .certificate-card {
+            background: #FFFFFF;
+            border: 1px solid var(--border, #E2E8F0);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cert-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .cert-id {
+            font-size: 11px;
+            font-weight: 700;
+            color: #166534;
+            background: #DCFCE7;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="learning-page">
+<div class="app">
 
-    <!-- ==========================================
-         HEADER
-    =========================================== -->
-
-    <header class="topbar">
-
-        <a
-            href="home.html"
-            class="logo"
-        >
-
-            REMADEF
-
-        </a>
-
-        <div class="search-box">
-
-            <input
-                type="search"
-                id="course-search"
-                placeholder="Search courses..."
-            >
-
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-left">
+            <button id="sidebarToggle" class="menu-toggle" type="button">
+                <i data-lucide="panel-left"></i>
+            </button>
+            <div class="brand" id="brandButton">
+                <img src="assets/logo/remadef-logo.svg" alt="REMADEF" class="brand-logo">
+                <span class="brand-name">REMADEF</span>
+            </div>
         </div>
-
-        <div class="top-actions">
-
-            <a
-                href="notifications.html"
-                class="icon-button"
-            >
-
-                🔔
-
-            </a>
-
-            <a
-                href="messages.html"
-                class="icon-button"
-            >
-
-                💬
-
-            </a>
-
-            <a
-                href="profile.html"
-                class="avatar"
-                id="avatar"
-            >
-
-                U
-
-            </a>
-
+        
+        <div class="search-wrapper">
+            <i data-lucide="search"></i>
+            <input type="search" id="courseSearch" placeholder="Search technical courses, solar microgrids, B2B sourcing..." onkeyup="renderCourses()">
         </div>
-
+        
+        <div class="header-right">
+            <button class="notification-btn" type="button">
+                <i data-lucide="bell"></i>
+                <span id="notificationBadge" class="badge">0</span>
+            </button>
+            <a href="profile.html" class="avatar" id="avatar">A</a>
+        </div>
     </header>
 
-    <!-- ==========================================
-         MAIN LAYOUT
-    =========================================== -->
-
+    <!-- LAYOUT -->
     <div class="layout">
 
-        <!-- ======================================
-             SIDEBAR
-        ======================================= -->
-
-        <aside class="sidebar">
-
-            <div class="sidebar-title">
-
-                Learning
-
-            </div>
-
-            <nav class="menu">
-
-                <a
-                    href="home.html"
-                >
-
-                    🏠 Home
-
-                </a>
-
-                <a
-                    href="learning.html"
-                    class="active"
-                >
-
-                    📚 My Learning
-
-                </a>
-
-                <a
-                    href="#discover"
-                >
-
-                    🔍 Discover Courses
-
-                </a>
-
-                <a
-                    href="#paths"
-                >
-
-                    🛤 Learning Paths
-
-                </a>
-
-                <a
-                    href="apprenticeships.html"
-                >
-
-                    🛠 Apprenticeship Training
-
-                </a>
-
-                <a
-                    href="#saved"
-                >
-
-                    ⭐ Saved Courses
-
-                </a>
-
-                <a
-                    href="#certificates"
-                >
-
-                    🏅 Certificates
-
-                </a>
-
-                <a
-                    href="#progress"
-                >
-
-                    📈 Progress
-
-                </a>
-
-                <a
-                    href="settings.html"
-                >
-
-                    ⚙ Settings
-
-                </a>
-
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">PLATFORM</div>
+            <nav class="sidebar-nav">
+                <a href="home.html"><i data-lucide="house"></i><span>Home</span></a>
+                <a href="profile.html"><i data-lucide="user"></i><span>My Profile</span></a>
+                <a href="messages.html"><i data-lucide="message-circle"></i><span>Messages</span><span id="messageBadge" class="menu-badge">0</span></a>
+                <a href="learning.html" class="active"><i data-lucide="graduation-cap"></i><span>Learning</span></a>
+                <a href="apprenticeships.html"><i data-lucide="hammer"></i><span>Apprenticeships</span></a>
+                <a href="jobs.html"><i data-lucide="briefcase-business"></i><span>Jobs</span></a>
+                <a href="business.html"><i data-lucide="building-2"></i><span>Business</span></a>
             </nav>
 
+            <div class="sidebar-footer">
+                <div class="profile-progress">
+                    <div class="progress-header">
+                        <span>Fidelity Score</span>
+                        <span id="sidebarFidelityScore" class="role-badge green">98% AAA</span>
+                    </div>
+                </div>
+                <div class="copyright">© 2026 REMADEF</div>
+            </div>
         </aside>
 
-        <!-- ======================================
-             MAIN CONTENT
-        ======================================= -->
+        <!-- MAIN WORKSPACE -->
+        <main class="main">
 
-        <main class="content">
-
-            <!-- HERO -->
-
-            <section class="hero">
-
-                <div>
-
-                    <h1
-                        id="welcome-title"
-                    >
-
-                        Welcome Back
-
-                    </h1>
-
-                    <p>
-
-                        Continue building practical
-                        skills for education,
-                        employment and business.
-
-                    </p>
-
-                    <button
-                        id="continue-learning"
-                        class="primary-button"
-                    >
-
-                        Continue Learning
-
-                    </button>
-
+            <!-- WELCOME HEADER -->
+            <section class="welcome">
+                <div class="welcome-content">
+                    <h1>Unified Learning & Skill Certificate Hub</h1>
+                    <p>Master practical trade theory, business operations, and industrial skills directly linked to real-world workshop placements.</p>
                 </div>
-
-                <div class="progress-card">
-
-                    <h3>
-
-                        Overall Progress
-
-                    </h3>
-
-                    <div class="progress">
-
-                        <div
-                            id="overall-progress"
-                            class="progress-fill"
-                        ></div>
-
-                    </div>
-
-                    <span
-                        id="progress-text"
-                    >
-
-                        0%
-
-                    </span>
-
-                </div>
-
             </section>
 
-            <!-- ======================================
-                 LEARNING CATEGORIES
-            ======================================= -->
+            <!-- SHARED ADMISSION PORTAL BANNER -->
+            <section class="admission-portal-card">
+                <div class="admission-portal-badge">
+                    <i data-lucide="graduation-cap"></i>
+                    <span>SHARED ADMISSION PORTAL</span>
+                </div>
+                <div class="admission-portal-body">
+                    <div class="admission-portal-info">
+                        <h2>Apprenticeship & Academic Joint Admission Desk</h2>
+                        <p>Complete theoretical modules and secure host enterprise placements simultaneously. Courses enrolled here build your official workforce transcript.</p>
+                    </div>
+                    <div class="admission-portal-action">
+                        <a href="apprenticeships.html" class="action-btn primary-btn btn-lg" style="text-decoration:none;">
+                            <i data-lucide="compass"></i>
+                            <span>View Placement Track</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
 
-            <section
-                class="section"
-                id="discover"
-            >
+            <!-- STATS OVERVIEW -->
+            <section class="dashboard-cards">
+                <div class="dashboard-card">
+                    <div class="card-icon blue">
+                        <i data-lucide="book-open"></i>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-title">Enrolled Courses</span>
+                        <h2 id="activeEnrolledCount">3 Active</h2>
+                        <small>In-Progress Modules</small>
+                    </div>
+                </div>
 
+                <div class="dashboard-card">
+                    <div class="card-icon green">
+                        <i data-lucide="award"></i>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-title">Certificates & Transcripts</span>
+                        <h2 id="certsEarnedCount">1 Verified</h2>
+                        <small>Employer Exportable</small>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CATEGORIES -->
+            <section class="dashboard-section">
                 <div class="section-header">
-
-                    <h2>
-
-                        Learning Categories
-
-                    </h2>
-
-                    <a href="#">
-
-                        View All
-
-                    </a>
-
+                    <h2>Explore Skill Domains</h2>
                 </div>
-
-                <div class="categories">
-
-                    <div class="category-card">
-
-                        💻
-
-                        <span>
-
-                            Technology
-
-                        </span>
-
-                    </div>
-
-                    <div class="category-card">
-
-                        💼
-
-                        <span>
-
-                            Business
-
-                        </span>
-
-                    </div>
-
-                    <div class="category-card">
-
-                        💰
-
-                        <span>
-
-                            Finance
-
-                        </span>
-
-                    </div>
-
-                    <div class="category-card">
-
-                        🌾
-
-                        <span>
-
-                            Agriculture
-
-                        </span>
-
-                    </div>
-
-                    <div class="category-card">
-
-                        🏭
-
-                        <span>
-
-                            Manufacturing
-
-                        </span>
-
-                    </div>
-
-                    <div class="category-card">
-
-                        🏥
-
-                        <span>
-
-                            Healthcare
-
-                        </span>
-
-                    </div>
-
-                    <div class="category-card">
-
-                        🏗
-
-                        <span>
-
-                            Construction
-
-                        </span>
-
-                    </div>
-
-                    <div class="category-card">
-
-                        🎨
-
-                        <span>
-
-                            Creative Arts
-
-                        </span>
-
-                    </div>
-
-                    <div class="category-card">
-
-                        🚚
-
-                        <span>
-
-                            Trade & Logistics
-
-                        </span>
-
-                    </div>
-
-                    <div class="category-card">
-
-                        🤖
-
-                        <span>
-
-                            AI & Data
-
-                        </span>
-
-                    </div>
-
-                    <div class="category-card">
-
-                        📈
-
-                        <span>
-
-                            Entrepreneurship
-
-                        </span>
-
-                    </div>
-
-                    <div class="category-card">
-
-                        🌍
-
-                        <span>
-
-                            Digital Skills
-
-                        </span>
-
-                    </div>
-
+                <div id="learningCategoriesContainer" class="category-grid">
+                    <!-- Dynamic Categories -->
                 </div>
-
             </section>
 
-            <!-- ======================================
-                 FEATURED COURSES
-            ======================================= -->
-
-            <section class="section">
-
+            <!-- COURSE CATALOGUE & FILTERS -->
+            <section class="dashboard-section">
                 <div class="section-header">
-
-                    <h2>
-
-                        Featured Courses
-
-                    </h2>
-
-                    <a href="#">
-
-                        Browse All
-
-                    </a>
-
+                    <h2>Course Catalog & Workshop Modules</h2>
+                    <div class="filter-group" style="width: 250px;">
+                        <select id="courseCategoryFilter" class="filter-input" onchange="renderCourses()">
+                            <option value="">All Categories</option>
+                            <option value="Solar & Renewable Energy">Solar & Renewable Energy</option>
+                            <option value="Industrial Manufacturing">Industrial Manufacturing</option>
+                            <option value="Commercial & Business Growth">Commercial & Business Growth</option>
+                            <option value="Technical & Handyman Trades">Technical & Handyman Trades</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div
-                    id="featured-courses"
-                    class="courses-grid"
-                >
-
-                    <!-- Loaded by JS -->
-
+                <div id="coursesGrid" class="apprentice-grid">
+                    <!-- Dynamic Courses -->
                 </div>
-
             </section>
 
-            <!-- ======================================
-                 CONTINUE LEARNING
-            ======================================= -->
+            <!-- LIVE SESSIONS & CERTIFICATES -->
+            <div class="dashboard-grid" style="margin-top: 24px;">
+                <section class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Live Workshop Sessions</h2>
+                    </div>
+                    <div id="liveSessionsContainer">
+                        <!-- Dynamic Live Masterclasses -->
+                    </div>
+                </section>
 
-            <section class="section">
-
-                <div class="section-header">
-
-                    <h2>
-
-                        Continue Learning
-
-                    </h2>
-
-                </div>
-
-                <div
-                    id="continue-list"
-                    class="continue-grid"
-                >
-
-                    <!-- JS -->
-
-                </div>
-
-            </section>
-
-            <!-- ======================================
-                 LIVE SESSIONS
-            ======================================= -->
-
-            <section class="section">
-
-                <div class="section-header">
-
-                    <h2>
-
-                        Upcoming Live Classes
-
-                    </h2>
-
-                </div>
-
-                <div
-                    id="live-sessions"
-                    class="live-list"
-                >
-
-                    <!-- JS -->
-
-                </div>
-
-            </section>
-
-            <!-- ======================================
-                 CERTIFICATES
-            ======================================= -->
-
-            <section
-                class="section"
-                id="certificates"
-            >
-
-                <div class="section-header">
-
-                    <h2>
-
-                        Certificates
-
-                    </h2>
-
-                </div>
-
-                <div
-                    id="certificate-list"
-                    class="certificate-grid"
-                >
-
-                    <!-- JS -->
-
-                </div>
-
-            </section>
+                <section class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Verified Skill Certificates</h2>
+                    </div>
+                    <div id="certificatesContainer">
+                        <!-- Dynamic Digital Certificates -->
+                    </div>
+                </section>
+            </div>
 
         </main>
-
-        <!-- ======================================
-             RIGHT SIDEBAR
-        ======================================= -->
-
-        <aside class="right-sidebar">
-
-            <div class="widget">
-
-                <h3>
-
-                    Daily Goal
-
-                </h3>
-
-                <p>
-
-                    Study for
-                    <strong>1 hour</strong>
-
-                </p>
-
-            </div>
-
-            <div class="widget">
-
-                <h3>
-
-                    Learning Streak
-
-                </h3>
-
-                <h2
-                    id="learning-streak"
-                >
-
-                    🔥 0 Days
-
-                </h2>
-
-            </div>
-
-            <div class="widget">
-
-                <h3>
-
-                    Statistics
-
-                </h3>
-
-                <ul>
-
-                    <li>
-
-                        Courses Enrolled:
-                        <strong
-                            id="courses-enrolled"
-                        >
-
-                            0
-
-                        </strong>
-
-                    </li>
-
-                    <li>
-
-                        Courses Completed:
-                        <strong
-                            id="courses-completed"
-                        >
-
-                            0
-
-                        </strong>
-
-                    </li>
-
-                    <li>
-
-                        Certificates:
-                        <strong
-                            id="certificate-count"
-                        >
-
-                            0
-
-                        </strong>
-
-                    </li>
-
-                    <li>
-
-                        Hours Learned:
-                        <strong
-                            id="learning-hours"
-                        >
-
-                            0
-
-                        </strong>
-
-                    </li>
-
-                </ul>
-
-            </div>
-
-            <div class="widget">
-
-                <h3>
-
-                    Announcements
-
-                </h3>
-
-                <div
-                    id="announcements"
-                >
-
-                    Loading...
-
-                </div>
-
-            </div>
-
-        </aside>
-
     </div>
-
-    <!-- ==========================================
-         MOBILE NAVIGATION
-    =========================================== -->
-
-    <nav class="mobile-nav">
-
-        <a href="home.html">
-
-            🏠
-
-            <span>
-
-                Home
-
-            </span>
-
-        </a>
-
-        <a href="search.html">
-
-            🔍
-
-            <span>
-
-                Search
-
-            </span>
-
-        </a>
-
-        <a
-            href="learning.html"
-            class="active"
-        >
-
-            📚
-
-            <span>
-
-                Learning
-
-            </span>
-
-        </a>
-
-        <a href="messages.html">
-
-            💬
-
-            <span>
-
-                Messages
-
-            </span>
-
-        </a>
-
-        <a href="profile.html">
-
-            👤
-
-            <span>
-
-                Profile
-
-            </span>
-
-        </a>
-
-    </nav>
-
 </div>
 
-<!-- ==========================================
-     APPWRITE SDK
-========================================== -->
-
-<script src="https://cdn.jsdelivr.net/npm/appwrite@21.1.0"></script>
-
-<script src="api.js"></script>
-
+<!-- SCRIPTS -->
 <script src="js/learning.js"></script>
+<script>
+    lucide.createIcons();
+</script>
 
 </body>
-
 </html>
