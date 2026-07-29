@@ -1,0 +1,332 @@
+/* ==========================================================
+   REMADEF APPRENTICESHIPS & PROTECTION MODULE (css/apprenticeships.css)
+   ========================================================== */
+
+/* ----------------------------------------------------------
+   1. SHARED ADMISSION PORTAL BANNER (LOCKED GATEWAY)
+   ---------------------------------------------------------- */
+.admission-portal-card {
+    background: linear-gradient(135deg, #071A3D 0%, #0F2A5A 60%, #1E3A8A 100%);
+    border-radius: 18px;
+    padding: 24px;
+    color: #FFFFFF;
+    margin-bottom: 24px;
+    box-shadow: 0 10px 25px -5px rgba(7, 26, 61, 0.25);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admission-portal-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #93C5FD;
+    margin-bottom: 12px;
+}
+
+.admission-portal-badge i {
+    width: 14px;
+    height: 14px;
+}
+
+.admission-portal-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.admission-portal-info h2 {
+    font-size: 20px;
+    font-weight: 800;
+    color: #FFFFFF;
+    margin-bottom: 6px;
+}
+
+.admission-portal-info p {
+    font-size: 13px;
+    color: #CBD5E1;
+    max-width: 680px;
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+.admission-meta {
+    display: flex;
+    gap: 16px;
+    font-size: 12px;
+    color: #93C5FD;
+    flex-wrap: wrap;
+}
+
+.admission-meta span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.admission-meta i {
+    width: 14px;
+    height: 14px;
+}
+
+.btn-lg {
+    padding: 12px 24px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+}
+
+/* ----------------------------------------------------------
+   2. TAB NAVIGATION & PROGRAM FEED GRID
+   ---------------------------------------------------------- */
+.tab-navigation {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border, #E2E8F0);
+    padding-bottom: 10px;
+    overflow-x: auto;
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted, #64748B);
+    cursor: pointer;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    transition: var(--transition, all 0.2s ease);
+}
+
+.tab-btn i {
+    width: 16px;
+    height: 16px;
+}
+
+.tab-btn:hover {
+    background: #F1F5F9;
+    color: var(--navy, #071A3D);
+}
+
+.tab-btn.active {
+    background: #EFF6FF;
+    color: #2563EB;
+}
+
+.apprentice-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+}
+
+.apprentice-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border, #E2E8F0);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: var(--transition, all 0.2s ease);
+}
+
+.apprentice-card:hover {
+    border-color: #2563EB;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.08);
+}
+
+.apprentice-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.pathway-badge {
+    background: #FEF3C7;
+    color: #92400E;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 6px;
+}
+
+.trade-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--navy, #071A3D);
+    margin-top: 4px;
+}
+
+.host-company {
+    font-size: 12px;
+    color: var(--muted, #64748B);
+}
+
+/* ----------------------------------------------------------
+   3. FIDELITY RANKING & PROTECTION AUDIT TIMELINE
+   ---------------------------------------------------------- */
+.fidelity-summary-box {
+    background: #FFFFFF;
+    border: 1px solid var(--border, #E2E8F0);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.fidelity-gauge-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.fidelity-score-display {
+    font-size: 42px;
+    font-weight: 900;
+    color: #166534;
+}
+
+.fidelity-score-display small {
+    font-size: 18px;
+    color: var(--muted, #64748B);
+}
+
+.badge-trust {
+    background: #DCFCE7;
+    color: #166534;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.fidelity-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    flex-grow: 1;
+}
+
+.f-metric {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-left: 3px solid #2563EB;
+    padding-left: 12px;
+}
+
+.f-metric span {
+    font-size: 12px;
+    color: var(--muted, #64748B);
+}
+
+.f-metric strong {
+    font-size: 15px;
+    color: var(--navy, #071A3D);
+}
+
+.protection-logs-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border, #E2E8F0);
+    border-radius: 16px;
+    padding: 24px;
+}
+
+.protection-logs-card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--navy, #071A3D);
+    margin-bottom: 16px;
+}
+
+.audit-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.audit-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border, #E2E8F0);
+}
+
+.audit-list li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.audit-list li i {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+}
+
+.text-green { color: #166534; }
+.text-blue { color: #2563EB; }
+
+/* ----------------------------------------------------------
+   4. SKILL LOGS & MENTORS GRID
+   ---------------------------------------------------------- */
+.skill-logs-grid,
+.mentors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.skill-log-card,
+.mentor-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border, #E2E8F0);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.skill-log-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.verified-signoff {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #166534;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.verified-signoff i {
+    width: 14px;
+    height: 14px;
+}
