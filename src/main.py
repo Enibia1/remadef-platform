@@ -172,6 +172,10 @@ def response(
     }
 
 
+# ============================================================
+# SUCCESS RESPONSE
+# ============================================================
+
 def success(
     data=None,
     message="Success"
@@ -187,6 +191,10 @@ def success(
     )
 
 
+# ============================================================
+# ERROR RESPONSE
+# ============================================================
+
 def error(
     message,
     status_code=400
@@ -199,6 +207,7 @@ def error(
             "message": message
         }
     )
+
 
 # ============================================================
 # APPWRITE CLIENT
@@ -236,9 +245,8 @@ def get_client(context):
     return client
 
 
-
 # ============================================================
-# APPWRITE SERVICES
+# APPWRITE ACCOUNT SERVICE
 # ============================================================
 
 def get_account_service(context):
@@ -247,6 +255,16 @@ def get_account_service(context):
         get_client(context)
     )
 
+
+# ============================================================
+# APPWRITE TABLES DATABASE SERVICE
+# ============================================================
+
+def get_tables_db(context):
+
+    return TablesDB(
+        get_client(context)
+    )
 
 
 # ============================================================
@@ -266,15 +284,6 @@ def get_current_user(context):
     )
 
 
-
-def get_tables_db(context):
-
-    return TablesDB(
-        get_client(context)
-    )
-
-
-
 # ============================================================
 # REQUEST BODY PARSER
 # ============================================================
@@ -283,18 +292,13 @@ def parse_json_body(request):
 
     body = request.body
 
-
     if not body:
 
         return {}
 
-
-
     if isinstance(body, dict):
 
         return body
-
-
 
     if isinstance(body, str):
 
@@ -306,9 +310,8 @@ def parse_json_body(request):
 
             return {}
 
-
-
     return {}
+
 
 # ============================================================
 # PROFILE FIELDS
@@ -367,7 +370,6 @@ def find_profile(
         result
     )
 
-
     if not isinstance(
         result,
         dict
@@ -375,20 +377,16 @@ def find_profile(
 
         return None
 
-
     rows = result.get(
         "rows",
         []
     )
 
-
     if not rows:
 
         return None
 
-
     return rows[0]
-
 
 
 # ============================================================
@@ -417,16 +415,13 @@ def calculate_completion(
 
     ]
 
-
     completed = 0
-
 
     for field in fields:
 
         value = profile.get(
             field
         )
-
 
         if (
 
@@ -438,12 +433,9 @@ def calculate_completion(
 
             completed += 1
 
-
-
     skills = profile.get(
         "skills"
     )
-
 
     if skills:
 
@@ -456,15 +448,11 @@ def calculate_completion(
 
                 completed += 1
 
-
         elif str(skills).strip():
 
             completed += 1
 
-
-
     total = len(fields) + 1
-
 
     return round(
 
@@ -475,9 +463,6 @@ def calculate_completion(
         ) * 100
 
     )
-
-
-
 
 
 # ============================================================
@@ -500,12 +485,9 @@ def create_profile(
         context
     )
 
-
     now = datetime.now(
         timezone.utc
     ).isoformat()
-
-
 
     profile_data = {
 
@@ -549,8 +531,6 @@ def create_profile(
 
     }
 
-
-
     profile = tables_db.create_row(
 
         database_id=DATABASE_ID,
@@ -563,12 +543,9 @@ def create_profile(
 
     )
 
-
-
     return convert_to_dict(
         profile
     )
-
 
 
 # ============================================================
@@ -589,8 +566,6 @@ def update_profile(
         context
     )
 
-
-
     existing = find_profile(
 
         account_id,
@@ -599,10 +574,7 @@ def update_profile(
 
     )
 
-
-
     if not existing:
-
 
         return create_profile(
 
@@ -612,13 +584,9 @@ def update_profile(
 
         )
 
-
-
     row_id = existing.get(
         "$id"
     )
-
-
 
     if not row_id:
 
@@ -628,27 +596,17 @@ def update_profile(
 
         )
 
-
-
     update_data = {}
 
-
-
     for field in PROFILE_FIELDS:
-
 
         if field not in profile_data:
 
             continue
 
-
-
         value = profile_data[field]
 
-
-
         if field == "skills":
-
 
             if isinstance(
 
@@ -658,22 +616,15 @@ def update_profile(
 
             ):
 
-
                 value = json.dumps(
                     value
                 )
-
 
             elif value is None:
 
                 value = ""
 
-
-
         update_data[field] = value
-
-
-
 
     merged = {
 
@@ -682,9 +633,6 @@ def update_profile(
         **update_data
 
     }
-
-
-
 
     update_data[
 
@@ -696,8 +644,6 @@ def update_profile(
 
     )
 
-
-
     update_data[
 
         "updated_at"
@@ -707,8 +653,6 @@ def update_profile(
         timezone.utc
 
     ).isoformat()
-
-
 
     updated_profile = tables_db.update_row(
 
@@ -722,14 +666,11 @@ def update_profile(
 
     )
 
-
-
     return convert_to_dict(
 
         updated_profile
 
     )
-
 
 
 # ============================================================
@@ -744,11 +685,9 @@ def get_current_profile(context):
             context
         )
 
-
         account_id = user.get(
             "$id"
         )
-
 
         if not account_id:
 
@@ -760,8 +699,6 @@ def get_current_profile(context):
 
             )
 
-
-
         profile = find_profile(
 
             account_id,
@@ -770,10 +707,7 @@ def get_current_profile(context):
 
         )
 
-
-
         if not profile:
-
 
             return error(
 
@@ -783,8 +717,6 @@ def get_current_profile(context):
 
             )
 
-
-
         return success(
 
             profile,
@@ -793,17 +725,13 @@ def get_current_profile(context):
 
         )
 
-
-
     except Exception as exc:
-
 
         context.error(
 
             f"GET PROFILE ERROR: {str(exc)}"
 
         )
-
 
         return error(
 
@@ -812,7 +740,6 @@ def get_current_profile(context):
             500
 
         )
-
 
 
 # ============================================================
@@ -829,21 +756,15 @@ def update_current_profile(
 
     try:
 
-
         user = get_current_user(
             context
         )
-
-
 
         account_id = user.get(
             "$id"
         )
 
-
-
         if not account_id:
-
 
             return error(
 
@@ -852,8 +773,6 @@ def update_current_profile(
                 401
 
             )
-
-
 
         updated = update_profile(
 
@@ -865,8 +784,6 @@ def update_current_profile(
 
         )
 
-
-
         return success(
 
             updated,
@@ -875,17 +792,13 @@ def update_current_profile(
 
         )
 
-
-
     except Exception as exc:
-
 
         context.error(
 
             f"UPDATE PROFILE ERROR: {str(exc)}"
 
         )
-
 
         return error(
 
@@ -894,6 +807,7 @@ def update_current_profile(
             500
 
         )
+
 
 # ============================================================
 # HOME DASHBOARD
@@ -1148,6 +1062,7 @@ def send_message(
 
         )
 
+
 # ============================================================
 # REGISTER USER
 # ============================================================
@@ -1166,8 +1081,6 @@ def register_user(
 
     ).strip().lower()
 
-
-
     password = str(
 
         data.get(
@@ -1177,8 +1090,6 @@ def register_user(
 
     )
 
-
-
     phone = str(
 
         data.get(
@@ -1187,8 +1098,6 @@ def register_user(
         ) or ""
 
     ).strip()
-
-
 
     # ========================================================
     # VALIDATION
@@ -1202,8 +1111,6 @@ def register_user(
 
         )
 
-
-
     if len(password) < 8:
 
         return error(
@@ -1212,14 +1119,11 @@ def register_user(
 
         )
 
-
-
     # ========================================================
     # NORMALIZE NIGERIAN PHONE NUMBER
     # ========================================================
 
     if phone:
-
 
         phone = (
 
@@ -1235,43 +1139,29 @@ def register_user(
 
         )
 
-
-
         if phone.startswith("0"):
-
 
             phone = "+234" + phone[1:]
 
-
-
         elif phone.startswith("234"):
-
 
             phone = "+" + phone
 
-
-
         if not phone.startswith("+234"):
-
 
             return error(
 
                 "Please enter a valid Nigerian phone number."
 
             )
-
-
 
         if len(phone) != 14:
 
-
             return error(
 
                 "Please enter a valid Nigerian phone number."
 
             )
-
-
 
     # ========================================================
     # APPWRITE ACCOUNT SERVICE
@@ -1283,17 +1173,13 @@ def register_user(
 
     )
 
-
-
     # ========================================================
     # CREATE ACCOUNT
     # ========================================================
 
     try:
 
-
         if email:
-
 
             user = account_service.create(
 
@@ -1305,10 +1191,7 @@ def register_user(
 
             )
 
-
-
         else:
-
 
             user = account_service.create_phone(
 
@@ -1320,10 +1203,7 @@ def register_user(
 
             )
 
-
-
     except Exception as exc:
-
 
         context.error(
 
@@ -1335,8 +1215,6 @@ def register_user(
 
         )
 
-
-
         return error(
 
             "Could not create account.",
@@ -1344,8 +1222,6 @@ def register_user(
             400
 
         )
-
-
 
     # ========================================================
     # EXTRACT USER ID
@@ -1356,8 +1232,6 @@ def register_user(
         user
 
     )
-
-
 
     user_id = (
 
@@ -1377,10 +1251,7 @@ def register_user(
 
     )
 
-
-
     if not user_id:
-
 
         return error(
 
@@ -1390,14 +1261,11 @@ def register_user(
 
         )
 
-
-
     # ========================================================
     # CREATE PROFILE
     # ========================================================
 
     try:
-
 
         profile = create_profile(
 
@@ -1411,16 +1279,13 @@ def register_user(
 
         )
 
-
     except Exception as exc:
-
 
         context.error(
 
             f"Profile creation failed: {str(exc)}"
 
         )
-
 
         return error(
 
@@ -1430,10 +1295,8 @@ def register_user(
 
         )
 
-
-
     # ========================================================
-    # SUCCESS
+    # REGISTER SUCCESS RESPONSE
     # ========================================================
 
     return response(
@@ -1442,15 +1305,11 @@ def register_user(
 
         {
 
-
             "success": True,
-
 
             "message":
 
                 "Account and profile created successfully.",
-
-
 
             "account":
 
@@ -1460,18 +1319,15 @@ def register_user(
 
                     user_id,
 
-
                 "email":
 
                     email,
-
 
                 "phone":
 
                     phone
 
             },
-
 
             "profile":
 
@@ -1496,7 +1352,6 @@ def health_check():
 
                 "REMADEF Platform API",
 
-
             "status":
 
                 "healthy"
@@ -1506,7 +1361,6 @@ def health_check():
         "REMADEF Platform API is running."
 
     )
-
 
 
 # ============================================================
@@ -1525,14 +1379,11 @@ def route_request(
 
     path = request.path
 
-
-
     # ========================================================
     # CORS PREFLIGHT
     # ========================================================
 
     if method == "OPTIONS":
-
 
         return response(
 
@@ -1550,10 +1401,8 @@ def route_request(
 
         )
 
-
-
     # ========================================================
-    # HEALTH
+    # ROUTE: HEALTH
     # ========================================================
 
     if (
@@ -1564,13 +1413,10 @@ def route_request(
 
     ):
 
-
         return health_check()
 
-
-
     # ========================================================
-    # REGISTER
+    # ROUTE: REGISTER
     # ========================================================
 
     if (
@@ -1581,14 +1427,11 @@ def route_request(
 
     ):
 
-
         data = parse_json_body(
 
             request
 
         )
-
-
 
         return register_user(
 
@@ -1598,10 +1441,8 @@ def route_request(
 
         )
 
-
-
     # ========================================================
-    # GET PROFILE
+    # ROUTE: GET PROFILE
     # ========================================================
 
     if (
@@ -1612,151 +1453,173 @@ def route_request(
 
     ):
 
-
         return get_current_profile(
 
             context
 
         )
 
+    # ========================================================
+    # ROUTE: UPDATE PROFILE
+    # ========================================================
 
+    if (
 
-# ========================================================
-# UPDATE PROFILE
-# ========================================================
+        method in ["PUT", "PATCH"]
 
-if (
+        and path == "/api/profile"
 
-    method in ["PUT", "PATCH"]
+    ):
 
-    and path == "/api/profile"
+        data = parse_json_body(
 
-):
+            request
 
-    data = parse_json_body(
+        )
 
-        request
+        return update_current_profile(
+
+            data,
+
+            context
+
+        )
+
+    # ========================================================
+    # ROUTE: DASHBOARD
+    # ========================================================
+
+    if (
+
+        method == "GET"
+
+        and path == "/api/dashboard"
+
+    ):
+
+        return get_dashboard(
+
+            context
+
+        )
+
+    # ========================================================
+    # ROUTE: NOTIFICATIONS
+    # ========================================================
+
+    if (
+
+        method == "GET"
+
+        and path == "/api/notifications"
+
+    ):
+
+        return get_notifications(
+
+            context
+
+        )
+
+    # ========================================================
+    # ROUTE: GET MESSAGES
+    # ========================================================
+
+    if (
+
+        method == "GET"
+
+        and path == "/api/messages"
+
+    ):
+
+        return get_messages(
+
+            context
+
+        )
+
+    # ========================================================
+    # ROUTE: SEND MESSAGE
+    # ========================================================
+
+    if (
+
+        method == "POST"
+
+        and path == "/api/messages"
+
+    ):
+
+        data = parse_json_body(
+
+            request
+
+        )
+
+        return send_message(
+
+            data,
+
+            context
+
+        )
+
+    # ========================================================
+    # ROUTE: GET CONVERSATIONS
+    # ========================================================
+
+    if (
+
+        method == "GET"
+
+        and path == "/api/conversations"
+
+    ):
+
+        return get_conversations(
+
+            context
+
+        )
+
+    # ========================================================
+    # ROUTE: CREATE CONVERSATION
+    # ========================================================
+
+    if (
+
+        method == "POST"
+
+        and path == "/api/conversations"
+
+    ):
+
+        data = parse_json_body(
+
+            request
+
+        )
+
+        return create_conversation(
+
+            data,
+
+            context
+
+        )
+
+    # ========================================================
+    # ROUTE: NOT FOUND
+    # ========================================================
+
+    return error(
+
+        "Route not found.",
+
+        404
 
     )
-
-    return update_current_profile(
-
-        data,
-
-        context
-
-    )
-
-
-# ========================================================
-# DASHBOARD
-# ========================================================
-
-if (
-
-    method == "GET"
-
-    and path == "/api/dashboard"
-
-):
-
-    return get_dashboard(
-
-        context
-
-    )
-
-
-# ========================================================
-# NOTIFICATIONS
-# ========================================================
-
-if (
-
-    method == "GET"
-
-    and path == "/api/notifications"
-
-):
-
-    return get_notifications(
-
-        context
-
-    )
-
-
-# ========================================================
-# MESSAGES
-# ========================================================
-
-if (
-
-    method == "GET"
-
-    and path == "/api/messages"
-
-):
-
-    return get_messages(
-
-        context
-
-    )
-
-
-if (
-
-    method == "POST"
-
-    and path == "/api/messages"
-
-):
-
-    data = parse_json_body(
-
-        request
-
-    )
-
-    return send_message(
-
-        data,
-
-        context
-
-    )
-
-# =======================================================
-# HEALTH
-# =======================================================
-if method == "GET" and path == "/api/health":
-    return health_check()
-
-# =======================================================
-# REGISTER
-# =======================================================
-if method == "POST" and path == "/api/register":
-    data = parse_json_body(request)
-    return register_user(data)
-
-
-    return create_conversation(
-
-        data,
-
-        context
-
-    )
-
-
-return error(
-
-    "Route not found.",
-
-    404
-
-)
 
 
 # ============================================================
@@ -1771,7 +1634,6 @@ def main(
 
     try:
 
-
         return route_request(
 
             context.req,
@@ -1780,10 +1642,7 @@ def main(
 
         )
 
-
-
     except Exception as exc:
-
 
         context.error(
 
@@ -1795,15 +1654,11 @@ def main(
 
         )
 
-
-
         context.error(
 
             traceback.format_exc()
 
         )
-
-
 
         return error(
 
@@ -1812,5 +1667,3 @@ def main(
             500
 
         )
-
-
