@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#071A3D"
+    >
+
+    <title>REMADEF | Jobs & Gig Workspace</title>
+
+    <link
+        rel="stylesheet"
+        href="css/home.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/jobs.css"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@21.1.0"></script>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- HEADER -->
+
+    <header class="header">
+
+        <div class="header-left">
+
+            <button
+                id="sidebarToggle"
+                class="menu-toggle"
+                type="button"
+            >
+
+                <i data-lucide="panel-left"></i>
+
+            </button>
+
+            <div
+                class="brand"
+                id="brandButton"
+            >
+
+                <img
+                    src="assets/logo/remadef-logo.svg"
+                    alt="REMADEF"
+                    class="brand-logo"
+                >
+
+                <span class="brand-name">REMADEF</span>
+
+            </div>
+
+        </div>
+
+        <div class="search-wrapper">
+
+            <i data-lucide="search"></i>
+
+            <input
+                type="search"
+                id="globalSearch"
+                placeholder="Search gigs, skilled trades, freelance jobs..."
+            >
+
+        </div>
+
+        <div class="header-right">
+
+            <button
+                class="notification-btn"
+                type="button"
+            >
+
+                <i data-lucide="bell"></i>
+
+                <span
+                    id="notificationBadge"
+                    class="badge"
+                >0</span>
+
+            </button>
+
+            <a
+                href="profile.html"
+                class="avatar"
+                id="avatar"
+            >U</a>
+
+        </div>
+
+    </header>
+
+    <!-- LAYOUT -->
+
+    <div class="layout">
+
+        <!-- SIDEBAR -->
+
+        <aside
+            class="sidebar"
+            id="sidebar"
+        >
+
+            <div class="sidebar-title">PLATFORM</div>
+
+            <nav class="sidebar-nav">
+
+                <a href="home.html">
+
+                    <i data-lucide="house"></i>
+
+                    <span>Home</span>
+
+                </a>
+
+                <a href="profile.html">
+
+                    <i data-lucide="user"></i>
+
+                    <span>My Profile</span>
+
+                </a>
+
+                <a href="messages.html">
+
+                    <i data-lucide="message-circle"></i>
+
+                    <span>Messages</span>
+
+                    <span
+                        id="messageBadge"
+                        class="menu-badge"
+                    >0</span>
+
+                </a>
+
+                <a href="learning.html">
+
+                    <i data-lucide="graduation-cap"></i>
+
+                    <span>Learning</span>
+
+                </a>
+
+                <a href="apprenticeships.html">
+
+                    <i data-lucide="hammer"></i>
+
+                    <span>Apprenticeships</span>
+
+                </a>
+
+                <a
+                    href="jobs.html"
+                    class="active"
+                >
+
+                    <i data-lucide="briefcase-business"></i>
+
+                    <span>Jobs</span>
+
+                </a>
+
+                <a href="business.html">
+
+                    <i data-lucide="building-2"></i>
+
+                    <span>Business</span>
+
+                </a>
+
+            </nav>
+
+            <div class="sidebar-footer">
+
+                <div class="profile-progress">
+
+                    <div class="progress-header">
+
+                        <span>Role Mode</span>
+
+                        <span
+                            id="roleLabel"
+                            class="role-badge"
+                        >Client</span>
+
+                    </div>
+
+                    <button
+                        class="complete-profile-btn"
+                        id="roleToggleBtn"
+                        onclick="toggleUserRoleMode()"
+                    >
+
+                        Switch to Provider
+
+                    </button>
+
+                </div>
+
+                <div class="copyright">© 2026 REMADEF</div>
+
+            </div>
+
+        </aside>
+
+        <!-- MAIN WORKSPACE -->
+
+        <main class="main">
+
+            <!-- WELCOME / SYSTEM STATS BANNER -->
+
+            <section class="welcome">
+
+                <div class="welcome-content">
+
+                    <h1 id="jobWelcomeTitle">Jobs & On-Demand Gig Desk</h1>
+
+                    <p>Low 2%–5% commission structure with guaranteed Escrow lock protection.</p>
+
+                </div>
+
+                <button
+                    class="action-btn post-job-btn"
+                    onclick="openPostJobModal()"
+                >
+
+                    <i data-lucide="plus-circle"></i>
+
+                    <span>Post a Job / Gig</span>
+
+                </button>
+
+            </section>
+
+            <!-- JOB DASHBOARD SUMMARY CARDS -->
+
+            <section class="dashboard-cards">
+
+                <div class="dashboard-card">
+
+                    <div class="card-icon blue">
+
+                        <i data-lucide="briefcase-business"></i>
+
+                    </div>
+
+                    <div class="card-content">
+
+                        <span class="card-title">Available Jobs</span>
+
+                        <h2 id="totalJobsCount">0</h2>
+
+                        <small>Verified postings</small>
+
+                    </div>
+
+                </div>
+
+                <div class="dashboard-card">
+
+                    <div class="card-icon green">
+
+                        <i data-lucide="shield-check"></i>
+
+                    </div>
+
+                    <div class="card-content">
+
+                        <span class="card-title">Escrow Locked</span>
+
+                        <h2 id="totalEscrowLocked">₦0</h2>
+
+                        <small>Guaranteed payments</small>
+
+                    </div>
+
+                </div>
+
+                <div class="dashboard-card">
+
+                    <div class="card-icon orange">
+
+                        <i data-lucide="navigation"></i>
+
+                    </div>
+
+                    <div class="card-content">
+
+                        <span class="card-title">Nearby Gigs</span>
+
+                        <h2 id="nearbyCount">0</h2>
+
+                        <small>Within 15km</small>
+
+                    </div>
+
+                </div>
+
+                <div class="dashboard-card">
+
+                    <div class="card-icon purple">
+
+                        <i data-lucide="percent"></i>
+
+                    </div>
+
+                    <div class="card-content">
+
+                        <span class="card-title">Platform Fee</span>
+
+                        <h2>3.5%</h2>
+
+                        <small>Ultra-low commission</small>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- FILTERS & GEOLOCATION DISPATCH CONTROL -->
+
+            <section class="dashboard-section">
+
+                <div class="jobs-filter-bar">
+
+                    <div class="filter-group">
+
+                        <i data-lucide="search"></i>
+
+                        <input
+                            type="text"
+                            id="jobKeyword"
+                            placeholder="Search by skill (e.g. Plumbing, Solar, React, Legal)..."
+                            onkeyup="renderJobsList()"
+                        >
+
+                    </div>
+
+                    <div class="filter-group">
+
+                        <select
+                            id="jobTypeFilter"
+                            onchange="renderJobsList()"
+                        >
+
+                            <option value="">All Job Types</option>
+
+                            <option value="Gig">On-Demand Gig (15km)</option>
+
+                            <option value="Fixed">Fixed Price Contract</option>
+
+                            <option value="Hourly">Milestone / Hourly</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="filter-group">
+
+                        <select
+                            id="stateFilter"
+                            onchange="renderJobsList()"
+                        >
+
+                            <option value="">All Nigeria States</option>
+
+                            <option value="Lagos">Lagos</option>
+
+                            <option value="Kano">Kano</option>
+
+                            <option value="Imo">Imo (Owerri)</option>
+
+                            <option value="Anambra">Anambra</option>
+
+                            <option value="Abuja">Abuja (FCT)</option>
+
+                        </select>
+
+                    </div>
+
+                    <button
+                        id="proximityBtn"
+                        class="action-btn"
+                        onclick="toggleProximityDispatch()"
+                    >
+
+                        <i data-lucide="map-pin"></i>
+
+                        <span id="proximityText">Enable 15km Radius</span>
+
+                    </button>
+
+                </div>
+
+            </section>
+
+            <!-- MAIN JOBS FEED & ACTIVE PROPOSALS -->
+
+            <div class="dashboard-grid">
+
+                <!-- LEFT COLUMN: JOB LISTINGS -->
+
+                <section class="dashboard-section">
+
+                    <div class="section-header">
+
+                        <h2>Job Feed</h2>
+
+                        <small id="jobFeedSubtitle">Showing all active jobs</small>
+
+                    </div>
+
+                    <div
+                        id="jobsList"
+                        class="jobs-container"
+                    >
+
+                        <!-- Dynamic Job Cards render here -->
+
+                    </div>
+
+                </section>
+
+                <!-- RIGHT COLUMN: ACTIVE CONTRACTS & OTP HANDOFF -->
+
+                <aside class="dashboard-section">
+
+                    <div class="section-header">
+
+                        <h2>Escrow & OTP Handoff</h2>
+
+                    </div>
+
+                    <div class="active-contract-card">
+
+                        <div class="contract-status-header">
+
+                            <span class="status-dot-active"></span>
+
+                            <strong>Active Escrow Job</strong>
+
+                        </div>
+
+                        <p
+                            id="activeContractTitle"
+                            class="contract-title"
+                        >No active contract selected</p>
+
+                        <div class="contract-amount-row">
+
+                            <span>Budget Locked:</span>
+
+                            <strong id="activeContractBudget">₦0.00</strong>
+
+                        </div>
+
+                        <div
+                            id="otpContainer"
+                            class="otp-box hidden"
+                        >
+
+                            <small>Client Delivery 4-Digit OTP:</small>
+
+                            <div
+                                id="otpDisplay"
+                                class="otp-code"
+                            >----</div>
+
+                            <p class="otp-warning">Provide this OTP to the artisan/freelancer upon job completion to release funds.</p>
+
+                        </div>
+
+                        <button
+                            id="openChatBtn"
+                            class="action-btn width-full hidden"
+                            onclick="openContractMessageDesk()"
+                        >
+
+                            <i data-lucide="message-square"></i> Open Chat & Agreement
+
+                        </button>
+
+                    </div>
+
+                </aside>
+
+            </div>
+
+        </main>
+
+    </div>
+
+</div>
+
+<!-- MODAL: POST A JOB / GIG (CLIENT) -->
+
+<div
+    id="postJobModal"
+    class="modal-backdrop hidden"
+>
+
+    <div class="modal-card">
+
+        <div class="modal-header">
+
+            <h3>Post a Job or On-Demand Gig</h3>
+
+            <button
+                type="button"
+                class="close-btn"
+                onclick="closePostJobModal()"
+            >&times;</button>
+
+        </div>
+
+        <form
+            id="postJobForm"
+            onsubmit="handlePostJobSubmit(event)"
+        >
+
+            <div class="form-group">
+
+                <label>Job Title</label>
+
+                <input
+                    type="text"
+                    id="postTitle"
+                    class="filter-input"
+                    required
+                    placeholder="e.g. Urgent Repair of Inverter System or Frontend Web Build"
+                >
+
+            </div>
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label>Job Type</label>
+
+                    <select
+                        id="postType"
+                        class="filter-input"
+                        required
+                    >
+
+                        <option value="Gig">On-Demand Gig (15km Proximity)</option>
+
+                        <option value="Fixed">Fixed Price Project</option>
+
+                        <option value="Hourly">Milestone / Hourly</option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>State / Location</label>
+
+                    <select
+                        id="postState"
+                        class="filter-input"
+                        required
+                    >
+
+                        <option value="Lagos">Lagos</option>
+
+                        <option value="Kano">Kano</option>
+
+                        <option value="Imo">Imo (Owerri)</option>
+
+                        <option value="Anambra">Anambra</option>
+
+                        <option value="Abuja">Abuja (FCT)</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label>Budget Amount (NGN)</label>
+
+                    <input
+                        type="number"
+                        id="postBudget"
+                        class="filter-input"
+                        required
+                        placeholder="e.g. 35000"
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Required Skill</label>
+
+                    <input
+                        type="text"
+                        id="postSkill"
+                        class="filter-input"
+                        required
+                        placeholder="e.g. Electrical, Plumbing, Node.js"
+                    >
+
+                </div>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Job Description & Deliverables</label>
+
+                <textarea
+                    id="postDescription"
+                    class="filter-input textarea-input"
+                    rows="4"
+                    required
+                    placeholder="Describe specific tasks, expectations, and delivery timeframe..."
+                ></textarea>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="action-btn"
+                    onclick="closePostJobModal()"
+                >Cancel</button>
+
+                <button
+                    type="submit"
+                    class="action-btn primary-btn"
+                >Fund Escrow & Publish Job</button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- MODAL: SUBMIT PROPOSAL / APPLY (FREELANCER / ARTISAN) -->
+
+<div
+    id="applyModal"
+    class="modal-backdrop hidden"
+>
+
+    <div class="modal-card">
+
+        <div class="modal-header">
+
+            <h3 id="applyModalTitle">Submit Proposal</h3>
+
+            <button
+                type="button"
+                class="close-btn"
+                onclick="closeApplyModal()"
+            >&times;</button>
+
+        </div>
+
+        <form
+            id="applyForm"
+            onsubmit="handleProposalSubmit(event)"
+        >
+
+            <input
+                type="hidden"
+                id="applyJobId"
+            >
+
+            <input
+                type="hidden"
+                id="applyClientName"
+            >
+
+            <div class="form-group">
+
+                <label>Your Bid / Offer Amount (NGN)</label>
+
+                <input
+                    type="number"
+                    id="bidAmount"
+                    class="filter-input"
+                    required
+                    oninput="calculateEarningsBreakdown()"
+                >
+
+            </div>
+
+            <!-- Commission Calculation Breakdown -->
+
+            <div class="commission-breakdown">
+
+                <div class="breakdown-row">
+
+                    <span>Client Escrow Payment:</span>
+
+                    <strong id="breakdownClientPay">₦0.00</strong>
+
+                </div>
+
+                <div class="breakdown-row text-muted">
+
+                    <span>REMADEF Fee (3.5%):</span>
+
+                    <span id="breakdownFee">-₦0.00</span>
+
+                </div>
+
+                <hr class="breakdown-divider">
+
+                <div class="breakdown-row text-success">
+
+                    <span>Your Net Payout:</span>
+
+                    <strong id="breakdownNetPayout">₦0.00</strong>
+
+                </div>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Cover Letter / Pitch</label>
+
+                <textarea
+                    id="applyCoverLetter"
+                    class="filter-input textarea-input"
+                    rows="4"
+                    required
+                    placeholder="Explain why you are best suited for this job and your estimated completion time..."
+                ></textarea>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="action-btn"
+                    onclick="closeApplyModal()"
+                >Cancel</button>
+
+                <button
+                    type="submit"
+                    class="action-btn primary-btn"
+                >Submit Proposal & Message Client</button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script src="js/api.js"></script>
+
+<script src="js/jobs.js"></script>
+
+<script>
+
+    lucide.createIcons();
+
+</script>
+
+</body>
+
+</html>
