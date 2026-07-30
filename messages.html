@@ -20,7 +20,11 @@
     content="REMADEF Secure Messaging"
 >
 
-<title>REMADEF | Messages</title>
+<title>
+
+REMADEF | Messages
+
+</title>
 
 <link
     rel="stylesheet"
@@ -31,80 +35,135 @@
 
 <body>
 
+<!-- ======================================================
+     NETWORK STATUS
+====================================================== -->
+
+<div
+id="networkBanner"
+class="network-banner hidden"
+>
+
+You are offline. Messages will send automatically when your connection returns.
+
+</div>
+
+<!-- ======================================================
+     LOADING
+====================================================== -->
+
+<div
+id="loadingOverlay"
+class="loading-overlay hidden"
+>
+
+<div class="loading-card">
+
+<div class="loader"></div>
+
+<p>
+
+Loading Messages...
+
+</p>
+
+</div>
+
+</div>
+
+<!-- ======================================================
+     APP
+====================================================== -->
+
 <div class="messages-app">
 
-<!-- =========================================
+<!-- ======================================================
      HEADER
-========================================== -->
+====================================================== -->
 
 <header class="topbar">
 
-    <div class="topbar-left">
+<div class="topbar-left">
 
-        <button
-            id="menuButton"
-            class="icon-button"
-            type="button"
-            aria-label="Menu"
-        >
-            ☰
-        </button>
+<button
+id="menuButton"
+class="icon-button"
+type="button"
+>
 
-        <a
-            href="home.html"
-            class="logo"
-        >
-            REMADEF
-        </a>
+☰
 
-    </div>
+</button>
 
-    <div class="topbar-right">
+<a
+href="home.html"
+class="logo"
+>
 
-        <button
-            id="newConversationButton"
-            class="icon-button"
-            type="button"
-            title="New Conversation"
-        >
-            ✏️
-        </button>
+REMADEF
 
-        <button
-            id="notificationButton"
-            class="icon-button"
-            type="button"
-            title="Notifications"
-        >
-            🔔
-        </button>
+</a>
 
-        <a
-            href="profile.html"
-            class="profile-avatar"
-            id="profileAvatar"
-        >
-            U
-        </a>
+</div>
 
-    </div>
+<div class="topbar-center">
+
+<input
+id="conversationSearch"
+type="search"
+placeholder="Search conversations..."
+autocomplete="off"
+>
+
+</div>
+
+<div class="topbar-right">
+
+<button
+id="notificationButton"
+class="icon-button"
+type="button"
+title="Notifications"
+>
+
+🔔
+
+</button>
+
+<span
+id="messageBadge"
+class="message-badge hidden"
+>
+
+0
+
+</span>
+
+<a
+href="profile.html"
+id="profileAvatar"
+class="profile-avatar"
+>
+
+U
+
+</a>
+
+</div>
 
 </header>
 
-<!-- =========================================
-     MAIN LAYOUT
-========================================== -->
+<!-- ======================================================
+     MAIN
+====================================================== -->
 
 <div class="messages-layout">
 
-<!-- =========================================
+<!-- ======================================================
      SIDEBAR
-========================================== -->
+====================================================== -->
 
-<aside
-    class="sidebar"
-    id="sidebar"
->
+<aside class="sidebar">
 
 <div class="sidebar-header">
 
@@ -115,9 +174,9 @@ Messages
 </h2>
 
 <button
-    id="composeButton"
-    class="primary-button"
-    type="button"
+id="newConversation"
+class="primary-button"
+type="button"
 >
 
 New Chat
@@ -126,163 +185,63 @@ New Chat
 
 </div>
 
-<!-- SEARCH -->
-
-<div class="conversation-search">
-
-<input
-    type="search"
-    id="conversationSearch"
-    placeholder="Search conversations..."
->
-
-</div>
-
-<!-- FILTERS -->
-
-<div class="conversation-filters">
-
-<button
-    class="filter active"
-    data-filter="all"
->
-
-All
-
-</button>
-
-<button
-    class="filter"
-    data-filter="unread"
->
-
-Unread
-
-</button>
-
-<button
-    class="filter"
-    data-filter="groups"
->
-
-Groups
-
-</button>
-
-<button
-    class="filter"
-    data-filter="archived"
->
-
-Archived
-
-</button>
-
-</div>
-
-<!-- CONVERSATION LIST -->
-
 <div
-    class="conversation-list"
-    id="conversationList"
+id="conversationList"
+class="conversation-list"
 >
 
-<!-- Conversation Item -->
+<div class="empty-state">
 
-<div
-    class="conversation active"
-    data-id="conversation_1"
->
+<h3>
 
-<div class="conversation-avatar">
+No Conversations
 
-RM
+</h3>
 
-</div>
+<p>
 
-<div class="conversation-details">
+Your conversations will appear here.
 
-<div class="conversation-title">
-
-<span>
-
-REMADEF Support
-
-</span>
-
-<span class="conversation-time">
-
-10:30
-
-</span>
+</p>
 
 </div>
-
-<div class="conversation-preview">
-
-Welcome to REMADEF.
-
-</div>
-
-</div>
-
-<div class="conversation-meta">
-
-<span class="unread-badge">
-
-1
-
-</span>
-
-</div>
-
-</div>
-
-<!-- More conversations loaded by JS -->
 
 </div>
 
 </aside>
 
-<!-- =========================================
-     CHAT PANEL STARTS HERE
-     (CONTINUES IN PART 2)
-========================================== -->
+<!-- ======================================================
+     CHAT PANEL
+====================================================== -->
 
-<main
-    class="chat-panel"
-    id="chatPanel"
->
-<!-- =========================================
-     CHAT HEADER
-========================================== -->
+<main class="chat-panel">
 
 <header class="chat-header">
 
 <div class="chat-user">
 
 <div
-    class="conversation-avatar"
-    id="chatAvatar"
+id="chatAvatar"
+class="chat-avatar"
 >
 
 RM
 
 </div>
 
-<div class="chat-user-info">
+<div>
 
-<h2 id="chatName">
+<h3 id="chatName">
 
-REMADEF Support
+Select a Conversation
 
-</h2>
+</h3>
 
-<span id="chatStatus">
+<p id="chatStatus">
 
-🟢 Online
+Secure Conversation
 
-</span>
+</p>
 
 </div>
 
@@ -291,32 +250,10 @@ REMADEF Support
 <div class="chat-actions">
 
 <button
-    id="voiceCallButton"
-    class="icon-button"
-    type="button"
-    title="Voice Call"
->
-
-📞
-
-</button>
-
-<button
-    id="videoCallButton"
-    class="icon-button"
-    type="button"
-    title="Video Call"
->
-
-🎥
-
-</button>
-
-<button
-    id="chatInfoButton"
-    class="icon-button"
-    type="button"
-    title="Conversation Info"
+id="chatInfoButton"
+class="icon-button"
+type="button"
+title="Conversation Information"
 >
 
 ℹ️
@@ -327,9 +264,9 @@ REMADEF Support
 
 </header>
 
-<!-- =========================================
+    <!-- ======================================================
      PRIVACY NOTICE
-========================================== -->
+====================================================== -->
 
 <section class="privacy-banner">
 
@@ -338,158 +275,104 @@ REMADEF Support
 <i>
 
 Messages in REMADEF are end-to-end encrypted.
-They are automatically deleted from REMADEF
-servers after the selected retention period.
-If enabled, encrypted copies may remain only on
-authorized devices of conversation participants.
+They are automatically deleted from REMADEF servers
+72 hours after delivery.
+If enabled, a copy may remain only on the devices
+of the conversation participants.
 Deleted messages cannot be recovered.
 
 </i>
 
 </p>
 
-<label class="device-copy-option">
+<label class="device-copy">
 
 <input
-    type="checkbox"
-    id="keepLocalCopies"
-    checked
+type="checkbox"
+id="keepLocalCopies"
+checked
 >
 
+<span>
+
 Keep encrypted copies on this device after server deletion
+
+</span>
 
 </label>
 
 </section>
 
-<!-- =========================================
-     PINNED MESSAGE
-========================================== -->
-
-<section
-    id="pinnedMessage"
-    class="pinned-message hidden"
->
-
-📌
-
-<span id="pinnedText">
-
-No pinned messages
-
-</span>
-
-<button
-    id="viewPinned"
-    type="button"
->
-
-View
-
-</button>
-
-</section>
-
-<!-- =========================================
-     MESSAGE AREA
-========================================== -->
-
-<section
-    class="chat-messages"
-    id="chatMessages"
->
-
-<div class="date-divider">
-
-Today
-
-</div>
-
-<div class="message received">
-
-<div class="message-content">
-
-<div class="bubble">
-
-Welcome to REMADEF.
-
-</div>
-
-<div class="message-meta">
-
-<span>
-
-10:30 AM
-
-</span>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="message sent">
-
-<div class="message-content">
-
-<div class="bubble">
-
-Thank you.
-
-</div>
-
-<div class="message-meta">
-
-<span>
-
-10:31 AM
-
-</span>
-
-<span>
-
-✓✓ Read
-
-</span>
-
-</div>
-
-</div>
-
-</div>
-
-</section>
-
-<!-- =========================================
+<!-- ======================================================
      TYPING INDICATOR
-========================================== -->
+====================================================== -->
 
 <div
-    id="typingIndicator"
-    class="typing-indicator hidden"
+id="typingIndicator"
+class="typing-indicator hidden"
 >
 
-<span></span>
+<div class="typing-avatar">
 
-<span></span>
-
-<span></span>
-
-REMADEF Support is typing...
+RM
 
 </div>
 
-<!-- =========================================
-     REPLY PREVIEW
-========================================== -->
+<div class="typing-bubble">
 
-<div
-    id="replyPreview"
-    class="reply-preview hidden"
+<span></span>
+
+<span></span>
+
+<span></span>
+
+</div>
+
+<div class="typing-text">
+
+Typing...
+
+</div>
+
+</div>
+
+<!-- ======================================================
+     CHAT MESSAGES
+====================================================== -->
+
+<section
+id="chatMessages"
+class="chat-messages"
 >
 
-<div>
+<div class="empty-state">
+
+<h2>
+
+Welcome to REMADEF Messaging
+
+</h2>
+
+<p>
+
+Select a conversation or start a new secure chat.
+
+</p>
+
+</div>
+
+</section>
+
+<!-- ======================================================
+     REPLY PREVIEW
+====================================================== -->
+
+<div
+id="replyPreview"
+class="reply-preview hidden"
+>
+
+<div class="reply-content">
 
 <strong>
 
@@ -497,13 +380,17 @@ Replying to
 
 </strong>
 
-<p id="replyText"></p>
+<p id="replyText">
+
+</p>
 
 </div>
 
 <button
-    id="cancelReply"
-    type="button"
+id="cancelReply"
+class="icon-button"
+type="button"
+title="Cancel Reply"
 >
 
 ✕
@@ -512,16 +399,17 @@ Replying to
 
 </div>
 
-<!-- =========================================
-     COMPOSER
-========================================== -->
+<!-- ======================================================
+     MESSAGE COMPOSER
+====================================================== -->
 
 <footer class="composer">
 
 <button
-    id="attachmentButton"
-    class="icon-button"
-    type="button"
+id="attachmentButton"
+class="icon-button"
+type="button"
+title="Attachments"
 >
 
 📎
@@ -529,19 +417,17 @@ Replying to
 </button>
 
 <textarea
-
 id="messageInput"
-
-rows="1"
-
 placeholder="Type a secure message..."
-
+rows="1"
+autocomplete="off"
 ></textarea>
 
 <button
-    id="emojiButton"
-    class="icon-button"
-    type="button"
+id="emojiButton"
+class="icon-button"
+type="button"
+title="Emoji"
 >
 
 😊
@@ -549,531 +435,299 @@ placeholder="Type a secure message..."
 </button>
 
 <button
-    id="sendButton"
-    class="send-button"
-    type="button"
+id="sendButton"
+class="send-button"
+type="button"
 >
 
 Send
 
 </button>
 
-<!-- =========================================
-     EMOJI PICKER
-========================================== -->
-
-<div
-    id="emojiPicker"
-    class="emoji-picker hidden"
->
-
-😀 😃 😄 😁 😅 😂 🤣 😊 😍 😎 🤝 👍 ❤️ 🎉 👏 🙏 😢 😮
-
-</div>
-
-<!-- =========================================
-     ATTACHMENT MENU
-========================================== -->
-
-<div
-    id="attachmentMenu"
-    class="attachment-menu hidden"
->
-
-<button type="button">
-📷 Photo
-</button>
-
-<button type="button">
-🎥 Video
-</button>
-
-<button type="button">
-📄 Document
-</button>
-
-<button type="button">
-🎵 Audio
-</button>
-
-<button type="button">
-📍 Location
-</button>
-
-<button type="button">
-👤 Contact
-</button>
-
-</div>
-
-<!-- =========================================
-     CONVERSATION INFORMATION
-========================================== -->
-
-<aside
-    id="conversationInfo"
-    class="conversation-info-panel hidden"
->
-
-<h2>
-
-Conversation Information
-
-</h2>
-
-<hr>
-
-<h3>
-
-Privacy
-
-</h3>
-
-<p>
-
-🔒 End-to-End Encryption
-
-</p>
-
-<p>
-
-Server Retention:
-72 Hours (Default)
-
-</p>
-
-<p>
-
-Encrypted Device Copies:
-Enabled
-
-</p>
-
-<p>
-
-Verified Conversation:
-Yes
-
-</p>
-
-<hr>
-
-<h3>
-
-Authorized Devices
-
-</h3>
-
-<ul>
-
-<li>
-
-📱 Current Device
-
-</li>
-
-<li>
-
-💻 Windows Laptop
-
-</li>
-
-</ul>
-
-<hr>
-
-<h3>
-
-Actions
-
-</h3>
-
-<button
-    type="button"
->
-
-📌 View Pinned Messages
-
-</button>
-
-<button
-    type="button"
->
-
-🌐 Translation Settings
-
-</button>
-
-<button
-    type="button"
->
-
-🕒 Message Retention
-
-</button>
-
-<button
-    type="button"
->
-
-📤 Export Conversation
-
-</button>
-
-<button
-    type="button"
->
-
-🗑 Clear Local Device Copies
-
-</button>
-
-</aside>
-
-<!-- =========================================
-     LOADING OVERLAY
-========================================== -->
-
-<div
-    id="loadingOverlay"
-    class="loading-overlay hidden"
->
-
-<div class="loading-card">
-
-<div class="spinner"></div>
-
-<p>
-
-Loading conversation...
-
-</p>
-
-</div>
-
-</div>
-
-<!-- =========================================
-     EMPTY STATE
-========================================== -->
-
-<div
-    id="emptyState"
-    class="empty-state hidden"
->
-
-<h2>
-
-No Conversation Selected
-
-</h2>
-
-<p>
-
-Choose an existing conversation or start a new one.
-
-</p>
-
-<button
-    id="startConversation"
-    class="primary-button"
-    type="button"
->
-
-Start Conversation
-
-</button>
-
-</div>
-
-</main>
-
-</div>
-
-</div>
-
-<!-- =========================================
-     APPWRITE SDK
-========================================== -->
-
-<script src="https://cdn.jsdelivr.net/npm/appwrite@21.1.0"></script>
-
-<!-- =========================================
-     REMADEF API
-========================================== -->
-
-<script src="api.js"></script>
-
-<!-- =========================================
-     REMADEF MESSAGES
-========================================== -->
-
-<script src="js/messages.js"></script>
-
-</body>
-
-</html>
-
-
 </footer>
 
-<!-- =========================================
-     PART 3 CONTINUES...
-========================================== -->
+</main>
 
-<!-- =========================================
-     EMOJI PICKER
-========================================== -->
-
-<div
-    id="emojiPicker"
-    class="emoji-picker hidden"
->
-
-😀 😃 😄 😁 😅 😂 🤣 😊 😍 😎 🤝 👍 ❤️ 🎉 👏 🙏 😢 😮
-
-</div>
-
-<!-- =========================================
-     ATTACHMENT MENU
-========================================== -->
-
-<div
-    id="attachmentMenu"
-    class="attachment-menu hidden"
->
-
-<button type="button">
-📷 Photo
-</button>
-
-<button type="button">
-🎥 Video
-</button>
-
-<button type="button">
-📄 Document
-</button>
-
-<button type="button">
-🎵 Audio
-</button>
-
-<button type="button">
-📍 Location
-</button>
-
-<button type="button">
-👤 Contact
-</button>
-
-</div>
-
-<!-- =========================================
+    <!-- ======================================================
      CONVERSATION INFORMATION
-========================================== -->
+====================================================== -->
 
 <aside
-    id="conversationInfo"
-    class="conversation-info-panel hidden"
+id="conversationInfo"
+class="conversation-info hidden"
 >
 
-<h2>
+<h3>
 
 Conversation Information
 
-</h2>
-
-<hr>
-
-<h3>
-
-Privacy
-
 </h3>
+
+<div class="info-section">
 
 <p>
 
-🔒 End-to-End Encryption
+<i>
+
+Messages in this conversation are end-to-end encrypted.
+
+Server copies are automatically deleted after
+72 hours based on the selected retention policy.
+
+</i>
 
 </p>
 
-<p>
+</div>
 
-Server Retention:
+<div class="info-section">
+
+<h4>
+
+Message Retention
+
+</h4>
+
+<label>
+
+<input
+type="radio"
+name="retention"
+value="72h"
+checked
+>
+
 72 Hours (Default)
 
-</p>
+</label>
 
-<p>
+<label>
 
-Encrypted Device Copies:
-Enabled
-
-</p>
-
-<p>
-
-Verified Conversation:
-Yes
-
-</p>
-
-<hr>
-
-<h3>
-
-Authorized Devices
-
-</h3>
-
-<ul>
-
-<li>
-
-📱 Current Device
-
-</li>
-
-<li>
-
-💻 Windows Laptop
-
-</li>
-
-</ul>
-
-<hr>
-
-<h3>
-
-Actions
-
-</h3>
-
-<button
-    type="button"
+<input
+type="radio"
+name="retention"
+value="24h"
 >
 
-📌 View Pinned Messages
+24 Hours
+
+</label>
+
+<label>
+
+<input
+type="radio"
+name="retention"
+value="7d"
+>
+
+7 Days
+
+</label>
+
+<label>
+
+<input
+type="radio"
+name="retention"
+value="custom"
+disabled
+>
+
+Custom (Future)
+
+</label>
+
+</div>
+
+<div class="info-section">
+
+<h4>
+
+Conversation
+
+</h4>
+
+<button
+class="secondary-button"
+type="button"
+disabled
+>
+
+Search Messages (Future)
 
 </button>
 
 <button
-    type="button"
+class="secondary-button"
+type="button"
+disabled
 >
 
-🌐 Translation Settings
+Export Conversation (Future)
 
 </button>
 
 <button
-    type="button"
+class="secondary-button"
+type="button"
+disabled
 >
 
-🕒 Message Retention
+Block User (Future)
 
 </button>
 
-<button
-    type="button"
->
-
-📤 Export Conversation
-
-</button>
-
-<button
-    type="button"
->
-
-🗑 Clear Local Device Copies
-
-</button>
+</div>
 
 </aside>
 
-<!-- =========================================
-     LOADING OVERLAY
-========================================== -->
+<!-- ======================================================
+     EMOJI PICKER
+====================================================== -->
 
 <div
-    id="loadingOverlay"
-    class="loading-overlay hidden"
+id="emojiPicker"
+class="emoji-picker hidden"
 >
 
-<div class="loading-card">
-
-<div class="spinner"></div>
-
-<p>
-
-Loading conversation...
-
-</p>
+<span data-emoji="😀">😀</span>
+<span data-emoji="😂">😂</span>
+<span data-emoji="😍">😍</span>
+<span data-emoji="👍">👍</span>
+<span data-emoji="👏">👏</span>
+<span data-emoji="🙏">🙏</span>
+<span data-emoji="❤️">❤️</span>
+<span data-emoji="🔥">🔥</span>
+<span data-emoji="🎉">🎉</span>
+<span data-emoji="😊">😊</span>
+<span data-emoji="😎">😎</span>
+<span data-emoji="🤝">🤝</span>
 
 </div>
 
-</div>
-
-<!-- =========================================
-     EMPTY STATE
-========================================== -->
+<!-- ======================================================
+     ATTACHMENT MENU
+====================================================== -->
 
 <div
-    id="emptyState"
-    class="empty-state hidden"
+id="attachmentMenu"
+class="attachment-menu hidden"
 >
-
-<h2>
-
-No Conversation Selected
-
-</h2>
-
-<p>
-
-Choose an existing conversation or start a new one.
-
-</p>
 
 <button
-    id="startConversation"
-    class="primary-button"
-    type="button"
+type="button"
+disabled
 >
 
-Start Conversation
+📷 Photo
+<small>(Coming Soon)</small>
+
+</button>
+
+<button
+type="button"
+disabled
+>
+
+🎥 Video
+<small>(Coming Soon)</small>
+
+</button>
+
+<button
+type="button"
+disabled
+>
+
+📄 Document
+<small>(Coming Soon)</small>
+
+</button>
+
+<button
+type="button"
+disabled
+>
+
+🎵 Audio
+<small>(Coming Soon)</small>
+
+</button>
+
+<button
+type="button"
+disabled
+>
+
+📍 Location
+<small>(Coming Soon)</small>
+
+</button>
+
+<button
+type="button"
+disabled
+>
+
+👤 Contact
+<small>(Coming Soon)</small>
 
 </button>
 
 </div>
 
-</main>
+<!-- ======================================================
+     INTERNAL PLACEHOLDERS
+     Hidden From Users
+====================================================== -->
+
+<div
+id="futureModules"
+class="hidden"
+aria-hidden="true"
+>
+
+<div id="voiceCallPlaceholder"></div>
+
+<div id="videoCallPlaceholder"></div>
+
+<div id="screenSharePlaceholder"></div>
+
+<div id="translationPlaceholder"></div>
+
+<div id="paymentsPlaceholder"></div>
+
+<div id="businessChatPlaceholder"></div>
+
+<div id="marketplaceChatPlaceholder"></div>
+
+<div id="communityChatPlaceholder"></div>
+
+<div id="learningChatPlaceholder"></div>
+
+<div id="mentorChatPlaceholder"></div>
+
+<div id="aiAssistantPlaceholder"></div>
+
+<div id="pollPlaceholder"></div>
+
+<div id="broadcastPlaceholder"></div>
 
 </div>
 
 </div>
 
-<!-- =========================================
-     APPWRITE SDK
-========================================== -->
+<!-- ======================================================
+     SCRIPTS
+====================================================== -->
 
 <script src="https://cdn.jsdelivr.net/npm/appwrite@21.1.0"></script>
 
-<!-- =========================================
-     REMADEF API
-========================================== -->
-
 <script src="api.js"></script>
-
-<!-- =========================================
-     REMADEF MESSAGES
-========================================== -->
 
 <script src="js/messages.js"></script>
 
 </body>
 
 </html>
-
