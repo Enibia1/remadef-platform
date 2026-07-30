@@ -57,46 +57,44 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // 5. ESCROW & WALLET MODAL LOGIC (New & Fixed)
+    // 5. EMBEDDED MODAL LOGIC (WALLET & ESCROW)
     // ==========================================
-    const escrowToggle = document.getElementById("escrowToggle");
+    // Query exact links matching your sidebar markup structural layout
+    const walletLink = document.querySelector('aside .sidebar-nav a[href="wallet.html"]');
+    const escrowLink = document.querySelector('aside .sidebar-nav a[href="escrow.html"]');
+    
+    const walletModal = document.getElementById("walletModal");
     const escrowModal = document.getElementById("escrowModal");
+    
+    const closeWallet = document.getElementById("closeWallet");
     const closeEscrow = document.getElementById("closeEscrow");
 
-    const walletToggle = document.getElementById("walletToggle");
-    const walletModal = document.getElementById("walletModal");
-    const closeWallet = document.getElementById("closeWallet");
-
-    // Open Escrow
-    if (escrowToggle && escrowModal) {
-        escrowToggle.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            escrowModal.classList.add("active");
-        });
-    }
-
-    // Close Escrow Button
-    if (closeEscrow && escrowModal) {
-        closeEscrow.addEventListener("click", () => {
-            escrowModal.classList.remove("active");
-        });
-    }
-
-    // Open Wallet
-    if (walletToggle && walletModal) {
-        walletToggle.addEventListener("click", (e) => {
-            e.preventDefault();
+    // Open Wallet Trigger
+    if (walletLink && walletModal) {
+        walletLink.addEventListener("click", (e) => {
+            e.preventDefault(); // Stop page redirect to wallet.html
             e.stopPropagation();
             walletModal.classList.add("active");
+            if (sidebar && window.innerWidth <= 768) sidebar.classList.remove("show");
         });
     }
 
-    // Close Wallet Button
-    if (closeWallet && walletModal) {
-        closeWallet.addEventListener("click", () => {
-            walletModal.classList.remove("active");
+    // Open Escrow Trigger
+    if (escrowLink && escrowModal) {
+        escrowLink.addEventListener("click", (e) => {
+            e.preventDefault(); // Stop page redirect to escrow.html
+            e.stopPropagation();
+            escrowModal.classList.add("active");
+            if (sidebar && window.innerWidth <= 768) sidebar.classList.remove("show");
         });
+    }
+
+    // Close Button Controls
+    if (closeWallet && walletModal) {
+        closeWallet.addEventListener("click", () => walletModal.classList.remove("active"));
+    }
+    if (closeEscrow && escrowModal) {
+        closeEscrow.addEventListener("click", () => escrowModal.classList.remove("active"));
     }
 
     // ==========================================
@@ -117,12 +115,14 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        // Click outside modals to close them
-        if (escrowModal && escrowModal.classList.contains("active") && !escrowModal.querySelector(".modal-content").contains(e.target) && e.target !== escrowToggle) {
-            escrowModal.classList.remove("active");
+        // Close Modals safely on outside dim area clicks
+        if (walletModal && walletModal.classList.contains("active")) {
+            const content = walletModal.querySelector(".modal-box");
+            if (content && !content.contains(e.target)) walletModal.classList.remove("active");
         }
-        if (walletModal && walletModal.classList.contains("active") && !walletModal.querySelector(".modal-content").contains(e.target) && e.target !== walletToggle) {
-            walletModal.classList.remove("active");
+        if (escrowModal && escrowModal.classList.contains("active")) {
+            const content = escrowModal.querySelector(".modal-box");
+            if (content && !content.contains(e.target)) escrowModal.classList.remove("active");
         }
     });
 
