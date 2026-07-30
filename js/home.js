@@ -1,189 +1,219 @@
-document.addEventListener("DOMContentLoaded", () => {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REMADEF Platform | Dashboard</title>
     
-    // 1. Initialize Lucide Icons
-    if (window.lucide) {
-        lucide.createIcons();
-    }
-
-    // ==========================================
-    // 2. SIDEBAR TOGGLE & COLLAPSE LOGIC
-    // ==========================================
-    const sidebar = document.getElementById("sidebar");
-    const sidebarToggle = document.getElementById("sidebarToggle");
-
-    if (sidebarToggle && sidebar) {
-        sidebarToggle.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-
-            if (window.innerWidth <= 768) {
-                sidebar.classList.toggle("show");
-            } else {
-                sidebar.classList.toggle("collapsed");
-            }
-        });
-    }
-
-    window.addEventListener("resize", () => {
-        if (window.innerWidth > 768 && sidebar) {
-            sidebar.classList.remove("show");
-        }
-    });
-
-    // ==========================================
-    // 3. BRAND DROPDOWN LOGIC
-    // ==========================================
-    const brandButton = document.getElementById("brandButton");
-    const brandDropdown = document.getElementById("brandDropdown");
-
-    if (brandButton && brandDropdown) {
-        brandButton.addEventListener("click", (e) => {
-            e.stopPropagation();
-            brandDropdown.classList.toggle("show");
-        });
-    }
-
-    // ==========================================
-    // 4. NOTIFICATIONS PANEL TOGGLE
-    // ==========================================
-    const notificationBtn = document.getElementById("notificationToggle");
-    const notificationsPanel = document.getElementById("notificationsPanel");
-
-    if (notificationBtn && notificationsPanel) {
-        notificationBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            notificationsPanel.classList.toggle("hidden");
-        });
-    }
-
-    // ==========================================
-    // 5. EMBEDDED MODAL LOGIC (WALLET & ESCROW)
-    // ==========================================
-    // Query exact links matching your sidebar markup structural layout
-    const walletLink = document.querySelector('aside .sidebar-nav a[href="wallet.html"]');
-    const escrowLink = document.querySelector('aside .sidebar-nav a[href="escrow.html"]');
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    const walletModal = document.getElementById("walletModal");
-    const escrowModal = document.getElementById("escrowModal");
+    <!-- Lucide Icons Core Framework -->
+    <script src="https://unpkg.com"></script>
     
-    const closeWallet = document.getElementById("closeWallet");
-    const closeEscrow = document.getElementById("closeEscrow");
+    <!-- Platform Master CSS Setup -->
+    <link rel="stylesheet" href="css/home.css">
+</head>
+<body>
 
-    // Open Wallet Trigger
-    if (walletLink && walletModal) {
-        walletLink.addEventListener("click", (e) => {
-            e.preventDefault(); // Stop page redirect to wallet.html
-            e.stopPropagation();
-            walletModal.classList.add("active");
-            if (sidebar && window.innerWidth <= 768) sidebar.classList.remove("show");
-        });
-    }
-
-    // Open Escrow Trigger
-    if (escrowLink && escrowModal) {
-        escrowLink.addEventListener("click", (e) => {
-            e.preventDefault(); // Stop page redirect to escrow.html
-            e.stopPropagation();
-            escrowModal.classList.add("active");
-            if (sidebar && window.innerWidth <= 768) sidebar.classList.remove("show");
-        });
-    }
-
-    // Close Button Controls
-    if (closeWallet && walletModal) {
-        closeWallet.addEventListener("click", () => walletModal.classList.remove("active"));
-    }
-    if (closeEscrow && escrowModal) {
-        closeEscrow.addEventListener("click", () => escrowModal.classList.remove("active"));
-    }
-
-    // ==========================================
-    // 6. GLOBAL CLICK HANDLER (CLOSE OUTSIDE)
-    // ==========================================
-    document.addEventListener("click", (e) => {
-        if (brandDropdown && !brandButton.contains(e.target) && !brandDropdown.contains(e.target)) {
-            brandDropdown.classList.remove("show");
-        }
-
-        if (notificationsPanel && !notificationBtn.contains(e.target) && !notificationsPanel.contains(e.target)) {
-            notificationsPanel.classList.add("hidden");
-        }
-
-        if (window.innerWidth <= 768 && sidebar && sidebar.classList.contains("show")) {
-            if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
-                sidebar.classList.remove("show");
-            }
-        }
-
-        // Close Modals safely on outside dim area clicks
-        if (walletModal && walletModal.classList.contains("active")) {
-            const content = walletModal.querySelector(".modal-box");
-            if (content && !content.contains(e.target)) walletModal.classList.remove("active");
-        }
-        if (escrowModal && escrowModal.classList.contains("active")) {
-            const content = escrowModal.querySelector(".modal-box");
-            if (content && !content.contains(e.target)) escrowModal.classList.remove("active");
-        }
-    });
-
-    // ==========================================
-    // 7. INFINITE SCROLL IMPLEMENTATION
-    // ==========================================
-    const opportunityList = document.querySelector(".opportunity-list");
-    let isLoading = false;
-    let pageCount = 1;
-
-    function fetchMoreItems() {
-        if (isLoading || !opportunityList) return;
-        isLoading = true;
-
-        const loader = document.createElement("div");
-        loader.className = "scroll-loader";
-        loader.innerHTML = "<p style='text-align:center; padding:12px; color:var(--muted); font-size:13px;'>Loading more opportunities...</p>";
-        opportunityList.appendChild(loader);
-
-        setTimeout(() => {
-            loader.remove();
-
-            for (let i = 1; i <= 2; i++) {
-                const itemIndex = pageCount * 2 + i;
-                const newItem = document.createElement("div");
-                newItem.className = "opportunity-card";
-                newItem.setAttribute("onclick", "window.location.href='opportunities.html'");
-                newItem.innerHTML = `
-                    <div class="opportunity-icon">
-                        <i data-lucide="briefcase"></i>
+    <div class="app">
+        
+        <!-- HEADER COMPONENT -->
+        <header class="header">
+            <div class="header-left">
+                <button id="sidebarToggle" class="menu-toggle" aria-label="Toggle Sidebar">
+                    <i data-lucide="menu"></i>
+                </button>
+                
+                <div class="brand" id="brandButton">
+                    <div class="brand-logo">
+                        <svg viewBox="0 0 100 100" fill="none" xmlns="http://w3.org">
+                            <rect width="100" height="100" rx="24" fill="#071A3D"/>
+                            <path d="M28 72V28L50 50L72 28V72" stroke="#2563EB" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="50" cy="24" r="8" fill="#22C55E"/>
+                        </svg>
                     </div>
+                    <span class="brand-name">REMADEF</span>
+                    <i data-lucide="chevron-down" class="brand-chevron"></i>
+                    
+                    <!-- BRAND DROPDOWN HUB MENU -->
+                    <div class="brand-dropdown" id="brandDropdown">
+                        <a href="home.html">
+                            <i data-lucide="layout-dashboard"></i>
+                            <span>Dashboard Hub</span>
+                        </a>
+                        <a href="profile.html">
+                            <i data-lucide="building"></i>
+                            <span>Enterprise Portal</span>
+                        </a>
+                        <a href="settings.html">
+                            <i data-lucide="sliders"></i>
+                            <span>System Settings</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ENGINE SEARCH BAR -->
+            <div class="search-wrapper">
+                <i data-lucide="search"></i>
+                <input type="text" placeholder="Search enterprise programs, messages, trade corridors...">
+            </div>
+
+            <!-- HEADER RIGHT INTERACTIONS -->
+            <div class="header-right">
+                <button class="notification-btn" id="notificationToggle" aria-label="Notifications">
+                    <i data-lucide="bell"></i>
+                    <span class="badge">3</span>
+                </button>
+                
+                <div class="avatar" id="userAvatar">
+                    <span>OK</span>
+                </div>
+            </div>
+            
+            <!-- NOTIFICATIONS PANEL EXTENSION -->
+            <div class="notifications-panel hidden" id="notificationsPanel">
+                <div class="panel-header">System Notifications</div>
+                <div class="panel-body">
+                    <div class="notification-item">
+                        <strong>Escrow Verification</strong> Secure node payment received.
+                    </div>
+                    <div class="notification-item">
+                        <strong>Logistics Update</strong> Trade corridor Node #4 modified.
+                    </div>
+                    <div class="notification-item">
+                        <strong>System Account</strong> Connected token status valid.
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- LAYOUT NAVIGATION / CONTENT WRAPPER -->
+        <div class="layout">
+            
+            <!-- SIDEBAR NAVIGATION SYSTEM -->
+            <aside class="sidebar" id="sidebar">
+                <div>
+                    <div class="sidebar-title">NAVIGATION</div>
+                    <nav class="sidebar-nav">
+                        <a href="home.html" class="active">
+                            <i data-lucide="house"></i>
+                            <span>Home</span>
+                        </a>
+                        <a href="profile.html">
+                            <i data-lucide="user"></i>
+                            <span>My Profile</span>
+                        </a>
+                        <a href="messages.html">
+                            <i data-lucide="message-square"></i>
+                            <span>Messages</span>
+                            <span class="menu-badge">2</span>
+                        </a>
+                        <a href="learning.html">
+                            <i data-lucide="book-open"></i>
+                            <span>Learning Hub</span>
+                        </a>
+                        <a href="apprenticeship.html">
+                            <i data-lucide="graduation-cap"></i>
+                            <span>Apprenticeship</span>
+                        </a>
+                        <a href="business.html">
+                            <i data-lucide="building-2"></i>
+                            <span>Business & Gigs</span>
+                        </a>
+
+                        <!-- ACCESSIBLE CONTROL SYSTEMS -->
+                        <div class="sidebar-title" style="margin-top: 16px;">MORE</div>
+                        <a href="wallet.html">
+                            <i data-lucide="wallet"></i>
+                            <span>Wallet</span>
+                            <span class="menu-badge">₦</span>
+                        </a>
+                        <a href="escrow.html">
+                            <i data-lucide="shield-check"></i>
+                            <span>Escrow</span>
+                        </a>
+                        <a href="gigs-directory.html">
+                            <i data-lucide="briefcase"></i>
+                            <span>Gig Engine & Directory</span>
+                        </a>
+                        <a href="settings.html">
+                            <i data-lucide="sliders"></i>
+                            <span>Platform Settings</span>
+                        </a>
+                        <a href="help.html">
+                            <i data-lucide="help-circle"></i>
+                            <span>Help & Support</span>
+                        </a>
+                        <a href="logout.html" class="logout-link">
+                            <i data-lucide="log-out"></i>
+                            <span>Sign Out</span>
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- SIDEBAR METRIC PROGRESS FOOTER -->
+                <div class="sidebar-footer">
+                    <div class="profile-progress">
+                        <div class="progress-header">
+                            <span>Profile Completion</span>
+                            <span>85%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 85%;"></div>
+                        </div>
+                        <button class="complete-profile-btn" onclick="window.location.href='profile.html'">
+                            Update Profile
+                        </button>
+                    </div>
+                    <div class="copyright">
+                        &copy; 2026 REMADEF Ltd.
+                    </div>
+                </div>
+            </aside>
+
+            <!-- MAIN PLATFORM CORE CONTENT FIELD -->
+            <main class="main">
+                
+                <!-- DASHBOARD BANNER -->
+                <section class="welcome">
                     <div>
-                        <h3>Trade Corridor Expansion Node #${itemIndex}</h3>
-                        <p>Consortium fulfillment & regional logistical distribution node model.</p>
+                        <h1>Welcome Back, Onyekachi</h1>
+                        <p>Monitor your project workflows, trade corridors, and active platform programs.</p>
                     </div>
-                `;
-                opportunityList.appendChild(newItem);
-            }
+                    <div class="platform-status">
+                        <span class="status-dot"></span>
+                        <span id="apiStatus">System Operational</span>
+                    </div>
+                </section>
 
-            if (window.lucide) {
-                lucide.createIcons();
-            }
+                <!-- REALTIME DATA METRIC CARDS -->
+                <section class="dashboard-cards">
+                    <div class="dashboard-card">
+                        <div class="card-icon blue">
+                            <i data-lucide="briefcase"></i>
+                        </div>
+                        <div class="card-content">
+                            <span class="card-title">Active Projects</span>
+                            <h2>12</h2>
+                            <small>+2 added this month</small>
+                        </div>
+                    </div>
+                </section>
 
-            pageCount++;
-            isLoading = false;
-        }, 800);
-    }
-
-    window.addEventListener("scroll", () => {
-        const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-
-        if (scrollTop + clientHeight >= scrollHeight - 150) {
-            fetchMoreItems();
-        }
-    });
-
-    // System Status Update
-    const apiStatus = document.getElementById("apiStatus");
-    if (apiStatus) {
-        setTimeout(() => {
-            apiStatus.textContent = "Connected to REMADEF";
-        }, 1200);
-    }
-});
+                <!-- ASYNC INFINITE SCROLL OPPORTUNITIES MODULE -->
+                <section class="opportunities-section">
+                    <h2>Available System Opportunities</h2>
+                    <div class="opportunity-list">
+                        <div class="opportunity-card" onclick="window.location.href='opportunities.html'">
+                            <div class="opportunity-icon">
+                                <i data-lucide="briefcase"></i>
+                            </div>
+                            <div>
+                                <h3>Trade Corridor Expansion Node #1</h3>
+                                <p>Consortium fulfillment & regional logistical distribution node model.</p>
+                            </div>
+                        </div>
