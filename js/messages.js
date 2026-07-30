@@ -1,20 +1,48 @@
 /* ==========================================================
-   REMADEF MESSAGES
-   Part 1
-   Initialization • Authentication • Conversations
+   REMADEF PLATFORM
+   MESSAGES MODULE
+   Version 1.0
 ========================================================== */
 
 /* ==========================================================
    CONFIGURATION
 ========================================================== */
 
-const PROJECT_ID = "6a634fdc00148a907132";
+const APPWRITE_ENDPOINT =
+"https://fra.cloud.appwrite.io/v1";
 
-const ENDPOINT = "https://fra.cloud.appwrite.io/v1";
+const PROJECT_ID =
+"6a634fdc00148a907132";
+
+const DEFAULT_RETENTION =
+"72h";
+
+const ENCRYPTION_VERSION =
+"REMADEF-E2EE-v1";
+
+const DEVICE_COPY_KEY =
+"remadef_message_settings";
+
+const DRAFT_KEY =
+"remadef_message_draft";
+
+/* ==========================================================
+   APPWRITE
+========================================================== */
 
 let client = null;
+
 let account = null;
+
+let databases = null;
+
+let storage = null;
+
 let realtime = null;
+
+/* ==========================================================
+   CURRENT STATE
+========================================================== */
 
 let currentUser = null;
 
@@ -22,38 +50,141 @@ let currentConversation = null;
 
 let conversations = [];
 
+let messages = [];
+
+let replyingTo = null;
+
+let editingMessage = null;
+
 let unsubscribeRealtime = null;
 
+let typingTimeout = null;
+
+let pendingMessages = [];
+
 /* ==========================================================
-   DOM
+   DOM REFERENCES
 ========================================================== */
 
 const conversationList =
-document.getElementById("conversationList");
+document.getElementById(
+"conversationList"
+);
 
-const searchInput =
-document.getElementById("conversationSearch");
+const conversationSearch =
+document.getElementById(
+"conversationSearch"
+);
 
-const loadingOverlay =
-document.getElementById("loadingOverlay");
+const chatMessages =
+document.getElementById(
+"chatMessages"
+);
 
-const emptyState =
-document.getElementById("emptyState");
+const messageInput =
+document.getElementById(
+"messageInput"
+);
+
+const sendButton =
+document.getElementById(
+"sendButton"
+);
 
 const profileAvatar =
-document.getElementById("profileAvatar");
+document.getElementById(
+"profileAvatar"
+);
+
+const chatAvatar =
+document.getElementById(
+"chatAvatar"
+);
+
+const chatName =
+document.getElementById(
+"chatName"
+);
+
+const chatStatus =
+document.getElementById(
+"chatStatus"
+);
+
+const typingIndicator =
+document.getElementById(
+"typingIndicator"
+);
+
+const loadingOverlay =
+document.getElementById(
+"loadingOverlay"
+);
+
+const replyPreview =
+document.getElementById(
+"replyPreview"
+);
+
+const replyText =
+document.getElementById(
+"replyText"
+);
+
+const cancelReply =
+document.getElementById(
+"cancelReply"
+);
+
+const keepLocalCopies =
+document.getElementById(
+"keepLocalCopies"
+);
+
+const attachmentMenu =
+document.getElementById(
+"attachmentMenu"
+);
+
+const emojiPicker =
+document.getElementById(
+"emojiPicker"
+);
+
+const emojiButton =
+document.getElementById(
+"emojiButton"
+);
+
+const attachmentButton =
+document.getElementById(
+"attachmentButton"
+);
+
+const chatInfoButton =
+document.getElementById(
+"chatInfoButton"
+);
+
+const conversationInfo =
+document.getElementById(
+"conversationInfo"
+);
 
 /* ==========================================================
    START APPLICATION
 ========================================================== */
 
 document.addEventListener(
+
 "DOMContentLoaded",
+
 initializeMessages
+
 );
 
 /* ==========================================================
-   INITIALIZE
+   INITIALIZE APPLICATION
 ========================================================== */
 
 async function initializeMessages(){
@@ -64,11 +195,15 @@ try{
 
 initializeAppwrite();
 
-await authenticateUser();
+await ensureAuthenticated();
 
-await loadConversations();
+loadPrivacySettings();
+
+loadDraft();
 
 registerEvents();
+
+await loadConversations();
 
 }
 catch(error){
@@ -76,11 +211,12 @@ catch(error){
 console.error(error);
 
 alert(
-"Unable to load messages."
+
+"Unable to load REMADEF Messages."
+
 );
 
-window.location.href =
-"login.html";
+window.location.href="login.html";
 
 }
 finally{
@@ -92,50 +228,78 @@ hideLoading();
 }
 
 /* ==========================================================
-   APPWRITE
+   APPWRITE INITIALIZATION
 ========================================================== */
 
 function initializeAppwrite(){
 
-const {
+const{
+
 Client,
+
 Account,
+
+Databases,
+
+Storage,
+
 Realtime
-} = Appwrite;
 
-client =
-new Client();
+}=Appwrite;
 
-client
-.setEndpoint(ENDPOINT)
-.setProject(PROJECT_ID);
+client=
 
-account =
+new Client()
+
+.setEndpoint(
+
+APPWRITE_ENDPOINT
+
+)
+
+.setProject(
+
+PROJECT_ID
+
+);
+
+account=
+
 new Account(client);
 
-realtime =
+databases=
+
+new Databases(client);
+
+storage=
+
+new Storage(client);
+
+realtime=
+
 new Realtime(client);
 
 }
 
 /* ==========================================================
-   AUTHENTICATE
+   AUTHENTICATION
 ========================================================== */
 
-async function authenticateUser(){
+async function ensureAuthenticated(){
 
-currentUser =
+currentUser=
+
 await account.get();
 
 if(profileAvatar){
 
-profileAvatar.textContent =
+profileAvatar.textContent=
 
 initials(
 
-currentUser.name ||
+currentUser.name||
 
-currentUser.email ||
+currentUser.email||
 
 "U"
 
@@ -146,97 +310,197 @@ currentUser.email ||
 }
 
 /* ==========================================================
+   REGISTER EVENTS
+========================================================== */
+
+function registerEvents(){
+
+conversationSearch?.addEventListener(
+
+"input",
+
+filterConversations
+
+);
+
+sendButton?.addEventListener(
+
+"click",
+
+sendMessage
+
+);
+
+messageInput?.addEventListener(
+
+"keydown",
+
+handleKeyDown
+
+);
+
+messageInput?.addEventListener(
+
+"input",
+
+handleTyping
+
+);
+
+cancelReply?.addEventListener(
+
+"click",
+
+cancelReplyMode
+
+);
+
+emojiButton?.addEventListener(
+
+"click",
+
+toggleEmojiPicker
+
+);
+
+attachmentButton?.addEventListener(
+
+"click",
+
+toggleAttachmentMenu
+
+);
+
+chatInfoButton?.addEventListener(
+
+"click",
+
+toggleConversationInfo
+
+);
+
+window.addEventListener(
+
+"online",
+
+networkOnline
+
+);
+
+window.addEventListener(
+
+"offline",
+
+networkOffline
+
+);
+
+}
+
+/* ==========================================================
+   PART 2 CONTINUES
+========================================================== *//* ==========================================================
+   PART 2
+   Conversations • Search • Open Conversation • Realtime
+========================================================== */
+
+/* ==========================================================
    LOAD CONVERSATIONS
 ========================================================== */
 
 async function loadConversations(){
 
+showLoading();
+
 try{
 
 const result =
-
 await RemadefAPI.getConversations();
 
-if(result.success){
+if(!result.success){
+
+throw new Error(result.message);
+
+}
 
 conversations =
-
 result.data || [];
 
 renderConversationList();
 
 }
-else{
-
-throw new Error(
-
-result.message
-
-);
-
-}
-
-}
 catch(error){
 
-console.error(
+handleApiError(error);
 
-"Conversation load error",
-
-error
-
-);
-
-conversationList.innerHTML =
+conversationList.innerHTML=
 
 `
-<div class="empty-list">
+<div class="empty-state">
 
-Unable to load conversations.
+<h3>No conversations</h3>
+
+<p>
+
+Your conversations will appear here.
+
+</p>
 
 </div>
+
 `;
+
+}
+finally{
+
+hideLoading();
 
 }
 
 }
 
 /* ==========================================================
-   RENDER CONVERSATIONS
+   RENDER CONVERSATION LIST
 ========================================================== */
 
 function renderConversationList(){
 
-conversationList.innerHTML = "";
+conversationList.innerHTML="";
 
 if(conversations.length===0){
 
-conversationList.innerHTML =
+conversationList.innerHTML=
 
 `
-<div class="empty-list">
+<div class="empty-state">
 
-No conversations yet.
+<h3>No conversations</h3>
+
+<p>
+
+Start a new conversation.
+
+</p>
 
 </div>
+
 `;
 
 return;
 
 }
 
-conversations.forEach(
+conversations.forEach(conversation=>{
 
-conversation=>{
+const unread =
+conversation.unread || 0;
 
 const item =
-
 document.createElement("div");
 
 item.className="conversation";
 
 item.dataset.id=
-
 conversation.id;
 
 item.innerHTML=
@@ -246,34 +510,42 @@ item.innerHTML=
 <div class="conversation-avatar">
 
 ${initials(
+
 conversation.name
+
 )}
 
 </div>
 
-<div class="conversation-details">
+<div class="conversation-body">
 
-<div class="conversation-title">
+<div class="conversation-top">
+
+<h3>
+
+${escapeHtml(
+
+conversation.name
+
+)}
+
+</h3>
 
 <span>
 
-${escapeHtml(
-conversation.name
-)}
+${formatConversationTime(
 
-</span>
-
-<span class="conversation-time">
-
-${formatTime(
 conversation.updated_at
+
 )}
 
 </span>
 
 </div>
 
-<div class="conversation-preview">
+<div class="conversation-bottom">
+
+<p>
 
 ${escapeHtml(
 
@@ -283,22 +555,23 @@ conversation.last_message ||
 
 )}
 
-</div>
-
-</div>
-
-<div class="conversation-meta">
+</p>
 
 ${
-conversation.unread>0
+
+unread>0
 
 ?
 
-`<span class="unread-badge">
+`
 
-${conversation.unread}
+<div class="conversation-unread">
 
-</span>`
+${unread}
+
+</div>
+
+`
 
 :
 
@@ -308,13 +581,11 @@ ${conversation.unread}
 
 </div>
 
+</div>
+
 `;
 
-item.addEventListener(
-
-"click",
-
-()=>{
+item.onclick=()=>{
 
 openConversation(
 
@@ -322,19 +593,11 @@ conversation.id
 
 );
 
-}
+};
 
-);
+conversationList.appendChild(item);
 
-conversationList.appendChild(
-
-item
-
-);
-
-}
-
-);
+});
 
 }
 
@@ -342,23 +605,11 @@ item
    SEARCH
 ========================================================== */
 
-function registerEvents(){
-
-searchInput.addEventListener(
-
-"input",
-
-filterConversations
-
-);
-
-}
-
 function filterConversations(){
 
-const keyword =
+const keyword=
 
-searchInput.value
+conversationSearch.value
 
 .toLowerCase()
 
@@ -366,15 +617,9 @@ searchInput.value
 
 document
 
-.querySelectorAll(
+.querySelectorAll(".conversation")
 
-".conversation"
-
-)
-
-.forEach(
-
-item=>{
+.forEach(item=>{
 
 const text=
 
@@ -394,6 +639,194 @@ text.includes(keyword)
 
 "none";
 
+});
+
+}
+
+/* ==========================================================
+   OPEN CONVERSATION
+========================================================== */
+
+async function openConversation(
+
+conversationId
+
+){
+
+currentConversation=
+
+conversationId;
+
+document
+
+.querySelectorAll(".conversation")
+
+.forEach(item=>{
+
+item.classList.remove(
+
+"active"
+
+);
+
+});
+
+const active=
+
+document.querySelector(
+
+`[data-id="${conversationId}"]`
+
+);
+
+if(active){
+
+active.classList.add(
+
+"active"
+
+);
+
+}
+
+await loadConversationDetails(
+
+conversationId
+
+);
+
+await loadMessages(
+
+conversationId
+
+);
+
+subscribeConversation(
+
+conversationId
+
+);
+
+}
+
+/* ==========================================================
+   LOAD CONVERSATION DETAILS
+========================================================== */
+
+async function loadConversationDetails(
+
+conversationId
+
+){
+
+try{
+
+const result=
+
+await RemadefAPI.getConversation(
+
+conversationId
+
+);
+
+if(!result.success){
+
+return;
+
+}
+
+const conversation=
+
+result.data;
+
+chatName.textContent=
+
+conversation.name;
+
+chatStatus.textContent=
+
+conversation.status ||
+
+"Secure conversation";
+
+if(chatAvatar){
+
+chatAvatar.textContent=
+
+initials(
+
+conversation.name
+
+);
+
+}
+
+}
+catch(error){
+
+console.error(error);
+
+}
+
+}
+
+/* ==========================================================
+   MARK READ
+========================================================== */
+
+async function markConversationRead(
+
+conversationId
+
+){
+
+try{
+
+await RemadefAPI.markConversationRead(
+
+conversationId
+
+);
+
+}
+catch(error){
+
+console.error(error);
+
+}
+
+}
+
+/* ==========================================================
+   REALTIME
+========================================================== */
+
+function subscribeConversation(
+
+conversationId
+
+){
+
+if(unsubscribeRealtime){
+
+unsubscribeRealtime();
+
+}
+
+unsubscribeRealtime=
+
+client.subscribe(
+
+`conversations.${conversationId}`,
+
+response=>{
+
+handleRealtimeEvent(
+
+response
+
+);
+
 }
 
 );
@@ -401,72 +834,104 @@ text.includes(keyword)
 }
 
 /* ==========================================================
-   LOADING
+   HANDLE REALTIME EVENTS
 ========================================================== */
 
-function showLoading(){
+async function handleRealtimeEvent(
 
-loadingOverlay
+event
 
-.classList.remove(
+){
 
-"hidden"
+switch(event.events?.[0]){
+
+case "messages.create":
+
+await loadMessages(
+
+currentConversation
+
+);
+
+break;
+
+case "messages.update":
+
+await loadMessages(
+
+currentConversation
+
+);
+
+break;
+
+case "messages.delete":
+
+await loadMessages(
+
+currentConversation
+
+);
+
+break;
+
+case "typing.start":
+
+showTyping();
+
+break;
+
+case "typing.stop":
+
+hideTyping();
+
+break;
+
+default:
+
+console.log(
+
+event
 
 );
 
 }
-
-function hideLoading(){
-
-loadingOverlay
-
-.classList.add(
-
-"hidden"
-
-);
 
 }
 
 /* ==========================================================
-   HELPERS
+   FORMAT CONVERSATION TIME
 ========================================================== */
 
-function initials(text){
+function formatConversationTime(
 
-if(!text)
+date
 
-return "U";
+){
 
-return text
-
-.trim()
-
-.split(" ")
-
-.map(
-
-word=>word[0]
-
-)
-
-.join("")
-
-.substring(0,2)
-
-.toUpperCase();
-
-}
-
-function formatTime(date){
-
-if(!date)
+if(!date){
 
 return "";
 
-return new Date(date)
+}
 
-.toLocaleTimeString(
+const d=
+
+new Date(date);
+
+const now=
+
+new Date();
+
+if(
+
+d.toDateString()===
+
+now.toDateString()
+
+){
+
+return d.toLocaleTimeString(
 
 [],
 
@@ -482,88 +947,124 @@ minute:"2-digit"
 
 }
 
-function escapeHtml(text){
-
-if(!text)
-
-return "";
-
-return text
-
-.replace(/&/g,"&amp;")
-
-.replace(/</g,"&lt;")
-
-.replace(/>/g,"&gt;")
-
-.replace(/"/g,"&quot;")
-
-.replace(/'/g,"&#039;");
+return d.toLocaleDateString();
 
 }
 
 /* ==========================================================
-   PART 2 CONTINUES
+   UPDATE UNREAD BADGE
 ========================================================== */
+
+function updateUnreadBadge(
+
+count
+
+){
+
+const badge=
+
+document.getElementById(
+
+"messageBadge"
+
+);
+
+if(!badge){
+
+return;
+
+}
+
+if(count>0){
+
+badge.classList.remove(
+
+"hidden"
+
+);
+
+badge.textContent=
+
+count;
+
+}else{
+
+badge.classList.add(
+
+"hidden"
+
+);
+
+}
+
+}
+
 /* ==========================================================
-   REMADEF MESSAGES
-   Part 2
-   Open Conversation • Load Messages • Render • Send
+   PART 3
+   Message Rendering & Sending
+========================================================== *//* ==========================================================
+   PART 3
+   Messages • Render • Send • Reply • Edit • Delete
 ========================================================== */
-
-const chatMessages =
-document.getElementById("chatMessages");
-
-const chatName =
-document.getElementById("chatName");
-
-const chatStatus =
-document.getElementById("chatStatus");
-
-const chatAvatar =
-document.getElementById("chatAvatar");
-
-const messageInput =
-document.getElementById("messageInput");
-
-const sendButton =
-document.getElementById("sendButton");
 
 /* ==========================================================
-   OPEN CONVERSATION
+   LOAD MESSAGES
 ========================================================== */
 
-async function openConversation(conversationId){
+async function loadMessages(conversationId){
 
 showLoading();
 
 try{
 
-currentConversation =
-conversationId;
+const result=
 
-document
-.querySelectorAll(".conversation")
-.forEach(item=>{
+await RemadefAPI.getMessages(
 
-item.classList.remove("active");
+conversationId
 
-if(item.dataset.id===conversationId){
+);
 
-item.classList.add("active");
+if(!result.success){
+
+throw new Error(
+
+result.message
+
+);
 
 }
 
-});
+messages=
 
-await loadMessages(conversationId);
+result.data || [];
+
+renderMessages();
+
+await markConversationRead(
+
+conversationId
+
+);
 
 }
 catch(error){
 
-console.error(error);
+handleApiError(error);
 
-alert("Unable to open conversation.");
+chatMessages.innerHTML=
+
+`
+<div class="empty-state">
+
+<h3>
+
+Unable to load messages
+
+</h3>
+
+</div>
+`;
 
 }
 finally{
@@ -575,65 +1076,31 @@ hideLoading();
 }
 
 /* ==========================================================
-   LOAD MESSAGES
-========================================================== */
-
-async function loadMessages(conversationId){
-
-try{
-
-const result =
-
-await RemadefAPI.getMessages(
-conversationId
-);
-
-if(!result.success){
-
-throw new Error(result.message);
-
-}
-
-renderMessages(result.data);
-
-}
-catch(error){
-
-console.error(error);
-
-chatMessages.innerHTML=
-
-`
-<div class="empty-list">
-
-Unable to load messages.
-
-</div>
-`;
-
-}
-
-}
-
-/* ==========================================================
    RENDER MESSAGES
 ========================================================== */
 
-function renderMessages(messages){
+function renderMessages(){
 
 chatMessages.innerHTML="";
 
-if(!messages ||
-messages.length===0){
+if(messages.length===0){
 
 chatMessages.innerHTML=
 
 `
-<div class="empty-list">
+<div class="empty-state">
 
-No messages yet.
+<h3>
 
-Say hello 👋
+No messages yet
+
+</h3>
+
+<p>
+
+Start the conversation.
+
+</p>
 
 </div>
 `;
@@ -644,13 +1111,17 @@ return;
 
 messages.forEach(message=>{
 
+const mine=
+
+message.sender_id===currentUser.$id;
+
 const wrapper=
 
 document.createElement("div");
 
 wrapper.className=
 
-message.sender_id===currentUser.$id
+mine
 
 ?
 
@@ -668,36 +1139,71 @@ wrapper.innerHTML=
 
 `
 
-<div class="message-content">
-
 <div class="bubble">
 
+${
+
+message.reply_preview
+
+?
+
+`
+
+<div class="reply-reference">
+
 ${escapeHtml(
-message.content
+
+message.reply_preview
+
 )}
 
 </div>
 
-<div class="message-meta">
+`
+
+:
+
+""
+
+}
+
+<div class="message-text">
+
+${escapeHtml(
+
+message.content
+
+)}
+
+</div>
+
+<div class="message-footer">
 
 <span>
 
 ${formatTime(
+
 message.created_at
+
 )}
 
 </span>
 
 ${
-message.sender_id===currentUser.$id
+
+mine
 
 ?
 
-`<span>
+`
 
-${message.status||"Sent"}
+<span>
 
-</span>`
+${message.status || "Sent"}
+
+</span>
+
+`
 
 :
 
@@ -711,7 +1217,33 @@ ${message.status||"Sent"}
 
 `;
 
-chatMessages.appendChild(wrapper);
+wrapper.addEventListener(
+
+"contextmenu",
+
+event=>{
+
+event.preventDefault();
+
+openMessageMenu(
+
+message,
+
+event.clientX,
+
+event.clientY
+
+);
+
+}
+
+);
+
+chatMessages.appendChild(
+
+wrapper
+
+);
 
 });
 
@@ -723,19 +1255,125 @@ scrollToBottom();
    SEND MESSAGE
 ========================================================== */
 
-sendButton.addEventListener(
+async function sendMessage(){
 
-"click",
+const text=
 
-sendMessage
+messageInput.value.trim();
+
+if(text===""){
+
+return;
+
+}
+
+if(!currentConversation){
+
+alert(
+
+"Select a conversation first."
 
 );
 
-messageInput.addEventListener(
+return;
 
-"keydown",
+}
 
-event=>{
+try{
+
+sendButton.disabled=true;
+
+const payload={
+
+content:text,
+
+reply_to:replyingTo,
+
+retention:getRetention(),
+
+encryption_version:
+
+ENCRYPTION_VERSION
+
+};
+
+const result=
+
+await RemadefAPI.sendMessage(
+
+currentConversation,
+
+payload
+
+);
+
+if(!result.success){
+
+throw new Error(
+
+result.message
+
+);
+
+}
+
+messageInput.value="";
+
+clearDraft();
+
+replyingTo=null;
+
+replyPreview.classList.add(
+
+"hidden"
+
+);
+
+await loadMessages(
+
+currentConversation
+
+);
+
+}
+catch(error){
+
+if(
+
+navigator.onLine===false
+
+){
+
+MessageModules
+
+.offlineQueue
+
+.add(
+
+text
+
+);
+
+}
+
+handleApiError(error);
+
+}
+finally{
+
+sendButton.disabled=false;
+
+messageInput.focus();
+
+}
+
+}
+
+/* ==========================================================
+   KEYBOARD
+========================================================== */
+
+function handleKeyDown(event){
 
 if(
 
@@ -755,419 +1393,45 @@ sendMessage();
 
 }
 
-);
-
-async function sendMessage(){
-
-const text=
-
-messageInput.value.trim();
-
-if(text===""){
-
-return;
-
-}
-
-if(!currentConversation){
-
-alert(
-
-"Select a conversation."
-
-);
-
-return;
-
-}
-
-try{
-
-sendButton.disabled=true;
-
-const result=
-
-await RemadefAPI.sendMessage(
-
-currentConversation,
-
-{
-
-content:text
-
-}
-
-);
-
-if(!result.success){
-
-throw new Error(
-
-result.message
-
-);
-
-}
-
-messageInput.value="";
-
-await loadMessages(
-
-currentConversation
-
-);
-
-}
-catch(error){
-
-console.error(error);
-
-alert(
-
-"Unable to send message."
-
-);
-
-}
-finally{
-
-sendButton.disabled=false;
-
-messageInput.focus();
-
-}
-
-}
-
-/* ==========================================================
-   SCROLL
-========================================================== */
-
-function scrollToBottom(){
-
-chatMessages.scrollTop=
-
-chatMessages.scrollHeight;
-
-}
-
-/* ==========================================================
-   PART 3 CONTINUES
-========================================================== *//* ==========================================================
-   REMADEF MESSAGES
-   Part 3
-   Typing • Reply • Reactions • Pin • Edit • Delete
-========================================================== */
-
-const typingIndicator =
-document.getElementById("typingIndicator");
-
-const replyPreview =
-document.getElementById("replyPreview");
-
-const replyText =
-document.getElementById("replyText");
-
-const cancelReply =
-document.getElementById("cancelReply");
-
-let replyingTo = null;
-
-let typingTimeout = null;
-
-/* ==========================================================
-   TYPING INDICATOR
-========================================================== */
-
-messageInput.addEventListener(
-"input",
-handleTyping
-);
-
-function handleTyping(){
-
-if(!currentConversation){
-
-return;
-
-}
-
-clearTimeout(
-typingTimeout
-);
-
-RemadefAPI.sendTyping(
-currentConversation
-);
-
-typingTimeout =
-setTimeout(()=>{
-
-RemadefAPI.stopTyping(
-currentConversation
-);
-
-},3000);
-
-}
-
-/* ==========================================================
-   SHOW REMOTE TYPING
-========================================================== */
-
-function showTyping(){
-
-typingIndicator.classList.remove(
-"hidden"
-);
-
-}
-
-function hideTyping(){
-
-typingIndicator.classList.add(
-"hidden"
-);
-
-}
-
 /* ==========================================================
    REPLY
 ========================================================== */
 
-function startReply(messageId,text){
+function startReply(
 
-replyingTo =
-messageId;
+message
+
+){
+
+replyingTo=
+
+message.$id;
 
 replyPreview.classList.remove(
+
 "hidden"
+
 );
 
-replyText.textContent =
-text;
+replyText.textContent=
+
+message.content;
 
 messageInput.focus();
 
 }
 
-cancelReply.addEventListener(
-
-"click",
-
-()=>{
+function cancelReplyMode(){
 
 replyingTo=null;
 
 replyPreview.classList.add(
+
 "hidden"
+
 );
 
 replyText.textContent="";
-
-}
-
-);
-
-/* ==========================================================
-   MESSAGE MENU
-========================================================== */
-
-function messageMenu(message){
-
-return [
-
-{
-
-title:"Reply",
-
-action:()=>{
-
-startReply(
-
-message.$id,
-
-message.content
-
-);
-
-}
-
-},
-
-{
-
-title:"Copy",
-
-action:()=>{
-
-navigator.clipboard.writeText(
-
-message.content
-
-);
-
-}
-
-},
-
-{
-
-title:"Pin",
-
-action:()=>{
-
-pinMessage(
-
-message.$id
-
-);
-
-}
-
-},
-
-{
-
-title:"React",
-
-action:()=>{
-
-reactToMessage(
-
-message.$id,
-
-"👍"
-
-);
-
-}
-
-},
-
-{
-
-title:"Edit",
-
-action:()=>{
-
-editMessage(
-
-message
-
-);
-
-}
-
-},
-
-{
-
-title:"Delete",
-
-action:()=>{
-
-deleteMessage(
-
-message.$id
-
-);
-
-}
-
-}
-
-];
-
-}
-
-/* ==========================================================
-   SEND REPLY
-========================================================== */
-
-async function sendReply(message){
-
-await RemadefAPI.sendMessage(
-
-currentConversation,
-
-{
-
-content:message,
-
-reply_to:replyingTo
-
-}
-
-);
-
-replyingTo=null;
-
-replyPreview.classList.add(
-"hidden"
-);
-
-}
-
-/* ==========================================================
-   REACTIONS
-========================================================== */
-
-async function reactToMessage(
-
-messageId,
-
-emoji
-
-){
-
-try{
-
-await RemadefAPI.reactToMessage(
-
-messageId,
-
-emoji
-
-);
-
-}
-catch(error){
-
-console.error(error);
-
-}
-
-}
-
-/* ==========================================================
-   PIN MESSAGE
-========================================================== */
-
-async function pinMessage(
-
-messageId
-
-){
-
-try{
-
-await RemadefAPI.pinMessage(
-
-messageId
-
-);
-
-alert(
-"Message pinned."
-);
-
-}
-catch(error){
-
-console.error(error);
-
-}
 
 }
 
@@ -1177,7 +1441,7 @@ console.error(error);
 
 async function editMessage(message){
 
-const updated =
+const updated=
 
 prompt(
 
@@ -1222,7 +1486,7 @@ currentConversation
 }
 catch(error){
 
-console.error(error);
+handleApiError(error);
 
 }
 
@@ -1232,17 +1496,21 @@ console.error(error);
    DELETE MESSAGE
 ========================================================== */
 
-async function deleteMessage(messageId){
+async function deleteMessage(
 
-const confirmed =
+messageId
 
-confirm(
+){
+
+if(
+
+!confirm(
 
 "Delete this message?"
 
-);
+)
 
-if(!confirmed){
+){
 
 return;
 
@@ -1265,111 +1533,180 @@ currentConversation
 }
 catch(error){
 
-console.error(error);
-
-alert(
-
-"Unable to delete message."
-
-);
+handleApiError(error);
 
 }
 
 }
 
 /* ==========================================================
-   CONTEXT MENU
+   PIN MESSAGE
 ========================================================== */
 
-chatMessages.addEventListener(
+async function pinMessage(
 
-"contextmenu",
+messageId
 
-event=>{
+){
 
-event.preventDefault();
+try{
 
-const bubble =
-
-event.target.closest(
-
-".message"
-
-);
-
-if(!bubble){
-
-return;
-
-}
-
-const messageId =
-
-bubble.dataset.id;
-
-console.log(
-
-"Open context menu:",
+await RemadefAPI.pinMessage(
 
 messageId
 
 );
 
-/* Custom context menu UI
-   will be implemented later */
+}
+catch(error){
 
-});
+handleApiError(error);
+
+}
+
+}
 
 /* ==========================================================
-   PART 4 CONTINUES
+   REACTION
+========================================================== */
+
+async function reactToMessage(
+
+messageId,
+
+emoji
+
+){
+
+try{
+
+await RemadefAPI.reactToMessage(
+
+messageId,
+
+emoji
+
+);
+
+}
+catch(error){
+
+handleApiError(error);
+
+}
+
+}
+
+/* ==========================================================
+   COPY MESSAGE
+========================================================== */
+
+async function copyMessage(text){
+
+try{
+
+await navigator.clipboard.writeText(
+
+text
+
+);
+
+}
+catch(error){
+
+console.error(error);
+
+}
+
+}
+
+/* ==========================================================
+   SCROLL
+========================================================== */
+
+function scrollToBottom(){
+
+chatMessages.scrollTop=
+
+chatMessages.scrollHeight;
+
+}
+
+/* ==========================================================
+   PART 4
+   Typing • Privacy • Drafts • Emoji • Attachments
 ========================================================== *//* ==========================================================
-   REMADEF MESSAGES
-   Part 4
-   Privacy • Device Copies • Retention • Realtime
-   Utilities • Initialization Complete
+   PART 4
+   Typing • Privacy • Drafts • Emoji • Attachments
+   Offline • Utilities • Future Modules
 ========================================================== */
 
 /* ==========================================================
-   DOM
+   TYPING INDICATOR
 ========================================================== */
 
-const keepLocalCopies =
-document.getElementById(
-"keepLocalCopies"
+function handleTyping(){
+
+if(!currentConversation){
+
+return;
+
+}
+
+clearTimeout(
+
+typingTimeout
+
 );
 
-const conversationInfo =
-document.getElementById(
-"conversationInfo"
+RemadefAPI.sendTyping(
+
+currentConversation
+
 );
 
-const chatInfoButton =
-document.getElementById(
-"chatInfoButton"
+messageInput.dispatchEvent(
+
+new Event("draft")
+
 );
 
-const attachmentButton =
-document.getElementById(
-"attachmentButton"
+typingTimeout=
+
+setTimeout(()=>{
+
+RemadefAPI.stopTyping(
+
+currentConversation
+
 );
 
-const attachmentMenu =
-document.getElementById(
-"attachmentMenu"
+},3000);
+
+}
+
+function showTyping(){
+
+typingIndicator?.classList.remove(
+
+"hidden"
+
 );
 
-const emojiButton =
-document.getElementById(
-"emojiButton"
+}
+
+function hideTyping(){
+
+typingIndicator?.classList.add(
+
+"hidden"
+
 );
 
-const emojiPicker =
-document.getElementById(
-"emojiPicker"
-);
+}
 
 /* ==========================================================
-   PRIVACY
+   PRIVACY SETTINGS
 ========================================================== */
 
 keepLocalCopies?.addEventListener(
@@ -1392,7 +1729,7 @@ keepLocalCopies.checked
 
 localStorage.setItem(
 
-"remadef_message_settings",
+DEVICE_COPY_KEY,
 
 JSON.stringify(settings)
 
@@ -1406,7 +1743,7 @@ const saved=
 
 localStorage.getItem(
 
-"remadef_message_settings"
+DEVICE_COPY_KEY
 
 );
 
@@ -1415,6 +1752,8 @@ if(!saved){
 return;
 
 }
+
+try{
 
 const settings=
 
@@ -1425,312 +1764,31 @@ keepLocalCopies.checked=
 settings.keepEncryptedCopies;
 
 }
+catch(error){
 
-/* ==========================================================
-   CONVERSATION INFO
-========================================================== */
-
-chatInfoButton?.addEventListener(
-
-"click",
-
-()=>{
-
-conversationInfo.classList.toggle(
-
-"hidden"
-
-);
-
-}
-
-);
-
-/* ==========================================================
-   EMOJI PICKER
-========================================================== */
-
-emojiButton?.addEventListener(
-
-"click",
-
-()=>{
-
-emojiPicker.classList.toggle(
-
-"hidden"
-
-);
-
-attachmentMenu.classList.add(
-
-"hidden"
-
-);
-
-}
-
-);
-
-emojiPicker?.addEventListener(
-
-"click",
-
-event=>{
-
-const emoji=
-
-event.target.textContent.trim();
-
-if(!emoji){
-
-return;
-
-}
-
-messageInput.value+=emoji;
-
-emojiPicker.classList.add(
-
-"hidden"
-
-);
-
-messageInput.focus();
-
-}
-
-);
-
-/* ==========================================================
-   ATTACHMENTS
-========================================================== */
-
-attachmentButton?.addEventListener(
-
-"click",
-
-()=>{
-
-attachmentMenu.classList.toggle(
-
-"hidden"
-
-);
-
-emojiPicker.classList.add(
-
-"hidden"
-
-);
-
-});
-
-/* Future:
-Photo
-Video
-Audio
-Document
-Location
-Contact */
-
-/* ==========================================================
-   REALTIME
-========================================================== */
-
-function subscribeConversation(
-
-conversationId
-
-){
-
-if(unsubscribeRealtime){
-
-unsubscribeRealtime();
-
-}
-
-unsubscribeRealtime=
-
-client.subscribe(
-
-`databases.messages.documents`,
-
-response=>{
-
-handleRealtime(
-
-response
-
-);
-
-}
-
-);
-
-}
-
-function handleRealtime(
-
-response
-
-){
-
-console.log(
-
-"Realtime",
-
-response
-
-);
-
-if(
-
-currentConversation
-
-){
-
-loadMessages(
-
-currentConversation
-
-);
+console.error(error);
 
 }
 
 }
 
 /* ==========================================================
-   ONLINE STATUS
+   DRAFTS
 ========================================================== */
 
-window.addEventListener(
+messageInput?.addEventListener(
 
-"online",
+"draft",
 
-()=>{
-
-console.log(
-
-"Online"
+saveDraft
 
 );
 
-}
-
-);
-
-window.addEventListener(
-
-"offline",
-
-()=>{
-
-console.log(
-
-"Offline"
-
-);
-
-}
-
-);
-
-/* ==========================================================
-   CLOSE MENUS
-========================================================== */
-
-document.addEventListener(
-
-"click",
-
-event=>{
-
-if(
-
-!emojiButton.contains(
-
-event.target
-
-)
-
-&&
-
-!emojiPicker.contains(
-
-event.target
-
-)
-
-){
-
-emojiPicker.classList.add(
-
-"hidden"
-
-);
-
-}
-
-if(
-
-!attachmentButton.contains(
-
-event.target
-
-)
-
-&&
-
-!attachmentMenu.contains(
-
-event.target
-
-)
-
-){
-
-attachmentMenu.classList.add(
-
-"hidden"
-
-);
-
-}
-
-}
-
-);
-
-/* ==========================================================
-   MESSAGE RETENTION
-========================================================== */
-
-function getRetention(){
-
-return "72h";
-
-}
-
-/* Future:
-24 Hours
-72 Hours
-7 Days
-Custom */
-
-/* ==========================================================
-   AUTO SAVE DRAFT
-========================================================== */
-
-messageInput.addEventListener(
-
-"input",
-
-()=>{
+function saveDraft(){
 
 localStorage.setItem(
 
-"remadef_message_draft",
+DRAFT_KEY,
 
 messageInput.value
 
@@ -1738,15 +1796,13 @@ messageInput.value
 
 }
 
-);
-
 function loadDraft(){
 
 const draft=
 
 localStorage.getItem(
 
-"remadef_message_draft"
+DRAFT_KEY
 
 );
 
@@ -1758,35 +1814,395 @@ messageInput.value=draft;
 
 }
 
-/* ==========================================================
-   CLEAR DRAFT
-========================================================== */
-
 function clearDraft(){
 
 localStorage.removeItem(
 
-"remadef_message_draft"
+DRAFT_KEY
 
 );
 
 }
 
 /* ==========================================================
-   INITIALIZATION
+   EMOJI PICKER
 ========================================================== */
 
-window.addEventListener(
+function toggleEmojiPicker(){
 
-"load",
+emojiPicker?.classList.toggle(
 
-()=>{
+"hidden"
 
-loadPrivacySettings();
+);
 
-loadDraft();
+attachmentMenu?.classList.add(
+
+"hidden"
+
+);
+
+}
+
+emojiPicker?.addEventListener(
+
+"click",
+
+event=>{
+
+if(
+
+!event.target.dataset.emoji
+
+){
+
+return;
+
+}
+
+messageInput.value+=
+
+event.target.dataset.emoji;
+
+messageInput.focus();
+
+saveDraft();
 
 });
+
+/* ==========================================================
+   ATTACHMENTS
+========================================================== */
+
+function toggleAttachmentMenu(){
+
+attachmentMenu?.classList.toggle(
+
+"hidden"
+
+);
+
+emojiPicker?.classList.add(
+
+"hidden"
+
+);
+
+}
+
+async function uploadAttachment(file){
+
+return MessageModules
+
+.attachments
+
+.upload(file);
+
+}
+
+/* ==========================================================
+   CONVERSATION INFO
+========================================================== */
+
+function toggleConversationInfo(){
+
+conversationInfo?.classList.toggle(
+
+"hidden"
+
+);
+
+}
+
+/* ==========================================================
+   NETWORK STATUS
+========================================================== */
+
+function networkOnline(){
+
+console.log(
+
+"Network Connected"
+
+);
+
+MessageModules
+
+.offlineQueue
+
+.flush();
+
+}
+
+function networkOffline(){
+
+console.log(
+
+"Offline Mode"
+
+);
+
+}
+
+/* ==========================================================
+   API ERROR HANDLER
+========================================================== */
+
+function handleApiError(error){
+
+console.error(error);
+
+alert(
+
+error.message ||
+
+"Something went wrong."
+
+);
+
+}
+
+/* ==========================================================
+   LOADING
+========================================================== */
+
+function showLoading(){
+
+loadingOverlay?.classList.remove(
+
+"hidden"
+
+);
+
+}
+
+function hideLoading(){
+
+loadingOverlay?.classList.add(
+
+"hidden"
+
+);
+
+}
+
+/* ==========================================================
+   UTILITIES
+========================================================== */
+
+function initials(text){
+
+if(!text){
+
+return "U";
+
+}
+
+return text
+
+.trim()
+
+.split(" ")
+
+.map(
+
+word=>word.charAt(0)
+
+)
+
+.join("")
+
+.substring(0,2)
+
+.toUpperCase();
+
+}
+
+function escapeHtml(text){
+
+if(!text){
+
+return "";
+
+}
+
+return text
+
+.replace(/&/g,"&amp;")
+
+.replace(/</g,"&lt;")
+
+.replace(/>/g,"&gt;")
+
+.replace(/"/g,"&quot;")
+
+.replace(/'/g,"&#039;");
+
+}
+
+function formatTime(date){
+
+if(!date){
+
+return "";
+
+}
+
+return new Date(date)
+
+.toLocaleTimeString(
+
+[],
+
+{
+
+hour:"2-digit",
+
+minute:"2-digit"
+
+}
+
+);
+
+}
+
+function getRetention(){
+
+return DEFAULT_RETENTION;
+
+}
+
+/* ==========================================================
+   INTERNAL PLACEHOLDER MODULES
+   Hidden from users
+========================================================== */
+
+const MessageModules={
+
+encryption:{
+
+version:
+
+ENCRYPTION_VERSION,
+
+async encrypt(message){
+
+return message;
+
+},
+
+async decrypt(message){
+
+return message;
+
+}
+
+},
+
+offlineQueue:{
+
+queue:[],
+
+add(message){
+
+this.queue.push(message);
+
+},
+
+async flush(){
+
+/* Backend */
+
+}
+
+},
+
+attachments:{
+
+async upload(file){
+
+/* Future:
+Photos
+Videos
+Audio
+Documents
+Location
+Contacts
+*/
+
+return null;
+
+}
+
+},
+
+voiceCalls:{
+
+async start(){
+
+/* Future */
+
+}
+
+},
+
+videoCalls:{
+
+async start(){
+
+/* Future */
+
+}
+
+},
+
+screenShare:{
+
+async start(){
+
+/* Future */
+
+}
+
+},
+
+translation:{
+
+async translate(
+
+text,
+
+language
+
+){
+
+return text;
+
+}
+
+},
+
+payments:{
+
+async send(){
+
+/* Future */
+
+}
+
+},
+
+aiAssistant:{
+
+async suggestReply(){
+
+return[];
+
+}
+
+}
+
+};
 
 /* ==========================================================
    CLEANUP
@@ -1798,14 +2214,19 @@ window.addEventListener(
 
 ()=>{
 
-if(unsubscribeRealtime){
+if(
+
+unsubscribeRealtime
+
+){
 
 unsubscribeRealtime();
 
 }
 
-});
+}
 
 /* ==========================================================
-   END OF messages.js
+   END OF FILE
 ========================================================== */
+);
