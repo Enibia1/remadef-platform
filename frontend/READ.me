@@ -1,0 +1,26 @@
+# REMADEF Platform - Unified Financial & Escrow Engine
+
+An institutional-grade, modular financial platform architecture featuring partner-managed BaaS routing, closed-loop gift cards, OTP escrow security, immutable transaction auditing, and tiered KYC compliance.
+
+---
+
+## 📂 Project Directory Structure
+
+```text
+remadef-platform/
+├── backend/
+│   ├── main.py                  # Appwrite function entry point & HTTP router
+│   ├── financial_engine.py      # Core financial, escrow, KYC, and audit modules
+│   └── requirements.txt         # Python runtime dependencies
+├── frontend/
+│   ├── static/
+│   │   ├── css/
+│   │   │   └── global.css       # Modern design system stylesheet
+│   │   └── js/
+│   │       └── app.js           # Shared API fetch & utility scripts
+│   └── templates/
+│       ├── dashboard-wallet.html# User financial overview panel
+│       ├── transactions.html    # Immutable audit logs & transaction history
+│       ├── admin-giftcards.html # Admin voucher minting tool
+│       └── kyc.html             # BVN/NIN compliance verification portal
+└── README.md
