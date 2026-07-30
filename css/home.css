@@ -393,7 +393,7 @@ ul{
 }
 
 /* ==========================================
-   SIDEBAR
+   SIDEBAR & COLLAPSIBLE NAVIGATION
 ========================================== */
 
 .sidebar{
@@ -410,15 +410,48 @@ ul{
 
     justify-content:space-between;
 
-    transition:width .3s ease;
+    transition:width .3s cubic-bezier(0.4, 0, 0.2, 1);
 
     overflow:hidden;
 
+    flex-shrink:0;
+
 }
 
+/* Collapsed Sidebar State */
 .sidebar.collapsed{
 
-    width:var(--sidebar-collapse);
+    width:var(--sidebar-collapse) !important;
+
+}
+
+.sidebar.collapsed .sidebar-title,
+.sidebar.collapsed .sidebar-nav span,
+.sidebar.collapsed .menu-badge,
+.sidebar.collapsed .profile-progress,
+.sidebar.collapsed .copyright{
+
+    display:none !important;
+
+    opacity:0;
+
+    pointer-events:none;
+
+}
+
+.sidebar.collapsed .sidebar-nav a{
+
+    justify-content:center;
+
+    padding:16px 0;
+
+    width:100%;
+
+}
+
+.sidebar.collapsed .sidebar-nav a svg{
+
+    margin:0;
 
 }
 
@@ -465,6 +498,17 @@ ul{
     transition:var(--transition);
 
     position:relative;
+
+    z-index:5;
+
+    cursor:pointer !important;
+
+}
+
+/* Pass click events directly to parent link */
+.sidebar-nav a *{
+
+    pointer-events:none;
 
 }
 
@@ -1358,6 +1402,14 @@ ul{
 
 }
 
+.brand-dropdown:not(.show){
+
+    display:none !important;
+
+    pointer-events:none !important;
+
+}
+
 .brand-dropdown a{
 
     display:flex;
@@ -1374,6 +1426,12 @@ ul{
 
 }
 
+.brand-dropdown a *{
+
+    pointer-events:none;
+
+}
+
 .brand-dropdown a:hover{
 
     background:#F5F7FB;
@@ -1387,46 +1445,6 @@ ul{
     height:20px;
 
     color:var(--navy);
-
-}
-
-/* ==========================================
-   COLLAPSIBLE SIDEBAR
-========================================== */
-
-.sidebar.collapsed .sidebar-title{
-
-    text-align:center;
-
-    padding-left:0;
-
-    padding-right:0;
-
-}
-
-.sidebar.collapsed .sidebar-nav span,
-
-.sidebar.collapsed .menu-badge,
-
-.sidebar.collapsed .profile-progress,
-
-.sidebar.collapsed .copyright{
-
-    display:none;
-
-}
-
-.sidebar.collapsed .sidebar-nav a{
-
-    justify-content:center;
-
-    padding:16px 0;
-
-}
-
-.sidebar.collapsed .sidebar-nav a svg{
-
-    margin:0;
 
 }
 
@@ -1453,6 +1471,14 @@ ul{
     z-index:1100;
 
     transition:opacity .3s ease;
+
+}
+
+.menu-overlay:not(.show){
+
+    display:none !important;
+
+    pointer-events:none !important;
 
 }
 
