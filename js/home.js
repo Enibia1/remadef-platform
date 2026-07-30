@@ -1,4 +1,4 @@
-Document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
     
     // 1. Initialize Lucide Icons
     if (window.lucide) {
@@ -57,7 +57,50 @@ Document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ==========================================
-    // 5. GLOBAL CLICK HANDLER (CLOSE OUTSIDE)
+    // 5. ESCROW & WALLET MODAL LOGIC (New & Fixed)
+    // ==========================================
+    const escrowToggle = document.getElementById("escrowToggle");
+    const escrowModal = document.getElementById("escrowModal");
+    const closeEscrow = document.getElementById("closeEscrow");
+
+    const walletToggle = document.getElementById("walletToggle");
+    const walletModal = document.getElementById("walletModal");
+    const closeWallet = document.getElementById("closeWallet");
+
+    // Open Escrow
+    if (escrowToggle && escrowModal) {
+        escrowToggle.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            escrowModal.classList.add("active");
+        });
+    }
+
+    // Close Escrow Button
+    if (closeEscrow && escrowModal) {
+        closeEscrow.addEventListener("click", () => {
+            escrowModal.classList.remove("active");
+        });
+    }
+
+    // Open Wallet
+    if (walletToggle && walletModal) {
+        walletToggle.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            walletModal.classList.add("active");
+        });
+    }
+
+    // Close Wallet Button
+    if (closeWallet && walletModal) {
+        closeWallet.addEventListener("click", () => {
+            walletModal.classList.remove("active");
+        });
+    }
+
+    // ==========================================
+    // 6. GLOBAL CLICK HANDLER (CLOSE OUTSIDE)
     // ==========================================
     document.addEventListener("click", (e) => {
         if (brandDropdown && !brandButton.contains(e.target) && !brandDropdown.contains(e.target)) {
@@ -73,16 +116,14 @@ Document.addEventListener("DOMContentLoaded", () => {
                 sidebar.classList.remove("show");
             }
         }
-    });
 
-    // ==========================================
-    // 6. UNBLOCKED NAVIGATION CLICKS
-    // ==========================================
-    const allNavLinks = document.querySelectorAll(".sidebar-nav a, .brand-dropdown a, .action-btn");
-    allNavLinks.forEach((link) => {
-        link.addEventListener("click", (e) => {
-            e.stopPropagation();
-        });
+        // Click outside modals to close them
+        if (escrowModal && escrowModal.classList.contains("active") && !escrowModal.querySelector(".modal-content").contains(e.target) && e.target !== escrowToggle) {
+            escrowModal.classList.remove("active");
+        }
+        if (walletModal && walletModal.classList.contains("active") && !walletModal.querySelector(".modal-content").contains(e.target) && e.target !== walletToggle) {
+            walletModal.classList.remove("active");
+        }
     });
 
     // ==========================================
@@ -145,74 +186,4 @@ Document.addEventListener("DOMContentLoaded", () => {
             apiStatus.textContent = "Connected to REMADEF";
         }, 1200);
     }
-
-    // ==========================================
-    // 8. WALLET & ESCROW DATA LOADER INTEGRATION
-    // ==========================================
-    const walletBalanceEl = document.getElementById("walletBalance");
-    const transactionListEl = document.getElementById("transactionList");
-    const escrowListEl = document.getElementById("escrowList");
-
-    async function fetchWalletAndEscrow() {
-        try {
-            const [walletRes, escrowRes] = await Promise.all([
-                fetch("/api/wallet", { headers: { "Content-Type": "application/json" } }),
-                fetch("/api/escrow", { headers: { "Content-Type": "application/json" } })
-            ]);
-
-            if (walletRes.ok) {
-                const walletJson = await walletRes.json();
-                const walletData = walletJson.data || walletJson;
-                const wallet = walletData.wallet;
-                const transactions = walletData.transactions || [];
-
-                if (walletBalanceEl && wallet) {
-                    const formattedBalance = new Intl.NumberFormat('en-NG', {
-                        style: 'currency',
-                        currency: wallet.currency || 'NGN'
-                    }).format(wallet.balance || 0);
-                    walletBalanceEl.textContent = formattedBalance;
-                }
-
-                if (transactionListEl && transactions.length > 0) {
-                    transactionListEl.innerHTML = transactions.map(tx => `
-                        <div class="transaction-item" style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color, #eee);">
-                            <div>
-                                <p style="margin: 0; font-weight: 500;">${tx.description || tx.type || 'Transaction'}</p>
-                                <small style="color: var(--muted);">${new Date(tx.created_at || tx.$createdAt).toLocaleDateString()}</small>
-                            </div>
-                            <div style="text-align: right; font-weight: 600; color: ${tx.amount < 0 ? '#e74c3c' : '#2ecc71'};">
-                                ${tx.amount < 0 ? '-' : '+'}₦${Math.abs(tx.amount || 0).toLocaleString()}
-                            </div>
-                        </div>
-                    `).join('');
-                } else if (transactionListEl) {
-                    transactionListEl.innerHTML = "<p style='color: var(--muted); font-size: 13px;'>No recent transactions found.</p>";
-                }
-            }
-
-            if (escrowRes.ok) {
-                const escrowJson = await escrowRes.json();
-                const escrows = escrowJson.data || escrowJson;
-
-                if (escrowListEl && Array.isArray(escrows) && escrows.length > 0) {
-                    escrowListEl.innerHTML = escrows.map(esc => `
-                        <div class="escrow-item" style="padding: 12px; margin-bottom: 8px; border: 1px solid var(--border-color, #eee); border-radius: 6px;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                                <strong style="font-size: 14px;">${esc.title || 'Escrow Agreement'}</strong>
-                                <span style="font-size: 12px; padding: 2px 6px; border-radius: 4px; background: #eef2f7; color: #333;">${esc.status || 'Active'}</span>
-                            </div>
-                            <p style="margin: 0; font-size: 13px; color: var(--muted);">Amount: ₦${(esc.amount || 0).toLocaleString()}</p>
-                        </div>
-                    `).join('');
-                } else if (escrowListEl) {
-                    escrowListEl.innerHTML = "<p style='color: var(--muted); font-size: 13px;'>No active escrow agreements found.</p>";
-                }
-            }
-        } catch (err) {
-            console.error("Failed to sync wallet and escrow data:", err);
-        }
-    }
-
-    fetchWalletAndEscrow();
 });
