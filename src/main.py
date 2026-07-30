@@ -1,3 +1,5 @@
+Here is the fully restored **main.py** script. All original section headings, structural dividers, database configurations, and functions (register_user, get_current_profile, update_current_profile, get_dashboard, health_check) have been preserved with their original formatting, while fully incorporating the updated routing logic and live database implementations for messages and conversations:
+```python
 # ============================================================
 # REMADEF PLATFORM API
 # Appwrite Cloud Function
@@ -159,7 +161,7 @@ def response(
                 "Content-Type, X-Appwrite-Project",
 
             "Access-Control-Allow-Methods":
-                "GET, POST, PUT, PATCH, OPTIONS"
+                "GET, POST, PUT, PATCH, DELETE, OPTIONS"
 
         },
 
@@ -923,13 +925,49 @@ def get_notifications(context):
 # MESSAGES
 # ============================================================
 
-def get_messages(context):
+def get_messages(conversation_id, context):
 
     try:
 
+        tables_db = get_tables_db(
+            context
+        )
+
+        queries = []
+
+        if conversation_id:
+
+            queries.append(
+                f'equal("conversation_id", "{conversation_id}")'
+            )
+
+        result = convert_to_dict(
+
+            tables_db.list_rows(
+
+                database_id=DATABASE_ID,
+
+                table_id=MESSAGES_TABLE_ID,
+
+                queries=queries
+
+            )
+
+        )
+
+        rows = (
+
+            result.get("rows", [])
+
+            if isinstance(result, dict)
+
+            else []
+
+        )
+
         return success(
 
-            [],
+            rows,
 
             "Messages loaded successfully."
 
@@ -960,9 +998,87 @@ def get_conversations(context):
 
     try:
 
+        user = get_current_user(
+            context
+        )
+
+        user_id = user.get(
+            "$id"
+        )
+
+        tables_db = get_tables_db(
+            context
+        )
+
+        memberships = convert_to_dict(
+
+            tables_db.list_rows(
+
+                database_id=DATABASE_ID,
+
+                table_id=MEMBERS_TABLE_ID,
+
+                queries=[
+
+                    f'equal("user_id", "{user_id}")'
+
+                ]
+
+            )
+
+        ).get("rows", [])
+
+        conversation_ids = [
+
+            m.get("conversation_id")
+
+            for m in memberships
+
+            if m.get("conversation_id")
+
+        ]
+
+        if not conversation_ids:
+
+            return success(
+
+                [],
+
+                "Conversations loaded successfully."
+
+            )
+
+        conversations = []
+
+        for conv_id in conversation_ids:
+
+            try:
+
+                c = convert_to_dict(
+
+                    tables_db.get_row(
+
+                        database_id=DATABASE_ID,
+
+                        table_id=CONVERSATIONS_TABLE_ID,
+
+                        row_id=conv_id
+
+                    )
+
+                )
+
+                if c:
+
+                    conversations.append(c)
+
+            except Exception:
+
+                continue
+
         return success(
 
-            [],
+            conversations,
 
             "Conversations loaded successfully."
 
@@ -999,9 +1115,75 @@ def create_conversation(
 
     try:
 
+        user = get_current_user(
+            context
+        )
+
+        user_id = user.get(
+            "$id"
+        )
+
+        tables_db = get_tables_db(
+            context
+        )
+
+        now = datetime.now(
+            timezone.utc
+        ).isoformat()
+
+        conv_data = {
+
+            "name": data.get("name", "New Conversation"),
+
+            "status": "Secure conversation",
+
+            "last_message": "Started conversation",
+
+            "updated_at": now
+
+        }
+
+        created = convert_to_dict(
+
+            tables_db.create_row(
+
+                database_id=DATABASE_ID,
+
+                table_id=CONVERSATIONS_TABLE_ID,
+
+                row_id="unique()",
+
+                data=conv_data
+
+            )
+
+        )
+
+        conv_id = created.get(
+            "$id"
+        )
+
+        tables_db.create_row(
+
+            database_id=DATABASE_ID,
+
+            table_id=MEMBERS_TABLE_ID,
+
+            row_id="unique()",
+
+            data={
+
+                "conversation_id": conv_id,
+
+                "user_id": user_id
+
+            }
+
+        )
+
         return success(
 
-            {},
+            created,
 
             "Conversation created successfully."
 
@@ -1030,6 +1212,8 @@ def create_conversation(
 
 def send_message(
 
+    conversation_id,
+
     data,
 
     context
@@ -1038,9 +1222,83 @@ def send_message(
 
     try:
 
+        user = get_current_user(
+            context
+        )
+
+        user_id = user.get(
+            "$id"
+        )
+
+        tables_db = get_tables_db(
+            context
+        )
+
+        now = datetime.now(
+            timezone.utc
+        ).isoformat()
+
+        content = data.get("content") or data.get("body") or ""
+
+        message_data = {
+
+            "conversation_id": conversation_id,
+
+            "sender_id": user_id,
+
+            "content": content,
+
+            "reply_preview": data.get("reply_to", ""),
+
+            "status": "Sent",
+
+            "created_at": now
+
+        }
+
+        created = convert_to_dict(
+
+            tables_db.create_row(
+
+                database_id=DATABASE_ID,
+
+                table_id=MESSAGES_TABLE_ID,
+
+                row_id="unique()",
+
+                data=message_data
+
+            )
+
+        )
+
+        try:
+
+            tables_db.update_row(
+
+                database_id=DATABASE_ID,
+
+                table_id=CONVERSATIONS_TABLE_ID,
+
+                row_id=conversation_id,
+
+                data={
+
+                    "last_message": content,
+
+                    "updated_at": now
+
+                }
+
+            )
+
+        except Exception:
+
+            pass
+
         return success(
 
-            {},
+            created,
 
             "Message sent successfully."
 
@@ -1375,9 +1633,39 @@ def route_request(
 
 ):
 
-    method = request.method.upper()
+    raw_body = request.body
 
-    path = request.path
+    req_payload = {}
+
+    if isinstance(raw_body, str) and raw_body.strip():
+
+        try:
+
+            req_payload = json.loads(raw_body)
+
+        except Exception:
+
+            req_payload = {}
+
+    elif isinstance(raw_body, dict):
+
+        req_payload = raw_body
+
+    method = req_payload.get("method", request.method).upper()
+
+    path = req_payload.get("path", request.path)
+
+    body_data = req_payload.get("body", {})
+
+    if isinstance(body_data, str) and body_data.strip():
+
+        try:
+
+            body_data = json.loads(body_data)
+
+        except Exception:
+
+            body_data = {}
 
     # ========================================================
     # CORS PREFLIGHT
@@ -1427,7 +1715,7 @@ def route_request(
 
     ):
 
-        data = parse_json_body(
+        data = body_data or parse_json_body(
 
             request
 
@@ -1471,7 +1759,7 @@ def route_request(
 
     ):
 
-        data = parse_json_body(
+        data = body_data or parse_json_body(
 
             request
 
@@ -1529,11 +1817,19 @@ def route_request(
 
         method == "GET"
 
-        and path == "/api/messages"
+        and path.startswith("/api/messages")
 
     ):
 
+        conv_id = ""
+
+        if "conversation_id=" in path:
+
+            conv_id = path.split("conversation_id=")[1].split("&")[0]
+
         return get_messages(
+
+            conv_id,
 
             context
 
@@ -1551,13 +1847,17 @@ def route_request(
 
     ):
 
-        data = parse_json_body(
+        data = body_data or parse_json_body(
 
             request
 
         )
 
+        conv_id = data.get("conversation_id", "")
+
         return send_message(
+
+            conv_id,
 
             data,
 
@@ -1595,7 +1895,7 @@ def route_request(
 
     ):
 
-        data = parse_json_body(
+        data = body_data or parse_json_body(
 
             request
 
@@ -1667,3 +1967,5 @@ def main(
             500
 
         )
+
+```
