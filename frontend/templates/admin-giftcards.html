@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Remadef - Admin Gift Card Minting</title>
+    <link rel="stylesheet" href="../static/css/global.css">
+</head>
+<body>
+    <main class="main">
+        <section class="welcome">
+            <div class="welcome-content">
+                <h1>Admin Voucher Minting Engine</h1>
+                <p>Generate closed-loop cryptographic voucher PINs and manage system-wide gift card inventory.</p>
+            </div>
+        </section>
+
+        <!-- Minting Form Card -->
+        <section class="card-box" style="max-width: 600px; margin: 0 auto;">
+            <h3 style="margin-bottom: 20px;">Mint New Gift Cards</h3>
+            <form onsubmit="handleMintCards(event)" style="display: flex; flex-direction: column; gap: 16px;">
+                <div>
+                    <label style="display:block; margin-bottom:6px; font-weight:500;">Denomination Amount (₦)</label>
+                    <input type="number" id="mintAmount" placeholder="5000" min="500" style="width:100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;" required>
+                </div>
+                <div>
+                    <label style="display:block; margin-bottom:6px; font-weight:500;">Quantity to Mint</label>
+                    <input type="number" id="mintQuantity" placeholder="10" min="1" max="100" style="width:100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;" required>
+                </div>
+                <button type="submit" class="action-btn primary-btn">Generate & Mint Vouchers</button>
+            </form>
+        </section>
+
+        <!-- Inventory List Card -->
+        <section class="card-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0;">Active Voucher Inventory</h3>
+                <button onclick="loadInventory()" class="action-btn" style="background: #f1f5f9; color: var(--text-secondary); border: 1px solid var(--border-color); padding: 6px 12px; font-size: 13px;">Refresh Inventory</button>
+            </div>
+            
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-secondary);">
+                            <th style="padding: 12px;">Voucher PIN</th>
+                            <th style="padding: 12px;">Amount</th>
+                            <th style="padding: 12px;">Redemption Status</th>
+                            <th style="padding: 12px;">Created Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryTableBody">
+                        <tr><td colspan="4" style="padding: 20px; text-align: center; color: var(--text-secondary);">Loading voucher inventory...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="../static/js/app.js"></script>
+    <script>
+        async function loadInventory() {
+            const tbody = document.getElementById('inventoryTableBody');
+            try {
+                const data = await apiRequest('/api/admin/giftcards/list');
+                const rows = data.rows || [];
+
+                if (rows.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" style="padding: 20px; text-align: center; color: var(--text-secondary);">No minted gift cards found.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                rows.forEach(card => {
+                    const tr = document.createElement('tr');
+                    tr.style.borderBottom = '1px solid var(--border-color)';
+                    
+                    const statusColor = card.is_redeemed ? 'var(--text-secondary)' : 'var(--success)';
+                    const statusText = card.is_redeemed ? 'Redeemed' : 'Active';
+                    
+                    tr.innerHTML = `
+                        <td style="padding: 12px; font-family: monospace; font-weight: 600;">${card.pin}</td>
+                        <td style="padding: 12px; font-weight: 600;">${formatCurrency(card.amount)}</td>
+                        <td style="padding: 12px;"><span style="color: ${statusColor}; font-weight: 500;">${statusText}</span></td>
+                        <td style="padding: 12px; color: var(--text-secondary); font-size: 13px;">${new Date(card.created_at).toLocaleString()}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (e) {
+                tbody.innerHTML = `<tr><td colspan="4" style="padding: 20px; text-align: center; color: #ef4444;">Failed to load gift card inventory.</td></tr>`;
+            }
+        }
+
+        async function handleMintCards(event) {
+            event.preventDefault();
+            const amount = parseFloat(document.getElementById('mintAmount').value);
+            const quantity = parseInt(document.getElementById('mintQuantity').value);
+
+            try {
+                const res = await apiRequest('/api/admin/giftcards/mint', 'POST', { amount, quantity });
+                notifyUser(`Successfully minted ${res.minted_count} gift cards!`);
+                loadInventory();
+            } catch (e) {
+                notifyUser(e.message, true);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadInventory);
+    </script>
+</body>
+</html>
