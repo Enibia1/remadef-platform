@@ -1,0 +1,154 @@
+<!-- ======================================================
+     REMADEF UI/UX: MENU DRAWER & SETTINGS MODAL
+====================================================== -->
+
+<!-- Overlay Backdrop -->
+<div id="menuOverlay" class="menu-overlay hidden"></div>
+
+<!-- Slide-Out Drawer Shell -->
+<aside id="menuDrawer" class="menu-drawer hidden" aria-label="Main Navigation">
+    <!-- Header / User Entity Card -->
+    <div class="drawer-header">
+        <div class="user-profile-summary">
+            <div id="drawerAvatar" class="avatar-circle">O</div>
+            <div class="user-info">
+                <h4 id="drawerUserName">Onyekachi Chetachi</h4>
+                <p id="drawerUserRole">Remora Limited</p>
+            </div>
+        </div>
+        <button id="closeMenuBtn" class="icon-btn-dark" type="button" aria-label="Close menu">
+            <i data-lucide="x"></i>
+        </button>
+    </div>
+
+    <!-- Navigation List -->
+    <nav class="drawer-nav">
+        <!-- CORE PLATFORM -->
+        <div class="nav-section">
+            <span class="nav-section-title">CORE PLATFORM</span>
+            <a href="home.html" class="nav-link active">
+                <i data-lucide="layout-dashboard" class="nav-icon"></i>
+                <span>Home Dashboard</span>
+            </a>
+            <a href="messages.html" class="nav-link">
+                <i data-lucide="message-square-lock" class="nav-icon"></i>
+                <span>Encrypted Messages</span>
+            </a>
+            <button id="drawerNotificationsBtn" class="nav-link-btn" type="button">
+                <div class="btn-label-group">
+                    <i data-lucide="bell" class="nav-icon"></i>
+                    <span>Notifications</span>
+                </div>
+                <span id="drawerBadge" class="nav-badge hidden">0</span>
+            </button>
+        </div>
+
+        <!-- OPERATIONS & MODULES -->
+        <div class="nav-section">
+            <span class="nav-section-title">OPERATIONS & MODULES</span>
+            <a href="gigs.html" class="nav-link">
+                <i data-lucide="briefcase" class="nav-icon"></i>
+                <span>Gig Engine & Directory</span>
+            </a>
+            <a href="supply-chain.html" class="nav-link">
+                <i data-lucide="truck" class="nav-icon"></i>
+                <span>Supply Chain & Sourcing</span>
+            </a>
+            <a href="apprenticeship.html" class="nav-link">
+                <i data-lucide="graduation-cap" class="nav-icon"></i>
+                <span>Apprenticeship Foundation</span>
+            </a>
+            
+            <!-- STAGED PLACEHOLDERS -->
+            <button class="nav-link-btn disabled" type="button" disabled>
+                <div class="btn-label-group">
+                    <i data-lucide="building-2" class="nav-icon"></i>
+                    <span>Real Estate & Assets</span>
+                </div>
+                <span class="coming-soon-pill">Coming Soon</span>
+            </button>
+            <button class="nav-link-btn disabled" type="button" disabled>
+                <div class="btn-label-group">
+                    <i data-lucide="landmark" class="nav-icon"></i>
+                    <span>Grants & Funding</span>
+                </div>
+                <span class="coming-soon-pill">Coming Soon</span>
+            </button>
+        </div>
+
+        <!-- ACCOUNT & SYSTEM -->
+        <div class="nav-section">
+            <span class="nav-section-title">ACCOUNT & SYSTEM</span>
+            <button id="drawerSettingsBtn" class="nav-link-btn" type="button">
+                <div class="btn-label-group">
+                    <i data-lucide="settings" class="nav-icon"></i>
+                    <span>Platform Settings</span>
+                </div>
+            </button>
+            <button id="logoutBtn" class="nav-link-btn logout" type="button">
+                <div class="btn-label-group">
+                    <i data-lucide="log-out" class="nav-icon"></i>
+                    <span>Sign Out</span>
+                </div>
+            </button>
+        </div>
+    </nav>
+</aside>
+
+<!-- Settings Modal UI -->
+<div id="settingsModal" class="modal-overlay hidden">
+    <div class="modal-card">
+        <header class="modal-header">
+            <div class="modal-header-title">
+                <i data-lucide="settings" class="modal-header-icon"></i>
+                <h3>Platform Settings</h3>
+            </div>
+            <button id="closeSettingsBtn" class="icon-btn-dark" type="button" aria-label="Close settings">
+                <i data-lucide="x"></i>
+            </button>
+        </header>
+
+        <div class="modal-body">
+            <section class="settings-group">
+                <h4>Account & Entity</h4>
+                <div class="input-field-group">
+                    <label for="settingEntity">Primary Entity</label>
+                    <input type="text" id="settingEntity" class="form-control" value="Remora Limited" readonly>
+                </div>
+                <div class="input-field-group">
+                    <label for="settingEmail">Contact Email</label>
+                    <input type="email" id="settingEmail" class="form-control" value="office@remadef.com" readonly>
+                </div>
+            </section>
+
+            <section class="settings-group">
+                <h4>Encrypted Message Retention</h4>
+                <p class="field-hint">Select auto-deletion schedule for server copies.</p>
+                <select id="settingRetention" class="form-control select-input">
+                    <option value="24h">24 Hours</option>
+                    <option value="72h" selected>72 Hours (Default)</option>
+                    <option value="7d">7 Days</option>
+                </select>
+            </section>
+
+            <section class="settings-group">
+                <h4>Alert Preferences</h4>
+                <label class="checkbox-control">
+                    <input type="checkbox" id="settingRealtimeAlerts" checked>
+                    <span class="label-text">Enable Real-time Pop-ups</span>
+                </label>
+                <label class="checkbox-control">
+                    <input type="checkbox" id="settingSoundAlerts" checked>
+                    <span class="label-text">Play Chime Sounds</span>
+                </label>
+            </section>
+        </div>
+
+        <footer class="modal-footer">
+            <button id="saveSettingsBtn" class="btn-primary" type="button">
+                <i data-lucide="save" class="btn-icon"></i>
+                <span>Save Settings</span>
+            </button>
+        </footer>
+    </div>
+</div>
