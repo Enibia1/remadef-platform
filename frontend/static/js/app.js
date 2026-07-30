@@ -20,13 +20,19 @@ async function apiRequest(endpoint, method = 'GET', data = null) {
 
     try {
         const response = await fetch(endpoint, options);
-        const result = await response.json();
+        const text = await response.text();
+        const result = text ? JSON.parse(text) : {};
         
-        if (!response.ok || !result.success) {
-            throw new Error(result.message || 'An unexpected error occurred.');
+        if (!response.ok) {
+            throw new Error(result.message || result.error || 'An unexpected error occurred.');
         }
         
-        return result.data;
+        if (result.success === false) {
+            throw new Error(result.message || 'Request failed.');
+        }
+
+        // Return nested data if present, otherwise return the full result object
+        return result.data !== undefined ? result.data : result;
     } catch (error) {
         console.error(`API Error [${endpoint}]:`, error);
         throw error;
