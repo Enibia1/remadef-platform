@@ -1,5 +1,3 @@
-Here is the fully restored **main.py** script. All original section headings, structural dividers, database configurations, and functions (register_user, get_current_profile, update_current_profile, get_dashboard, health_check) have been preserved with their original formatting, while fully incorporating the updated routing logic and live database implementations for messages and conversations:
-```python
 # ============================================================
 # REMADEF PLATFORM API
 # Appwrite Cloud Function
@@ -78,6 +76,26 @@ JOBS_TABLE_ID = os.environ.get(
 BUSINESSES_TABLE_ID = os.environ.get(
     "APPWRITE_BUSINESSES_TABLE_ID",
     "businesses"
+)
+
+
+# ============================================================
+# WALLET & ESCROW TABLES
+# ============================================================
+
+WALLETS_TABLE_ID = os.environ.get(
+    "APPWRITE_WALLETS_TABLE_ID",
+    "wallets"
+)
+
+TRANSACTIONS_TABLE_ID = os.environ.get(
+    "APPWRITE_TRANSACTIONS_TABLE_ID",
+    "transactions"
+)
+
+ESCROW_TABLE_ID = os.environ.get(
+    "APPWRITE_ESCROW_TABLE_ID",
+    "escrow"
 )
 
 
@@ -1322,6 +1340,104 @@ def send_message(
 
 
 # ============================================================
+# WALLET & ESCROW MANAGEMENT LOGIC
+# ============================================================
+
+def find_wallet(account_id, context):
+    tables_db = get_tables_db(context)
+    result = tables_db.list_rows(
+        database_id=DATABASE_ID,
+        table_id=WALLETS_TABLE_ID,
+        queries=[f'equal("account_id", "{account_id}")']
+    )
+    result = convert_to_dict(result)
+    rows = result.get("rows", []) if isinstance(result, dict) else []
+    return rows[0] if rows else None
+
+
+def create_wallet(account_id, context):
+    tables_db = get_tables_db(context)
+    now = datetime.now(timezone.utc).isoformat()
+    
+    wallet_data = {
+        "account_id": account_id,
+        "balance": 0.0,
+        "currency": "NGN",
+        "status": "active",
+        "created_at": now,
+        "updated_at": now
+    }
+    
+    wallet = tables_db.create_row(
+        database_id=DATABASE_ID,
+        table_id=WALLETS_TABLE_ID,
+        row_id="unique()",
+        data=wallet_data
+    )
+    return convert_to_dict(wallet)
+
+
+def get_user_wallet(context):
+    try:
+        user = get_current_user(context)
+        account_id = user.get("$id")
+        if not account_id:
+            return error("User authentication failed.", 401)
+            
+        wallet = find_wallet(account_id, context)
+        if not wallet:
+            wallet = create_wallet(account_id, context)
+            
+        tables_db = get_tables_db(context)
+        tx_result = convert_to_dict(
+            tables_db.list_rows(
+                database_id=DATABASE_ID,
+                table_id=TRANSACTIONS_TABLE_ID,
+                queries=[
+                    f'equal("account_id", "{account_id}")',
+                    'orderDesc("created_at")',
+                    'limit 20'
+                ]
+            )
+        )
+        transactions = tx_result.get("rows", []) if isinstance(tx_result, dict) else []
+        
+        return success(
+            {
+                "wallet": wallet,
+                "transactions": transactions
+            },
+            "Wallet data loaded successfully."
+        )
+    except Exception as exc:
+        context.error(f"WALLET ERROR: {str(exc)}")
+        return error("Unable to load wallet data.", 500)
+
+
+def get_user_escrows(context):
+    try:
+        user = get_current_user(context)
+        account_id = user.get("$id")
+        tables_db = get_tables_db(context)
+        
+        result = convert_to_dict(
+            tables_db.list_rows(
+                database_id=DATABASE_ID,
+                table_id=ESCROW_TABLE_ID,
+                queries=[
+                    f'equal("account_id", "{account_id}")',
+                    'orderDesc("created_at")'
+                ]
+            )
+        )
+        escrows = result.get("rows", []) if isinstance(result, dict) else []
+        return success(escrows, "Escrow agreements loaded successfully.")
+    except Exception as exc:
+        context.error(f"ESCROW ERROR: {str(exc)}")
+        return error("Unable to load escrow data.", 500)
+
+
+# ============================================================
 # REGISTER USER
 # ============================================================
 
@@ -1520,7 +1636,7 @@ def register_user(
         )
 
     # ========================================================
-    # CREATE PROFILE
+    # CREATE PROFILE & WALLET
     # ========================================================
 
     try:
@@ -1553,6 +1669,19 @@ def register_user(
 
         )
 
+    try:
+
+        create_wallet(
+            user_id,
+            context
+        )
+
+    except Exception as exc:
+
+        context.error(
+            f"Wallet creation failed: {str(exc)}"
+        )
+
     # ========================================================
     # REGISTER SUCCESS RESPONSE
     # ========================================================
@@ -1567,7 +1696,7 @@ def register_user(
 
             "message":
 
-                "Account and profile created successfully.",
+                "Account, profile, and wallet created successfully.",
 
             "account":
 
@@ -1910,6 +2039,22 @@ def route_request(
         )
 
     # ========================================================
+    # ROUTE: GET WALLET & TRANSACTIONS
+    # ========================================================
+
+    if method == "GET" and path == "/api/wallet":
+
+        return get_user_wallet(context)
+
+    # ========================================================
+    # ROUTE: GET ESCROW AGREEMENTS
+    # ========================================================
+
+    if method == "GET" and path == "/api/escrow":
+
+        return get_user_escrows(context)
+
+    # ========================================================
     # ROUTE: NOT FOUND
     # ========================================================
 
@@ -1967,5 +2112,3 @@ def main(
             500
 
         )
-
-```
