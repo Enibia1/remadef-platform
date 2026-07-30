@@ -1,0 +1,86 @@
+/* ==========================================================
+   REMADEF DESIGN SYSTEM & MODERN VECTOR ICON INTEGRATION
+========================================================== */
+
+/* Lucide Icon Alignment Overrides */
+.nav-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 12px;
+    stroke-width: 2px;
+    color: var(--remadef-text-muted);
+    transition: color 0.2s ease, stroke 0.2s ease;
+    flex-shrink: 0;
+}
+
+.nav-link:hover .nav-icon,
+.nav-link-btn:not(.disabled):hover .nav-icon {
+    color: #FFFFFF;
+}
+
+.nav-link.active .nav-icon {
+    color: var(--remadef-blue);
+}
+
+.nav-link-btn.logout .nav-icon {
+    color: #F87171;
+}
+
+.modal-header-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-header-icon {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2px;
+}
+
+.btn-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+    stroke-width: 2.2px;
+    vertical-align: middle;
+}
+
+.icon-btn-dark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    opacity: 0.8;
+    padding: 4px;
+    border-radius: var(--remadef-radius-sm);
+    transition: opacity 0.2s, background 0.2s;
+}
+
+.icon-btn-dark i {
+    width: 18px;
+    height: 18px;
+}
+
+.icon-btn-dark:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--remadef-blue);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--remadef-radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
