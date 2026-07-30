@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | REMADEF Platform</title>
+    <title>REMADEF Platform | Dashboard</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Lucide Icons Library -->
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- Custom Stylesheet -->
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="css/home.css">
 </head>
 <body>
@@ -28,14 +28,16 @@
                 </button>
                 
                 <div class="brand" id="brandButton">
+                    <!-- VECTOR BRAND LOGO GENERATED IN CODE -->
                     <div class="brand-logo">
-                        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="40" height="40" rx="10" fill="#071A3D"/>
-                            <path d="M12 28V12L20 20L28 12V28" stroke="#2563EB" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="100" height="100" rx="24" fill="#071A3D"/>
+                            <path d="M28 72V28L50 50L72 28V72" stroke="#2563EB" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="50" cy="24" r="8" fill="#22C55E"/>
                         </svg>
                     </div>
                     <span class="brand-name">REMADEF</span>
-                    <i data-lucide="chevron-down"></i>
+                    <i data-lucide="chevron-down" class="brand-chevron"></i>
                     
                     <!-- BRAND DROPDOWN MENU -->
                     <div class="brand-dropdown" id="brandDropdown">
@@ -58,7 +60,7 @@
             <!-- SEARCH BAR -->
             <div class="search-wrapper">
                 <i data-lucide="search"></i>
-                <input type="text" placeholder="Search opportunities, messages, modules...">
+                <input type="text" placeholder="Search opportunities, messages, trade corridors...">
             </div>
 
             <!-- HEADER RIGHT -->
@@ -270,61 +272,12 @@
 
                 </div>
 
-                <!-- BOTTOM GRID -->
-                <div class="bottom-grid">
-                    
-                    <!-- QUICK ACTIONS -->
-                    <section class="dashboard-section">
-                        <div class="section-header">
-                            <h2>Quick Actions</h2>
-                        </div>
-                        <div class="quick-actions">
-                            <button class="action-btn" onclick="window.location.href='messages.html'">
-                                <i data-lucide="send"></i>
-                                <span>Send Message</span>
-                            </button>
-                            <button class="action-btn" onclick="window.location.href='opportunities.html'">
-                                <i data-lucide="plus-circle"></i>
-                                <span>Post Opportunity</span>
-                            </button>
-                            <button class="action-btn" onclick="window.location.href='profile.html'">
-                                <i data-lucide="file-badge"></i>
-                                <span>Export Credentials</span>
-                            </button>
-                            <button class="action-btn" onclick="window.location.href='settings.html'">
-                                <i data-lucide="sliders"></i>
-                                <span>Configure System</span>
-                            </button>
-                        </div>
-                    </section>
-
-                    <!-- STATISTICS OVERVIEW -->
-                    <section class="dashboard-section">
-                        <div class="section-header">
-                            <h2>Metrics Overview</h2>
-                        </div>
-                        <div class="statistics-grid">
-                            <div class="stat-card">
-                                <i data-lucide="trending-up"></i>
-                                <h3>94%</h3>
-                                <p>System Efficiency</p>
-                            </div>
-                            <div class="stat-card">
-                                <i data-lucide="shield"></i>
-                                <h3>100%</h3>
-                                <p>Compliance Score</p>
-                            </div>
-                        </div>
-                    </section>
-
-                </div>
-
             </main>
         </div>
 
     </div>
 
-    <!-- NOTIFICATIONS DROPDOWN PANEL -->
+    <!-- NOTIFICATIONS PANEL -->
     <div class="notifications-panel hidden" id="notificationsPanel">
         <h3>Notifications</h3>
         <hr style="margin: 10px 0; border: none; border-top: 1px solid var(--border);">
