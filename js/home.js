@@ -1,5 +1,3 @@
-"use strict";
-
 /* ==========================================================
    REMADEF HOME
 ========================================================== */
@@ -47,54 +45,204 @@ const messageBadge =
     document.getElementById("messageBadge");
 
 /* ==========================================================
+   MENU DRAWER & SETTINGS ELEMENTS
+========================================================== */
+
+const menuButton = document.getElementById("menuButton");
+
+const menuDrawer = document.getElementById("menuDrawer");
+
+const menuOverlay = document.getElementById("menuOverlay");
+
+const closeMenuBtn = document.getElementById("closeMenuBtn");
+
+const drawerNotificationsBtn = document.getElementById("drawerNotificationsBtn");
+
+const drawerSettingsBtn = document.getElementById("drawerSettingsBtn");
+
+const settingsModal = document.getElementById("settingsModal");
+
+const closeSettingsBtn = document.getElementById("closeSettingsBtn");
+
+const saveSettingsBtn = document.getElementById("saveSettingsBtn");
+
+const notificationsPanel = document.getElementById("notificationsPanel");
+
+/* ==========================================================
    LUCIDE
 ========================================================== */
 
-lucide.createIcons();
+if (window.lucide) {
+    lucide.createIcons();
+}
 
 /* ==========================================================
    SIDEBAR
 ========================================================== */
 
-sidebarToggle.addEventListener("click", () => {
+if (sidebarToggle) {
+    sidebarToggle.addEventListener("click", () => {
 
-    if (window.innerWidth <= 768) {
+        if (window.innerWidth <= 768) {
 
-        sidebar.classList.toggle("show");
+            sidebar.classList.toggle("show");
+
+        } else {
+
+            sidebar.classList.toggle("collapsed");
+
+        }
+
+    });
+}
+
+/* ==========================================================
+   MENU DRAWER & MODAL CONTROLLERS
+========================================================== */
+
+function toggleMenu(show) {
+
+    if (!menuDrawer || !menuOverlay) return;
+
+    if (show) {
+
+        menuDrawer.classList.remove("hidden");
+
+        menuOverlay.classList.remove("hidden");
+
+        if (window.lucide) lucide.createIcons();
 
     } else {
 
-        sidebar.classList.toggle("collapsed");
+        menuDrawer.classList.add("hidden");
+
+        menuOverlay.classList.add("hidden");
 
     }
 
-});
+}
+
+function toggleSettings(show) {
+
+    if (!settingsModal) return;
+
+    if (show) {
+
+        settingsModal.classList.remove("hidden");
+
+        toggleMenu(false);
+
+        if (window.lucide) lucide.createIcons();
+
+    } else {
+
+        settingsModal.classList.add("hidden");
+
+    }
+
+}
+
+function initializeMenuSystem() {
+
+    if (menuButton) {
+
+        menuButton.addEventListener("click", () => toggleMenu(true));
+
+    }
+
+    if (closeMenuBtn) {
+
+        closeMenuBtn.addEventListener("click", () => toggleMenu(false));
+
+    }
+
+    if (menuOverlay) {
+
+        menuOverlay.addEventListener("click", () => toggleMenu(false));
+
+    }
+
+    if (drawerNotificationsBtn) {
+
+        drawerNotificationsBtn.addEventListener("click", (event) => {
+
+            event.stopPropagation();
+
+            toggleMenu(false);
+
+            if (notificationsPanel) {
+
+                notificationsPanel.classList.toggle("hidden");
+
+            }
+
+        });
+
+    }
+
+    if (drawerSettingsBtn) {
+
+        drawerSettingsBtn.addEventListener("click", () => toggleSettings(true));
+
+    }
+
+    if (closeSettingsBtn) {
+
+        closeSettingsBtn.addEventListener("click", () => toggleSettings(false));
+
+    }
+
+    if (saveSettingsBtn) {
+
+        saveSettingsBtn.addEventListener("click", () => {
+
+            const retention = document.getElementById("settingRetention")?.value;
+
+            const realtime = document.getElementById("settingRealtimeAlerts")?.checked;
+
+            const sound = document.getElementById("settingSoundAlerts")?.checked;
+
+            localStorage.setItem("remadef_settings", JSON.stringify({ retention, realtime, sound }));
+
+            alert("Platform settings saved!");
+
+            toggleSettings(false);
+
+        });
+
+    }
+
+}
 
 /* ==========================================================
    DROPDOWN
 ========================================================== */
 
-brandButton.addEventListener("click", () => {
+if (brandButton && brandDropdown) {
 
-    brandDropdown.classList.toggle("show");
+    brandButton.addEventListener("click", () => {
 
-});
+        brandDropdown.classList.toggle("show");
 
-document.addEventListener("click", (event) => {
+    });
 
-    if (
+    document.addEventListener("click", (event) => {
 
-        !brandButton.contains(event.target) &&
+        if (
 
-        !brandDropdown.contains(event.target)
+            !brandButton.contains(event.target) &&
 
-    ) {
+            !brandDropdown.contains(event.target)
 
-        brandDropdown.classList.remove("show");
+        ) {
 
-    }
+            brandDropdown.classList.remove("show");
 
-});
+        }
+
+    });
+
+}
 
 /* ==========================================================
    USER
@@ -112,8 +260,20 @@ async function loadUser() {
 
             initial = user.name.charAt(0).toUpperCase();
 
-            welcomeTitle.textContent =
-                `Welcome back, ${user.name.split(" ")[0]}!`;
+            if (welcomeTitle) {
+
+                welcomeTitle.textContent =
+                    `Welcome back, ${user.name.split(" ")[0]}!`;
+
+            }
+
+            const drawerUserName = document.getElementById("drawerUserName");
+
+            if (drawerUserName) {
+
+                drawerUserName.textContent = user.name;
+
+            }
 
         }
 
@@ -123,7 +283,11 @@ async function loadUser() {
 
         }
 
-        avatar.textContent = initial;
+        if (avatar) avatar.textContent = initial;
+
+        const drawerAvatar = document.getElementById("drawerAvatar");
+
+        if (drawerAvatar) drawerAvatar.textContent = initial;
 
     }
 
@@ -143,17 +307,19 @@ async function checkPlatform() {
 
     try {
 
-        await RemadefAPI.health();
+        if (window.RemadefAPI && typeof window.RemadefAPI.health === "function") {
 
-        apiStatus.textContent =
-            "Platform Online";
+            await RemadefAPI.health();
+
+        }
+
+        if (apiStatus) apiStatus.textContent = "Platform Online";
 
     }
 
     catch (error) {
 
-        apiStatus.textContent =
-            "Platform Offline";
+        if (apiStatus) apiStatus.textContent = "Platform Offline";
 
     }
 
@@ -167,14 +333,17 @@ function loadProfileProgress() {
 
     const completion = 0;
 
-    document.getElementById("profileCompletion").textContent =
-        completion + "%";
+    const profileComp = document.getElementById("profileCompletion");
 
-    document.getElementById("sidebarCompletion").textContent =
-        completion + "%";
+    const sidebarComp = document.getElementById("sidebarCompletion");
 
-    document.getElementById("progressFill").style.width =
-        completion + "%";
+    const progressFill = document.getElementById("progressFill");
+
+    if (profileComp) profileComp.textContent = completion + "%";
+
+    if (sidebarComp) sidebarComp.textContent = completion + "%";
+
+    if (progressFill) progressFill.style.width = completion + "%";
 
 }
 
@@ -184,19 +353,33 @@ function loadProfileProgress() {
 
 function loadDashboard() {
 
-    document.getElementById("learningCount").textContent = 0;
+    const learningCount = document.getElementById("learningCount");
 
-    document.getElementById("applicationCount").textContent = 0;
+    const applicationCount = document.getElementById("applicationCount");
 
-    document.getElementById("dashboardMessages").textContent = 0;
+    const dashboardMessages = document.getElementById("dashboardMessages");
 
-    document.getElementById("statApplications").textContent = 0;
+    const statApplications = document.getElementById("statApplications");
 
-    document.getElementById("statCertificates").textContent = 0;
+    const statCertificates = document.getElementById("statCertificates");
 
-    document.getElementById("statConnections").textContent = 0;
+    const statConnections = document.getElementById("statConnections");
 
-    document.getElementById("statHours").textContent = 0;
+    const statHours = document.getElementById("statHours");
+
+    if (learningCount) learningCount.textContent = 0;
+
+    if (applicationCount) applicationCount.textContent = 0;
+
+    if (dashboardMessages) dashboardMessages.textContent = 0;
+
+    if (statApplications) statApplications.textContent = 0;
+
+    if (statCertificates) statCertificates.textContent = 0;
+
+    if (statConnections) statConnections.textContent = 0;
+
+    if (statHours) statHours.textContent = 0;
 
 }
 
@@ -210,9 +393,13 @@ function updateBadges() {
 
     const notifications = 0;
 
-    messageBadge.textContent = unreadMessages;
+    if (messageBadge) messageBadge.textContent = unreadMessages;
 
-    notificationBadge.textContent = notifications;
+    if (notificationBadge) notificationBadge.textContent = notifications;
+
+    const drawerBadge = document.getElementById("drawerBadge");
+
+    if (drawerBadge) drawerBadge.textContent = notifications;
 
 }
 
@@ -222,17 +409,21 @@ function updateBadges() {
 
 const search = document.getElementById("globalSearch");
 
-search.addEventListener("keyup", (event) => {
+if (search) {
 
-    if (event.key !== "Enter") return;
+    search.addEventListener("keyup", (event) => {
 
-    const query = search.value.trim();
+        if (event.key !== "Enter") return;
 
-    if (!query) return;
+        const query = search.value.trim();
 
-    console.log("Searching:", query);
+        if (!query) return;
 
-});
+        console.log("Searching:", query);
+
+    });
+
+}
 
 /* ==========================================================
    SPONSORED
@@ -243,7 +434,7 @@ function initializeSponsored() {
     const section =
         document.getElementById("sponsoredSection");
 
-    section.classList.remove("show");
+    if (section) section.classList.remove("show");
 
 }
 
@@ -251,25 +442,29 @@ function initializeSponsored() {
    LOGOUT
 ========================================================== */
 
-logoutBtn.addEventListener("click", async (event) => {
+if (logoutBtn) {
 
-    event.preventDefault();
+    logoutBtn.addEventListener("click", async (event) => {
 
-    try {
+        event.preventDefault();
 
-        await account.deleteSession("current");
+        try {
 
-    }
+            await account.deleteSession("current");
 
-    catch (error) {
+        }
 
-        console.error(error);
+        catch (error) {
 
-    }
+            console.error(error);
 
-    window.location.href = "login.html";
+        }
 
-});
+        window.location.href = "login.html";
+
+    });
+
+}
 
 /* ==========================================================
    MOBILE
@@ -277,7 +472,7 @@ logoutBtn.addEventListener("click", async (event) => {
 
 window.addEventListener("resize", () => {
 
-    if (window.innerWidth > 768) {
+    if (window.innerWidth > 768 && sidebar) {
 
         sidebar.classList.remove("show");
 
@@ -303,9 +498,12 @@ async function initialize() {
 
     initializeSponsored();
 
+    initializeMenuSystem();
+
 }
 
 initialize();
+
 /* ==========================================================
    APPWRITE DATABASES
 ========================================================== */
@@ -340,6 +538,8 @@ let currentUser = null;
 ========================================================== */
 
 async function loadLiveDashboard() {
+
+    if (!DATABASE_ID || DATABASE_ID === "YOUR_DATABASE_ID") return;
 
     try {
 
@@ -377,6 +577,8 @@ async function loadLiveDashboard() {
 
 async function loadProfile() {
 
+    if (!DATABASE_ID || DATABASE_ID === "YOUR_DATABASE_ID") return;
+
     try {
 
         const response = await databases.listDocuments(
@@ -411,23 +613,17 @@ async function loadProfile() {
 
             profile.profile_completion || 0;
 
-        document.getElementById(
+        const profileComp = document.getElementById("profileCompletion");
 
-            "profileCompletion"
+        const sidebarComp = document.getElementById("sidebarCompletion");
 
-        ).textContent = completion + "%";
+        const progressFill = document.getElementById("progressFill");
 
-        document.getElementById(
+        if (profileComp) profileComp.textContent = completion + "%";
 
-            "sidebarCompletion"
+        if (sidebarComp) sidebarComp.textContent = completion + "%";
 
-        ).textContent = completion + "%";
-
-        document.getElementById(
-
-            "progressFill"
-
-        ).style.width = completion + "%";
+        if (progressFill) progressFill.style.width = completion + "%";
 
     }
 
@@ -444,6 +640,8 @@ async function loadProfile() {
 ========================================================== */
 
 async function loadMessages() {
+
+    if (!DATABASE_ID || DATABASE_ID === "YOUR_DATABASE_ID") return;
 
     try {
 
@@ -477,17 +675,11 @@ async function loadMessages() {
 
         });
 
-        document.getElementById(
+        const dashMessages = document.getElementById("dashboardMessages");
 
-            "dashboardMessages"
+        if (dashMessages) dashMessages.textContent = unread;
 
-        ).textContent = unread;
-
-        document.getElementById(
-
-            "messageBadge"
-
-        ).textContent = unread;
+        if (messageBadge) messageBadge.textContent = unread;
 
     }
 
@@ -504,6 +696,8 @@ async function loadMessages() {
 ========================================================== */
 
 async function loadNotifications() {
+
+    if (!DATABASE_ID || DATABASE_ID === "YOUR_DATABASE_ID") return;
 
     try {
 
@@ -535,13 +729,21 @@ async function loadNotifications() {
 
         );
 
-        document.getElementById(
+        if (notificationBadge) notificationBadge.textContent = response.total;
 
-            "notificationBadge"
+        const drawerBadge = document.getElementById("drawerBadge");
 
-        ).textContent =
+        if (drawerBadge) {
 
-            response.total;
+            drawerBadge.textContent = response.total;
+
+            if (response.total > 0) {
+
+                drawerBadge.classList.remove("hidden");
+
+            }
+
+        }
 
     }
 
@@ -559,11 +761,9 @@ async function loadNotifications() {
 
 async function loadApplications() {
 
-    document.getElementById(
+    const appCount = document.getElementById("applicationCount");
 
-        "applicationCount"
-
-    ).textContent = 0;
+    if (appCount) appCount.textContent = 0;
 
 }
 
@@ -573,11 +773,9 @@ async function loadApplications() {
 
 async function loadLearning() {
 
-    document.getElementById(
+    const learnCount = document.getElementById("learningCount");
 
-        "learningCount"
-
-    ).textContent = 0;
+    if (learnCount) learnCount.textContent = 0;
 
 }
 
@@ -587,29 +785,21 @@ async function loadLearning() {
 
 async function loadStatistics() {
 
-    document.getElementById(
+    const statApps = document.getElementById("statApplications");
 
-        "statApplications"
+    const statCerts = document.getElementById("statCertificates");
 
-    ).textContent = 0;
+    const statConns = document.getElementById("statConnections");
 
-    document.getElementById(
+    const statHrs = document.getElementById("statHours");
 
-        "statCertificates"
+    if (statApps) statApps.textContent = 0;
 
-    ).textContent = 0;
+    if (statCerts) statCerts.textContent = 0;
 
-    document.getElementById(
+    if (statConns) statConns.textContent = 0;
 
-        "statConnections"
-
-    ).textContent = 0;
-
-    document.getElementById(
-
-        "statHours"
-
-    ).textContent = 0;
+    if (statHrs) statHrs.textContent = 0;
 
 }
 
@@ -630,15 +820,18 @@ setInterval(
 ========================================================== */
 
 loadLiveDashboard();
+
 /* ==========================================================
    REALTIME UPDATES
 ========================================================== */
 
 function subscribeRealtime() {
 
+    if (!DATABASE_ID || DATABASE_ID === "YOUR_DATABASE_ID") return;
+
     client.subscribe(
 
-        `databases.${DATABASE_ID}.tables.${MESSAGES_TABLE}.rows`,
+        `databases.${DATABASE_ID}.collections.${MESSAGES_TABLE}.documents`,
 
         () => {
 
@@ -650,7 +843,7 @@ function subscribeRealtime() {
 
     client.subscribe(
 
-        `databases.${DATABASE_ID}.tables.${NOTIFICATIONS_TABLE}.rows`,
+        `databases.${DATABASE_ID}.collections.${NOTIFICATIONS_TABLE}.documents`,
 
         () => {
 
@@ -668,13 +861,15 @@ function subscribeRealtime() {
 
 function initializeProfileMenu() {
 
-    const avatar = document.getElementById("avatar");
+    if (avatar) {
 
-    avatar.addEventListener("click", () => {
+        avatar.addEventListener("click", () => {
 
-        window.location.href = "profile.html";
+            window.location.href = "profile.html";
 
-    });
+        });
+
+    }
 
 }
 
@@ -687,14 +882,6 @@ async function globalSearch(query) {
     if (!query) return;
 
     console.log("Searching:", query);
-
-    // Future:
-    // Learning
-    // Jobs
-    // Businesses
-    // Apprenticeships
-    // Marketplace
-    // Messages
 
 }
 
@@ -730,10 +917,6 @@ function initializeSponsoredArea() {
 
     if (!sponsored) return;
 
-    // Future:
-    // Read advertisements collection
-    // Show sponsored opportunities
-
     sponsored.classList.remove("show");
 
 }
@@ -746,6 +929,8 @@ document.addEventListener("click", event => {
 
     if (
 
+        !sidebar ||
+
         window.innerWidth > 768 ||
 
         !sidebar.classList.contains("show")
@@ -756,6 +941,8 @@ document.addEventListener("click", event => {
 
         !sidebar.contains(event.target) &&
 
+        sidebarToggle &&
+
         !sidebarToggle.contains(event.target)
 
     ) {
@@ -765,40 +952,6 @@ document.addEventListener("click", event => {
     }
 
 });
-
-/* ==========================================================
-   LOGOUT
-========================================================== */
-
-async function logout() {
-
-    try {
-
-        await account.deleteSession("current");
-
-    }
-
-    catch (error) {
-
-        console.error(error);
-
-    }
-
-    window.location.href = "login.html";
-
-}
-
-if (logoutBtn) {
-
-    logoutBtn.addEventListener(
-
-        "click",
-
-        logout
-
-    );
-
-}
 
 /* ==========================================================
    PAGE INITIALIZATION
@@ -822,7 +975,11 @@ window.addEventListener(
 
         subscribeRealtime();
 
-        lucide.createIcons();
+        if (window.lucide) {
+
+            lucide.createIcons();
+
+        }
 
     }
 
