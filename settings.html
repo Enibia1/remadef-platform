@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings | REMADEF Platform</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/home.css">
+</head>
+<body>
+
+    <div class="app">
+        
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-left">
+                <button id="sidebarToggle" class="menu-toggle" aria-label="Toggle Sidebar">
+                    <i data-lucide="menu"></i>
+                </button>
+                
+                <div class="brand" id="brandButton">
+                    <!-- VECTOR BRAND LOGO -->
+                    <div class="brand-logo">
+                        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="100" height="100" rx="24" fill="#071A3D"/>
+                            <path d="M28 72V28L50 50L72 28V72" stroke="#2563EB" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="50" cy="24" r="8" fill="#22C55E"/>
+                        </svg>
+                    </div>
+                    <span class="brand-name">REMADEF</span>
+                    <i data-lucide="chevron-down" class="brand-chevron"></i>
+                    
+                    <!-- BRAND DROPDOWN MENU -->
+                    <div class="brand-dropdown" id="brandDropdown">
+                        <a href="home.html">
+                            <i data-lucide="layout-dashboard"></i>
+                            <span>Dashboard Hub</span>
+                        </a>
+                        <a href="profile.html">
+                            <i data-lucide="building"></i>
+                            <span>Enterprise Portal</span>
+                        </a>
+                        <a href="settings.html">
+                            <i data-lucide="sliders"></i>
+                            <span>System Settings</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEARCH BAR -->
+            <div class="search-wrapper">
+                <i data-lucide="search"></i>
+                <input type="text" placeholder="Search system settings...">
+            </div>
+
+            <!-- HEADER RIGHT -->
+            <div class="header-right">
+                <button class="notification-btn" id="notificationToggle" aria-label="Notifications">
+                    <i data-lucide="bell"></i>
+                    <span class="badge">3</span>
+                </button>
+                
+                <div class="avatar" id="userAvatar">
+                    <span>OK</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- LAYOUT CONTAINER -->
+        <div class="layout">
+            
+            <!-- SIDEBAR NAVIGATION -->
+            <aside class="sidebar" id="sidebar">
+                <div>
+                    <div class="sidebar-title">NAVIGATION</div>
+                    <nav class="sidebar-nav">
+                        <a href="home.html">
+                            <i data-lucide="house"></i>
+                            <span>Home</span>
+                        </a>
+                        <a href="profile.html">
+                            <i data-lucide="user"></i>
+                            <span>My Profile</span>
+                        </a>
+                        <a href="messages.html">
+                            <i data-lucide="message-square"></i>
+                            <span>Messages</span>
+                            <span class="menu-badge">2</span>
+                        </a>
+                        <a href="opportunities.html">
+                            <i data-lucide="briefcase"></i>
+                            <span>Opportunities</span>
+                        </a>
+                        <a href="learning.html">
+                            <i data-lucide="book-open"></i>
+                            <span>Learning Hub</span>
+                        </a>
+                        <a href="settings.html" class="active">
+                            <i data-lucide="settings"></i>
+                            <span>Settings</span>
+                        </a>
+                    </nav>
+                </div>
+
+                <!-- SIDEBAR FOOTER -->
+                <div class="sidebar-footer">
+                    <div class="profile-progress">
+                        <div class="progress-header">
+                            <span>Profile Completion</span>
+                            <span>85%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 85%;"></div>
+                        </div>
+                        <button class="complete-profile-btn" onclick="window.location.href='profile.html'">
+                            Update Profile
+                        </button>
+                    </div>
+                    <div class="copyright">
+                        &copy; 2026 REMADEF Ltd.
+                    </div>
+                </div>
+            </aside>
+
+            <!-- MAIN CONTENT AREA -->
+            <main class="main">
+                
+                <!-- PAGE TITLE BANNER -->
+                <section class="welcome">
+                    <div>
+                        <h1>System & Account Settings</h1>
+                        <p>Configure workspace parameters, security protocols, and operational preferences.</p>
+                    </div>
+                    <div class="platform-status">
+                        <span class="status-dot"></span>
+                        <span id="apiStatus">System Operational</span>
+                    </div>
+                </section>
+
+                <!-- SETTINGS OPTIONS GRID -->
+                <div class="dashboard-grid">
+                    
+                    <!-- ACCOUNT & SECURITY -->
+                    <section class="dashboard-section">
+                        <div class="section-header">
+                            <h2>Security & Verification</h2>
+                        </div>
+                        <div class="opportunity-list">
+                            <div class="opportunity-card">
+                                <div class="opportunity-icon">
+                                    <i data-lucide="shield-check"></i>
+                                </div>
+                                <div style="flex: 1;">
+                                    <h3>Two-Factor Authentication (2FA)</h3>
+                                    <p>Ensure extra protection for enterprise portal logins and financial management.</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="opportunity-card">
+                                <div class="opportunity-icon">
+                                    <i data-lucide="key-round"></i>
+                                </div>
+                                <div style="flex: 1;">
+                                    <h3>Password Credentials</h3>
+                                    <p>Last modified 30 days ago. Update your security access credentials.</p>
+                                </div>
+                                <button class="btn-secondary" style="font-size: 13px;">Update</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- NOTIFICATIONS & PREFERENCES -->
+                    <section class="dashboard-section">
+                        <div class="section-header">
+                            <h2>Platform Notifications</h2>
+                        </div>
+                        <div class="activity-list">
+                            <div class="setting-row" style="padding: 12px 0; border-bottom: 1px solid var(--border);">
+                                <div class="setting-info">
+                                    <h4>Email Alert Digests</h4>
+                                    <p>Receive updates regarding trade corridors and opportunities.</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="setting-row" style="padding: 12px 0;">
+                                <div class="setting-info">
+                                    <h4>Message Instant Alerts</h4>
+                                    <p>Get notified when partners send direct messages.</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </section>
+
+                </div>
+
+            </main>
+        </div>
+
+    </div>
+
+    <!-- NOTIFICATIONS PANEL -->
+    <div class="notifications-panel hidden" id="notificationsPanel">
+        <h3>Notifications</h3>
+        <hr style="margin: 10px 0; border: none; border-top: 1px solid var(--border);">
+        <div class="activity-list">
+            <div class="activity-item">
+                <i data-lucide="message-square"></i>
+                <div>
+                    <strong>New Message Received</strong>
+                    <p style="font-size:12px; color:var(--muted);">2 minutes ago</p>
+                </div>
+            </div>
+            <div class="activity-item">
+                <i data-lucide="file-check"></i>
+                <div>
+                    <strong>Document Approved</strong>
+                    <p style="font-size:12px; color:var(--muted);">1 hour ago</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN SCRIPT -->
+    <script src="js/home.js"></script>
+</body>
+</html>
