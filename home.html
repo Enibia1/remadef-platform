@@ -1,515 +1,82 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>REMADEF Platform | Dashboard</title>
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/home.css">
-</head>
-<body>
+/* ==========================================
+   POPUP MODAL FRAMEWORK STYLING
+   ========================================== */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(7, 26, 61, 0.4); /* Transparent matching primary dark tint */
+    backdrop-filter: blur(4px); /* Modern frosted look */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Higher than headers and sidebars */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
 
-    <div class="app">
-        
-        <!-- HEADER -->
-        <header class="header">
-            <div class="header-left">
-                <button id="sidebarToggle" class="menu-toggle" aria-label="Toggle Sidebar">
-                    <i data-lucide="menu"></i>
-                </button>
-                
-                <div class="brand" id="brandButton">
-                    <!-- VECTOR BRAND LOGO GENERATED IN CODE -->
-                    <div class="brand-logo">
-                        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="100" height="100" rx="24" fill="#071A3D"/>
-                            <path d="M28 72V28L50 50L72 28V72" stroke="#2563EB" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
-                            <circle cx="50" cy="24" r="8" fill="#22C55E"/>
-                        </svg>
-                    </div>
-                    <span class="brand-name">REMADEF</span>
-                    <i data-lucide="chevron-down" class="brand-chevron"></i>
-                    
-                    <!-- BRAND DROPDOWN MENU -->
-                    <div class="brand-dropdown" id="brandDropdown">
-                        <a href="home.html">
-                            <i data-lucide="layout-dashboard"></i>
-                            <span>Dashboard Hub</span>
-                        </a>
-                        <a href="profile.html">
-                            <i data-lucide="building"></i>
-                            <span>Enterprise Portal</span>
-                        </a>
-                        <a href="settings.html">
-                            <i data-lucide="sliders"></i>
-                            <span>System Settings</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
+/* Activate Overlay State */
+.modal-backdrop.active {
+    opacity: 1;
+    pointer-events: all;
+}
 
-            <!-- SEARCH BAR -->
-            <div class="search-wrapper">
-                <i data-lucide="search"></i>
-                <input type="text" placeholder="Search enterprise programs, messages, trade corridors...">
-            </div>
+/* Centered Container Widget Card Limit (Not Fullscreen) */
+.modal-box {
+    background: #ffffff;
+    width: 90%;
+    max-width: 460px; /* Constrained card width sizing layout */
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-            <!-- HEADER RIGHT -->
-            <div class="header-right">
-                <button class="notification-btn" id="notificationToggle" aria-label="Notifications">
-                    <i data-lucide="bell"></i>
-                    <span class="badge">3</span>
-                </button>
-                
-                <div class="avatar" id="userAvatar">
-                    <span>OK</span>
-                </div>
-            </div>
-        </header>
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #E2E8F0;
+    background: #F8FAFC;
+}
 
-        <!-- LAYOUT CONTAINER -->
-        <div class="layout">
-            
-            <!-- SIDEBAR NAVIGATION -->
-            <aside class="sidebar" id="sidebar">
-                <div>
-                    <div class="sidebar-title">NAVIGATION</div>
-                    <nav class="sidebar-nav">
-                        <a href="home.html" class="active">
-                            <i data-lucide="house"></i>
-                            <span>Home</span>
-                        </a>
-                        <a href="profile.html">
-                            <i data-lucide="user"></i>
-                            <span>My Profile</span>
-                        </a>
-                        <a href="messages.html">
-                            <i data-lucide="message-square"></i>
-                            <span>Messages</span>
-                            <span class="menu-badge">2</span>
-                        </a>
-                        <a href="learning.html">
-                            <i data-lucide="book-open"></i>
-                            <span>Learning Hub</span>
-                        </a>
-                        <a href="apprenticeship.html">
-                            <i data-lucide="graduation-cap"></i>
-                            <span>Apprenticeship</span>
-                        </a>
-                        <a href="business.html">
-                            <i data-lucide="building-2"></i>
-                            <span>Business & Gigs</span>
-                        </a>
+.modal-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
-                        <!-- SYSTEM & ACCOUNT (MORE SECTION) -->
-                        <div class="sidebar-title" style="margin-top: 16px;">MORE</div>
-                        <a href="wallet.html">
-                            <i data-lucide="wallet"></i>
-                            <span>Wallet</span>
-                            <span class="menu-badge">₦</span>
-                        </a>
-                        <a href="escrow.html">
-                            <i data-lucide="shield-check"></i>
-                            <span>Escrow</span>
-                        </a>
-                        <a href="gigs-directory.html">
-                            <i data-lucide="briefcase"></i>
-                            <span>Gig Engine & Directory</span>
-                        </a>
-                        <a href="settings.html">
-                            <i data-lucide="sliders"></i>
-                            <span>Platform Settings</span>
-                        </a>
-                        <a href="help.html">
-                            <i data-lucide="help-circle"></i>
-                            <span>Help & Support</span>
-                        </a>
-                        <a href="logout.html" class="logout-link">
-                            <i data-lucide="log-out"></i>
-                            <span>Sign Out</span>
-                        </a>
-                    </nav>
-                </div>
+.modal-title h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #071A3D;
+}
 
-                <!-- SIDEBAR FOOTER -->
-                <div class="sidebar-footer">
-                    <div class="profile-progress">
-                        <div class="progress-header">
-                            <span>Profile Completion</span>
-                            <span>85%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 85%;"></div>
-                        </div>
-                        <button class="complete-profile-btn" onclick="window.location.href='profile.html'">
-                            Update Profile
-                        </button>
-                    </div>
-                    <div class="copyright">
-                        &copy; 2026 REMADEF Ltd.
-                    </div>
-                </div>
-            </aside>
+.modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #94A3B8;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px;
+    transition: color 0.15s ease;
+}
 
-            <!-- MAIN CONTENT AREA -->
-            <main class="main">
-                
-                <!-- WELCOME BANNER -->
-                <section class="welcome">
-                    <div>
-                        <h1>Welcome Back, Onyekachi</h1>
-                        <p>Monitor your project workflows, trade corridors, and active platform programs.</p>
-                    </div>
-                    <div class="platform-status">
-                        <span class="status-dot"></span>
-                        <span id="apiStatus">System Operational</span>
-                    </div>
-                </section>
+.modal-close-btn:hover {
+    color: #EF4444;
+}
 
-                <!-- DASHBOARD METRIC CARDS -->
-                <section class="dashboard-cards">
-                    <div class="dashboard-card">
-                        <div class="card-icon blue">
-                            <i data-lucide="briefcase"></i>
-                        </div>
-                        <div class="card-content">
-                            <span class="card-title">Active Projects</span>
-                            <h2>12</h2>
-                            <small>+2 added this month</small>
-                        </div>
-                    </div>
+.modal-body {
+    padding: 20px;
+}
 
-                    <div class="dashboard-card">
-                        <div class="card-icon green">
-                            <i data-lucide="users"></i>
-                        </div>
-                        <div class="card-content">
-                            <span class="card-title">Network Partners</span>
-                            <h2>48</h2>
-                            <small>Active collaborations</small>
-                        </div>
-                    </div>
-
-                    <div class="dashboard-card">
-                        <div class="card-icon orange">
-                            <i data-lucide="clock"></i>
-                        </div>
-                        <div class="card-content">
-                            <span class="card-title">Pending Reviews</span>
-                            <h2>5</h2>
-                            <small>Requires attention</small>
-                        </div>
-                    </div>
-
-                    <div class="dashboard-card">
-                        <div class="card-icon purple">
-                            <i data-lucide="award"></i>
-                        </div>
-                        <div class="card-content">
-                            <span class="card-title">Grants & Funding</span>
-                            <h2>$450K</h2>
-                            <small>In active pipelines</small>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- WALLET & FINANCIAL DASHBOARD SECTION -->
-                <section class="dashboard-cards" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-bottom: 0;">
-                    <div class="dashboard-card" style="justify-content: space-between;">
-                        <div>
-                            <span class="card-title" style="font-size: 14px; margin-bottom: 8px; display: block;">Available Balance</span>
-                            <div id="walletBalance" style="font-size: 32px; font-weight: 700; color: var(--text-main);">₦0.00</div>
-                        </div>
-                        <div class="card-icon blue">
-                            <i data-lucide="wallet"></i>
-                        </div>
-                    </div>
-                    <div class="dashboard-card" style="justify-content: space-between;">
-                        <div>
-                            <span class="card-title" style="font-size: 14px; margin-bottom: 8px; display: block;">Locked Escrow Funds</span>
-                            <div id="escrowLocked" style="font-size: 32px; font-weight: 700; color: var(--warning);">₦0.00</div>
-                        </div>
-                        <div class="card-icon orange">
-                            <i data-lucide="shield-check"></i>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- ACTION MODULES GRID -->
-                <div class="dashboard-grid">
-                    
-                    <!-- FUND WALLET & REDEEM VOUCHERS -->
-                    <section class="dashboard-section">
-                        <div class="section-header">
-                            <h2>Gateway Top-Up & Vouchers</h2>
-                        </div>
-                        
-                        <div style="display: flex; flex-direction: column; gap: 20px;">
-                            <!-- Fund Wallet Card -->
-                            <div style="background: var(--bg-main); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
-                                <h3 style="margin-bottom: 12px; font-size: 14px; font-weight: 600;">Fund Wallet (Fiat)</h3>
-                                <form onsubmit="handleDeposit(event)" style="display: flex; flex-direction: column; gap: 12px;">
-                                    <div>
-                                        <label style="display:block; margin-bottom:6px; font-weight:500; font-size: 13px;">Amount (₦)</label>
-                                        <input type="number" id="depositAmount" placeholder="10000" min="500" style="width:100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-card); color: var(--text-main); outline: none; font-size: 14px;" required>
-                                    </div>
-                                    <button type="submit" class="complete-profile-btn" style="padding: 10px; font-size: 14px;">Initialize Payment Session</button>
-                                </form>
-                            </div>
-
-                            <!-- Redeem Voucher Card -->
-                            <div style="background: var(--bg-main); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
-                                <h3 style="margin-bottom: 12px; font-size: 14px; font-weight: 600;">Redeem REMADEF Voucher</h3>
-                                <form onsubmit="handleRedeem(event)" style="display: flex; flex-direction: column; gap: 12px;">
-                                    <div>
-                                        <label style="display:block; margin-bottom:6px; font-weight:500; font-size: 13px;">Voucher PIN Code</label>
-                                        <input type="text" id="voucherPin" placeholder="REM-XXXX-XXXX-XXXX" style="width:100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-family: monospace; background: var(--bg-card); color: var(--text-main); outline: none; font-size: 14px;" required>
-                                    </div>
-                                    <button type="submit" class="complete-profile-btn" style="padding: 10px; font-size: 14px; background-color: var(--success);">Redeem Voucher</button>
-                                </form>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- ACTIVE WORKFLOWS SECTION -->
-                    <section class="dashboard-section">
-                        <div class="section-header">
-                            <h2>Business & Apprenticeship Hub</h2>
-                            <a href="business.html">View All</a>
-                        </div>
-                        <div class="opportunity-list">
-                            <div class="opportunity-card" onclick="window.location.href='business.html'">
-                                <div class="opportunity-icon">
-                                    <i data-lucide="truck"></i>
-                                </div>
-                                <div>
-                                    <h3>Logistics & Fulfillment Hub</h3>
-                                    <p>Consortium-based sourcing hub and prep-kit distribution setup for regional supply chains.</p>
-                                </div>
-                            </div>
-
-                            <div class="opportunity-card" onclick="window.location.href='apprenticeship.html'">
-                                <div class="opportunity-icon">
-                                    <i data-lucide="graduation-cap"></i>
-                                </div>
-                                <div>
-                                    <h3>Apprenticeship Framework Initiative</h3>
-                                    <p>Vocational youth development and direct enterprise onboarding deployment program.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- SPONSORED BANNER SECTION -->
-                        <div class="sponsored-section show">
-                            <span class="sponsored-label">FEATURED PROGRAM</span>
-                            <div class="sponsored-card">
-                                <div>
-                                    <h3>Nexus Global Trading Infrastructure</h3>
-                                    <p>Multi-modal industrial development and special economic zone project modeling.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                </div>
-
-                <!-- TRANSACTION AUDIT TRAIL TABLE SECTION -->
-                <section class="dashboard-section">
-                    <div class="section-header">
-                        <h2>Transaction Audit Trail</h2>
-                        <button onclick="loadTransactions()" class="complete-profile-btn" style="width: auto; padding: 6px 12px; font-size: 13px; background: var(--bg-main); color: var(--text-muted); border: 1px solid var(--border);">Refresh Log</button>
-                    </div>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-top: -8px;">Review immutable historical records of all deposits, redemptions, and escrow settlements.</p>
-                    
-                    <div style="overflow-x: auto;">
-                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;">
-                            <thead>
-                                <tr style="border-bottom: 2px solid var(--border); color: var(--text-muted);">
-                                    <th style="padding: 12px;">Reference ID</th>
-                                    <th style="padding: 12px;">Transaction Type</th>
-                                    <th style="padding: 12px;">Amount</th>
-                                    <th style="padding: 12px;">Status</th>
-                                    <th style="padding: 12px;">Timestamp</th>
-                                </tr>
-                            </thead>
-                            <tbody id="transactionTableBody">
-                                <tr><td colspan="5" style="padding: 20px; text-align: center; color: var(--text-muted);">Loading transaction audit trail...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-
-            </main>
-        </div>
-
-    </div>
-
-    <!-- NOTIFICATIONS PANEL -->
-    <div class="notifications-panel hidden" id="notificationsPanel">
-        <h3>Notifications</h3>
-        <hr style="margin: 10px 0; border: none; border-top: 1px solid var(--border);">
-        <div class="activity-list">
-            <div class="activity-item">
-                <i data-lucide="message-square"></i>
-                <div>
-                    <strong>New Message Received</strong>
-                    <p style="font-size:12px; color:var(--text-muted);">2 minutes ago</p>
-                </div>
-            </div>
-            <div class="activity-item">
-                <i data-lucide="file-check"></i>
-                <div>
-                    <strong>Document Approved</strong>
-                    <p style="font-size:12px; color:var(--text-muted);">1 hour ago</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MAIN SCRIPT & CLIENT BRIDGE -->
-    <script src="js/home.js"></script>
-    <script>
-        async function loadWalletData() {
-            try {
-                if (typeof RemadefAPI !== 'undefined') {
-                    const data = await RemadefAPI.getWalletBalance();
-                    if (document.getElementById('walletBalance')) {
-                        document.getElementById('walletBalance').innerText = formatCurrency(data.balance || 0);
-                    }
-                    if (document.getElementById('escrowLocked')) {
-                        document.getElementById('escrowLocked').innerText = formatCurrency(data.escrow_locked || 0);
-                    }
-                } else {
-                    const data = await apiRequest('/api/wallet/balance');
-                    if (document.getElementById('walletBalance')) {
-                        document.getElementById('walletBalance').innerText = formatCurrency(data.balance || 0);
-                    }
-                    if (document.getElementById('escrowLocked')) {
-                        document.getElementById('escrowLocked').innerText = formatCurrency(data.escrow_locked || 0);
-                    }
-                }
-            } catch (e) {
-                console.error("Failed to load wallet balance", e);
-            }
-        }
-
-        async function handleDeposit(event) {
-            event.preventDefault();
-            const amount = parseFloat(document.getElementById('depositAmount').value);
-            try {
-                if (typeof RemadefAPI !== 'undefined') {
-                    const res = await RemadefAPI.fundWalletFiat(amount, 'user@remadef.com');
-                    if (res.authorization_url) {
-                        window.location.href = res.authorization_url;
-                    } else {
-                        notifyUser("Deposit session initialized successfully.");
-                    }
-                } else {
-                    const res = await apiRequest('/api/wallet/fund/fiat', 'POST', { amount, currency: 'NGN', method: 'card' });
-                    if (res.authorization_url) {
-                        window.location.href = res.authorization_url;
-                    }
-                }
-            } catch (e) {
-                notifyUser(e.message, true);
-            }
-        }
-
-        async function handleRedeem(event) {
-            event.preventDefault();
-            const pin = document.getElementById('voucherPin').value;
-            try {
-                if (typeof RemadefAPI !== 'undefined') {
-                    const res = await RemadefAPI.redeemGiftCard(pin);
-                    notifyUser(`Successfully redeemed voucher for ${formatCurrency(res.amount || 0)}!`);
-                    loadWalletData();
-                    loadTransactions();
-                } else {
-                    const res = await apiRequest('/api/wallet/giftcard/redeem', 'POST', { pin });
-                    notifyUser(`Successfully redeemed ${formatCurrency(res.amount)}!`);
-                    loadWalletData();
-                    loadTransactions();
-                }
-            } catch (e) {
-                notifyUser(e.message, true);
-            }
-        }
-
-        async function loadTransactions() {
-            const tbody = document.getElementById('transactionTableBody');
-            if (!tbody) return;
-            try {
-                let rows = [];
-                if (typeof RemadefAPI !== 'undefined') {
-                    const data = await RemadefAPI._execute('/api/wallet/transactions', 'GET');
-                    rows = data.rows || [];
-                } else {
-                    const data = await apiRequest('/api/wallet/transactions');
-                    rows = data.rows || [];
-                }
-
-                if (rows.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" style="padding: 20px; text-align: center; color: var(--text-muted);">No historical records found.</td></tr>`;
-                    return;
-                }
-
-                tbody.innerHTML = '';
-                rows.forEach(txn => {
-                    const tr = document.createElement('tr');
-                    tr.style.borderBottom = '1px solid var(--border)';
-                    
-                    const statusColor = txn.status === 'SUCCESS' ? 'var(--success)' : 'var(--warning)';
-                    
-                    tr.innerHTML = `
-                        <td style="padding: 12px; font-family: monospace; font-weight: 600;">${txn.reference}</td>
-                        <td style="padding: 12px;">${txn.type}</td>
-                        <td style="padding: 12px; font-weight: 600;">${formatCurrency(txn.amount)}</td>
-                        <td style="padding: 12px;"><span style="color: ${statusColor}; font-weight: 500;">${txn.status}</span></td>
-                        <td style="padding: 12px; color: var(--text-muted); font-size: 13px;">${new Date(txn.created_at).toLocaleString()}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            } catch (e) {
-                tbody.innerHTML = `<tr><td colspan="5" style="padding: 20px; text-align: center; color: var(--danger);">Failed to load transaction audit history.</td></tr>`;
-            }
-        }
-
-        async function apiRequest(endpoint, method = 'GET', data = null) {
-            const options = {
-                method,
-                headers: { 'Content-Type': 'application/json' }
-            };
-            if (data) options.body = JSON.stringify(data);
-            const response = await fetch(endpoint, options);
-            const json = await response.json();
-            if (!response.ok) throw new Error(json.message || 'API request failed');
-            return json;
-        }
-
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('en-NG', {
-                style: 'currency',
-                currency: 'NGN'
-            }).format(amount || 0);
-        }
-
-        function notifyUser(message, isError = false) {
-            alert((isError ? "⚠️ Error: " : "✅ Success: ") + message);
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            loadWalletData();
-            loadTransactions();
-        });
-    </script>
-</body>
-</html>
+@keyframes modalSlideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
