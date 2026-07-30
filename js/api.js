@@ -110,6 +110,29 @@ const RemadefAPI = {
             reply_to: replyTo || ''
         };
         return await this._execute('/api/messages', 'POST', payload);
+    },
+
+    // ============================================================
+    // WALLET & PAYMENT GATEWAY
+    // ============================================================
+    async getWalletBalance() {
+        return await this._execute('/api/wallet/balance', 'GET');
+    },
+
+    async fundWalletFiat(amount, email, metadata = {}) {
+        const payload = {
+            amount: amount,
+            email: email,
+            metadata: metadata
+        };
+        return await this._execute('/api/wallet/fund/fiat', 'POST', payload);
+    },
+
+    async redeemGiftCard(pinCode) {
+        const payload = {
+            pin_code: pinCode
+        };
+        return await this._execute('/api/wallet/giftcard/redeem', 'POST', payload);
     }
 };
 
