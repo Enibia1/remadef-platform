@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Remadef - Wallet Dashboard</title>
+    <link rel="stylesheet" href="../static/css/global.css">
+</head>
+<body>
+    <main class="main">
+        <section class="welcome">
+            <div class="welcome-content">
+                <h1>Financial Dashboard</h1>
+                <p>Manage your multi-method wallet, review balances, and redeem REMADEF vouchers.</p>
+            </div>
+        </section>
+
+        <!-- Balance Overview Grid -->
+        <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+            <div class="card-box">
+                <h3 style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">Available Balance</h3>
+                <div id="walletBalance" style="font-size: 32px; font-weight: 700; color: var(--text-primary);">₦0.00</div>
+            </div>
+            <div class="card-box">
+                <h3 style="color: var(--text-secondary); font-size: 14px; margin-bottom: 8px;">Locked Escrow Funds</h3>
+                <div id="escrowLocked" style="font-size: 32px; font-weight: 700; color: var(--warning);">₦0.00</div>
+            </div>
+        </section>
+
+        <!-- Action Modules Grid -->
+        <section style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <!-- Fund Wallet Card -->
+            <div class="card-box">
+                <h3 style="margin-bottom: 16px;">Fund Wallet (Fiat)</h3>
+                <form onsubmit="handleDeposit(event)" style="display: flex; flex-direction: column; gap: 16px;">
+                    <div>
+                        <label style="display:block; margin-bottom:6px; font-weight:500;">Amount (₦)</label>
+                        <input type="number" id="depositAmount" placeholder="10000" min="500" style="width:100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;" required>
+                    </div>
+                    <button type="submit" class="action-btn primary-btn">Initialize Payment Session</button>
+                </form>
+            </div>
+
+            <!-- Redeem Voucher Card -->
+            <div class="card-box">
+                <h3 style="margin-bottom: 16px;">Redeem REMADEF Voucher</h3>
+                <form onsubmit="handleRedeem(event)" style="display: flex; flex-direction: column; gap: 16px;">
+                    <div>
+                        <label style="display:block; margin-bottom:6px; font-weight:500;">Voucher PIN Code</label>
+                        <input type="text" id="voucherPin" placeholder="REM-XXXX-XXXX-XXXX" style="width:100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-family: monospace;" required>
+                    </div>
+                    <button type="submit" class="action-btn primary-btn" style="background: var(--success);">Redeem Voucher</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <script src="../static/js/app.js"></script>
+    <script>
+        async function loadWalletData() {
+            try {
+                const data = await apiRequest('/api/wallet/balance');
+                document.getElementById('walletBalance').innerText = formatCurrency(data.balance);
+                document.getElementById('escrowLocked').innerText = formatCurrency(data.escrow_locked);
+            } catch (e) {
+                console.error("Failed to load balance");
+            }
+        }
+
+        async function handleDeposit(event) {
+            event.preventDefault();
+            const amount = parseFloat(document.getElementById('depositAmount').value);
+            try {
+                const res = await apiRequest('/api/wallet/fund/fiat', 'POST', { amount, currency: 'NGN', method: 'card' });
+                if (res.authorization_url) {
+                    window.location.href = res.authorization_url;
+                }
+            } catch (e) {
+                notifyUser(e.message, true);
+            }
+        }
+
+        async function handleRedeem(event) {
+            event.preventDefault();
+            const pin = document.getElementById('voucherPin').value;
+            try {
+                const res = await apiRequest('/api/wallet/giftcard/redeem', 'POST', { pin });
+                notifyUser(`Successfully redeemed ${formatCurrency(res.amount)}!`);
+                loadWalletData();
+            } catch (e) {
+                notifyUser(e.message, true);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadWalletData);
+    </script>
+</body>
+</html>
