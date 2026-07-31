@@ -1,918 +1,1817 @@
-/* ============================================================
-REMADEF PLATFORM
-AUTHENTICATION & SESSION MANAGER
-File: js/auth.ts
+/* ==========================================================
+   REMADEF PLATFORM
+   CENTRAL API CLIENT
+   File: js/api.ts
 
-Responsibilities:
+   RESPONSIBILITIES
+   ----------------------------------------------------------
+   • Centralize all frontend → backend communication
+   • Communicate with the REMADEF Appwrite Function
+   • Authentication
+   • Profiles
+   • Home / infinite feed
+   • Notifications
+   • Messaging
+   • Learning
+   • Jobs
+   • Apprenticeship
+   • Applications
+   • Marketplace
+   • Business
+   • Wallet
+   • Escrow
+   • Settings
 
-- Appwrite authentication
-- Sign in
-- Registration handoff
-- Current user
-- Session validation
-- Protected-page enforcement
-- Sign out
-- Session state
-- Local application state
-  ============================================================ */
+   IMPORTANT
+   ----------------------------------------------------------
+   UI files should NOT directly call Appwrite Functions.
 
-import RemadefAPI from "./api";
+   UI
+      ↓
+   Module
+      ↓
+   RemadefAPI
+      ↓
+   Appwrite Function
+      ↓
+   Database / Services
+========================================================== */
+
 import CONFIG from "./config";
 
-/* ============================================================
-TYPES
-============================================================ */
 
-export interface AuthUser {
+/* ==========================================================
+   TYPES
+========================================================== */
 
-$id: string;
+export interface APIResponse<T = any> {
 
-name?: string;
+    success?: boolean;
 
-email?: string;
+    message?: string;
 
-phone?: string;
+    data?: T;
 
-status?: boolean;
+    user?: any;
 
-emailVerification?: boolean;
+    profile?: any;
 
-phoneVerification?: boolean;
+    accountId?: string;
 
-registration?: string;
+    [key: string]: any;
+}
 
-prefs?: Record<string, unknown>;
 
-[key: string]: unknown;
+export interface APIRequestOptions {
+
+    timeout?: number;
+
+    retries?: number;
 
 }
 
-export interface AuthState {
 
-authenticated: boolean;
+/* ==========================================================
+   API CLIENT
+========================================================== */
 
-user: AuthUser | null;
+class RemadefAPIClient {
 
-loading: boolean;
 
-lastChecked: number;
+    /* ======================================================
+       CONFIGURATION
+    ====================================================== */
 
-}
+    private readonly FUNCTION_ID =
+        "6a6380f40035f4b76305";
 
-interface StoredAuth {
 
-user: AuthUser;
+    private readonly timeout =
+        CONFIG.api.timeout;
 
-authenticated: boolean;
 
-timestamp: number;
+    private readonly retries =
+        CONFIG.api.retries;
 
-}
 
-/* ============================================================
-STORAGE KEYS
-============================================================ */
+    /* ======================================================
+       APPWRITE FUNCTION EXECUTION
+    ====================================================== */
 
-const STORAGE_KEYS = {
+    private async execute(
 
-auth:
-    "remadef_auth",
+        path: string,
 
-user:
-    "remadef_user",
+        method:
+            string = "GET",
 
-account:
-    "remadef_account",
+        data:
+            any = null,
 
-profile:
-    "remadef_profile"
+        options:
+            APIRequestOptions = {}
 
-} as const;
+    ): Promise<APIResponse> {
 
-/* ============================================================
-AUTH MANAGER
-============================================================ */
 
-class RemadefAuth {
+        const maxRetries =
+            options.retries ??
+            this.retries;
 
-private state: AuthState = {
 
-    authenticated:
-        false,
+        let lastError:
+            any = null;
 
-    user:
-        null,
 
-    loading:
-        false,
-
-    lastChecked:
-        0
-
-};
-
-private listeners:
-    Array<(state: AuthState) => void> = [];
-
-/* ========================================================
-   INITIALIZE
-======================================================== */
-
-async initialize(): Promise<AuthState> {
-
-    if (
-        typeof window === "undefined"
-    ) {
-
-        return this.state;
-
-    }
-
-    this.state.loading =
-        true;
-
-    this.notify();
-
-    try {
-
-        const user =
-            await this.getCurrentUser();
-
-        if (user) {
-
-            this.setAuthenticatedUser(
-                user
-            );
-
-        } else {
-
-            this.clearAuthentication();
-
-        }
-
-    } catch (error) {
-
-        console.error(
-            "[REMADEF AUTH] Initialization failed:",
-            error
-        );
-
-        this.clearAuthentication();
-
-    } finally {
-
-        this.state.loading =
-            false;
-
-        this.state.lastChecked =
-            Date.now();
-
-        this.notify();
-
-    }
-
-    return this.state;
-
-}
-
-/* ========================================================
-   SIGN IN
-======================================================== */
-
-async signIn(
-
-    email: string,
-
-    password: string
-
-): Promise<AuthUser> {
-
-    if (!email.trim()) {
-
-        throw new Error(
-            "Email is required."
-        );
-
-    }
-
-    if (!password) {
-
-        throw new Error(
-            "Password is required."
-        );
-
-    }
-
-    this.state.loading =
-        true;
-
-    this.notify();
-
-    try {
-
-        /*
-         * Appwrite Account SDK is used here.
-         *
-         * The SDK must already be initialized by app.ts.
-         */
-
-        const account =
-            this.getAccountService();
-
-        if (!account) {
-
-            throw new Error(
-                "Appwrite Account service is not initialized."
-            );
-
-        }
-
-        /*
-         * Appwrite SDK versions use createEmailPasswordSession()
-         * for email/password authentication.
-         */
-
-        await account.createEmailPasswordSession(
-
-            email.trim().toLowerCase(),
-
-            password
-
-        );
-
-        const user =
-            await this.getCurrentUser();
-
-        if (!user) {
-
-            throw new Error(
-                "Authentication succeeded but the user could not be loaded."
-            );
-
-        }
-
-        this.setAuthenticatedUser(
-            user
-        );
-
-        return user;
-
-    } finally {
-
-        this.state.loading =
-            false;
-
-        this.notify();
-
-    }
-
-}
-
-/* ========================================================
-   PHONE SIGN IN
-======================================================== */
-
-async signInWithPhone(
-
-    phone: string,
-
-    password: string
-
-): Promise<AuthUser> {
-
-    if (!phone.trim()) {
-
-        throw new Error(
-            "Phone number is required."
-        );
-
-    }
-
-    if (!password) {
-
-        throw new Error(
-            "Password is required."
-        );
-
-    }
-
-    const account =
-        this.getAccountService();
-
-    if (!account) {
-
-        throw new Error(
-            "Appwrite Account service is not initialized."
-        );
-
-    }
-
-    /*
-     * Appwrite phone/password sessions.
-     */
-
-    await account.createPhoneSession(
-
-        phone.trim(),
-
-        password
-
-    );
-
-    const user =
-        await this.getCurrentUser();
-
-    if (!user) {
-
-        throw new Error(
-            "Unable to load authenticated user."
-        );
-
-    }
-
-    this.setAuthenticatedUser(
-        user
-    );
-
-    return user;
-
-}
-
-/* ========================================================
-   REGISTER
-======================================================== */
-
-async register(
-
-    data:
-        Record<string, unknown>
-
-) {
-
-    const response =
-        await RemadefAPI.register(
-            data
-        );
-
-    /*
-     * Registration creates the account/profile
-     * on the backend.
-     *
-     * It does NOT automatically assume that a
-     * browser session exists.
-     */
-
-    if (
-        response.success
-    ) {
-
-        if (
-            response.account
+        for (
+            let attempt = 0;
+            attempt <= maxRetries;
+            attempt++
         ) {
-
-            this.saveAccount(
-                response.account
-            );
-
-        }
-
-        if (
-            response.profile
-        ) {
-
-            this.saveProfile(
-                response.profile as Record<
-                    string,
-                    unknown
-                >
-            );
-
-        }
-
-    }
-
-    return response;
-
-}
-
-/* ========================================================
-   CURRENT USER
-======================================================== */
-
-async getCurrentUser():
-
-    Promise<AuthUser | null> {
-
-    try {
-
-        const account =
-            this.getAccountService();
-
-        if (!account) {
-
-            return null;
-
-        }
-
-        const user =
-            await account.get();
-
-        return user as AuthUser;
-
-    } catch {
-
-        return null;
-
-    }
-
-}
-
-/* ========================================================
-   VALIDATE SESSION
-======================================================== */
-
-async validateSession():
-
-    Promise<boolean> {
-
-    try {
-
-        const user =
-            await this.getCurrentUser();
-
-        if (!user) {
-
-            this.clearAuthentication();
-
-            return false;
-
-        }
-
-        this.setAuthenticatedUser(
-            user
-        );
-
-        return true;
-
-    } catch {
-
-        this.clearAuthentication();
-
-        return false;
-
-    }
-
-}
-
-/* ========================================================
-   REQUIRE AUTHENTICATION
-======================================================== */
-
-async requireAuth(
-
-    redirect = "login.html"
-
-): Promise<AuthUser> {
-
-    const user =
-        await this.getCurrentUser();
-
-    if (!user) {
-
-        this.clearAuthentication();
-
-        if (
-            typeof window !== "undefined"
-        ) {
-
-            const currentPage =
-                window.location.pathname;
-
-            const returnUrl =
-                encodeURIComponent(
-                    currentPage
-                );
-
-            window.location.href =
-                `${redirect}?return=${returnUrl}`;
-
-        }
-
-        throw new Error(
-            "Authentication required."
-        );
-
-    }
-
-    this.setAuthenticatedUser(
-        user
-    );
-
-    return user;
-
-}
-
-/* ========================================================
-   SIGN OUT
-======================================================== */
-
-async signOut(
-
-    redirect = "login.html"
-
-): Promise<void> {
-
-    try {
-
-        const account =
-            this.getAccountService();
-
-        if (account) {
-
-            await account.deleteSession(
-                "current"
-            );
-
-        }
-
-    } catch (error) {
-
-        /*
-         * Even if the remote session has already
-         * expired, local authentication state must
-         * still be cleared.
-         */
-
-        console.warn(
-            "[REMADEF AUTH] Remote logout warning:",
-            error
-        );
-
-    } finally {
-
-        this.clearAuthentication();
-
-        if (
-            typeof window !== "undefined" &&
-            redirect
-        ) {
-
-            window.location.href =
-                redirect;
-
-        }
-
-    }
-
-}
-
-/* ========================================================
-   GET AUTH STATE
-======================================================== */
-
-getState(): AuthState {
-
-    return {
-
-        ...this.state
-
-    };
-
-}
-
-/* ========================================================
-   IS AUTHENTICATED
-======================================================== */
-
-isAuthenticated(): boolean {
-
-    return this.state.authenticated;
-
-}
-
-/* ========================================================
-   GET CACHED USER
-======================================================== */
-
-getCachedUser():
-
-    AuthUser | null {
-
-    return this.state.user;
-
-}
-
-/* ========================================================
-   STATE LISTENER
-======================================================== */
-
-subscribe(
-
-    listener:
-        (state: AuthState) => void
-
-): () => void {
-
-    this.listeners.push(
-        listener
-    );
-
-    /*
-     * Return unsubscribe function.
-     */
-
-    return () => {
-
-        this.listeners =
-            this.listeners.filter(
-
-                item =>
-                    item !== listener
-
-            );
-
-    };
-
-}
-
-/* ========================================================
-   NOTIFY LISTENERS
-======================================================== */
-
-private notify(): void {
-
-    const snapshot = {
-
-        ...this.state
-
-    };
-
-    this.listeners.forEach(
-
-        listener => {
 
             try {
 
-                listener(
-                    snapshot
+                return await this.executeOnce(
+
+                    path,
+
+                    method,
+
+                    data,
+
+                    options.timeout ??
+                    this.timeout
+
                 );
 
             } catch (error) {
 
-                console.error(
-                    "[REMADEF AUTH] Listener error:",
-                    error
+                lastError =
+                    error;
+
+
+                if (
+                    attempt >=
+                    maxRetries
+                ) {
+
+                    break;
+
+                }
+
+
+                await this.delay(
+
+                    500 *
+                    (attempt + 1)
+
                 );
 
             }
 
         }
 
-    );
 
-}
+        throw lastError ||
+            new Error(
+                "REMADEF API request failed."
+            );
 
-/* ========================================================
-   SAVE AUTHENTICATED USER
-======================================================== */
+    }
 
-private setAuthenticatedUser(
 
-    user: AuthUser
+    /* ======================================================
+       SINGLE API EXECUTION
+    ====================================================== */
 
-): void {
+    private async executeOnce(
 
-    this.state.user =
-        user;
+        path:
+            string,
 
-    this.state.authenticated =
-        true;
+        method:
+            string,
 
-    this.state.lastChecked =
-        Date.now();
+        data:
+            any,
 
-    if (
-        typeof window !== "undefined"
-    ) {
+        timeout:
+            number
 
-        const authData:
-            StoredAuth = {
+    ): Promise<APIResponse> {
 
-                user,
 
-                authenticated:
-                    true,
+        const appwrite =
+            this.getAppwrite();
 
-                timestamp:
-                    Date.now()
 
-            };
+        const payload = {
 
-        localStorage.setItem(
+            path,
 
-            STORAGE_KEYS.auth,
+            method:
+                method.toUpperCase(),
 
-            JSON.stringify(
-                authData
-            )
+            body:
+                data ?? {}
 
+        };
+
+
+        const execution =
+            await Promise.race([
+
+                appwrite.functions.createExecution(
+
+                    this.FUNCTION_ID,
+
+                    JSON.stringify(
+                        payload
+                    ),
+
+                    false
+
+                ),
+
+                this.timeoutPromise(
+                    timeout
+                )
+
+            ]);
+
+
+        if (
+            !execution
+        ) {
+
+            throw new Error(
+                "No response received from REMADEF API."
+            );
+
+        }
+
+
+        const responseBody =
+            (execution as any)
+                .responseBody;
+
+
+        let responseData:
+            APIResponse = {};
+
+
+        if (
+            responseBody
+        ) {
+
+            try {
+
+                responseData =
+                    JSON.parse(
+                        responseBody
+                    );
+
+            } catch {
+
+                throw new Error(
+                    "Invalid JSON response from REMADEF API."
+                );
+
+            }
+
+        }
+
+
+        if (
+            (execution as any).status ===
+            "failed"
+        ) {
+
+            throw new Error(
+
+                responseData.message ||
+                "REMADEF API execution failed."
+
+            );
+
+        }
+
+
+        if (
+            responseData.success ===
+            false
+        ) {
+
+            throw new Error(
+
+                responseData.message ||
+                "REMADEF request failed."
+
+            );
+
+        }
+
+
+        return responseData;
+
+    }
+
+
+    /* ======================================================
+       APPWRITE INSTANCE
+    ====================================================== */
+
+    private getAppwrite(): any {
+
+        if (
+            typeof window ===
+            "undefined"
+        ) {
+
+            throw new Error(
+                "REMADEF API requires a browser environment."
+            );
+
+        }
+
+
+        const appwrite =
+            (window as any).appwrite;
+
+
+        if (
+            !appwrite ||
+            !appwrite.functions
+        ) {
+
+            throw new Error(
+                "Appwrite SDK has not been initialized."
+            );
+
+        }
+
+
+        return appwrite;
+
+    }
+
+
+    /* ======================================================
+       TIMEOUT
+    ====================================================== */
+
+    private timeoutPromise(
+        milliseconds:
+            number
+    ): Promise<never> {
+
+        return new Promise(
+            (_, reject) => {
+
+                setTimeout(
+
+                    () => {
+
+                        reject(
+
+                            new Error(
+                                "REMADEF API request timed out."
+                            )
+
+                        );
+
+                    },
+
+                    milliseconds
+
+                );
+
+            }
         );
 
-        localStorage.setItem(
+    }
 
-            STORAGE_KEYS.user,
 
-            JSON.stringify(
-                user
-            )
+    /* ======================================================
+       DELAY
+    ====================================================== */
 
+    private delay(
+        milliseconds:
+            number
+    ): Promise<void> {
+
+        return new Promise(
+            resolve => {
+
+                setTimeout(
+                    resolve,
+                    milliseconds
+                );
+
+            }
         );
 
     }
 
-    this.notify();
 
-}
+    /* ======================================================
+       GENERIC REQUEST
+    ====================================================== */
 
-/* ========================================================
-   CLEAR AUTHENTICATION
-======================================================== */
+    async request<T = any>(
 
-private clearAuthentication(): void {
+        path:
+            string,
 
-    this.state.user =
-        null;
+        method:
+            string = "GET",
 
-    this.state.authenticated =
-        false;
+        data:
+            any = null
 
-    if (
-        typeof window !== "undefined"
-    ) {
+    ): Promise<APIResponse<T>> {
 
-        localStorage.removeItem(
-            STORAGE_KEYS.auth
+        return await this.execute(
+            path,
+            method,
+            data
         );
 
-        localStorage.removeItem(
-            STORAGE_KEYS.user
+    }
+
+
+    /* ======================================================
+       HEALTH
+    ====================================================== */
+
+    async health() {
+
+        return await this.execute(
+            "/api/health",
+            "GET"
         );
 
-        localStorage.removeItem(
-            STORAGE_KEYS.account
-        );
-
-        /*
-         * Profile data is deliberately retained
-         * temporarily because it is useful for
-         * registration/profile completion recovery.
-         *
-         * The backend remains the authoritative
-         * source of profile data.
-         */
-
     }
 
-    this.notify();
+
+    /* ======================================================
+       AUTHENTICATION
+    ====================================================== */
+
+    readonly auth = {
+
+
+        /* --------------------------------------------------
+           REGISTER
+        -------------------------------------------------- */
+
+        register:
+            async (
+                data:
+                    Record<string, any>
+            ) => {
+
+                return await this.execute(
+
+                    "/api/register",
+
+                    "POST",
+
+                    data
+
+                );
+
+            },
+
+
+        /* --------------------------------------------------
+           LOGIN
+        -------------------------------------------------- */
+
+        login:
+            async (
+                credentials:
+                    Record<string, any>
+            ) => {
+
+                return await this.execute(
+
+                    "/api/auth/login",
+
+                    "POST",
+
+                    credentials
+
+                );
+
+            },
+
+
+        /* --------------------------------------------------
+           CURRENT SESSION
+        -------------------------------------------------- */
+
+        session:
+            async () => {
+
+                return await this.execute(
+
+                    "/api/auth/session",
+
+                    "GET"
+
+                );
+
+            },
+
+
+        /* --------------------------------------------------
+           CURRENT USER
+        -------------------------------------------------- */
+
+        me:
+            async () => {
+
+                return await this.execute(
+
+                    "/api/auth/me",
+
+                    "GET"
+
+                );
+
+            },
+
+
+        /* --------------------------------------------------
+           LOGOUT
+        -------------------------------------------------- */
+
+        logout:
+            async () => {
+
+                return await this.execute(
+
+                    "/api/auth/logout",
+
+                    "POST"
+
+                );
+
+            },
+
+
+        /* --------------------------------------------------
+           CHANGE PASSWORD
+        -------------------------------------------------- */
+
+        changePassword:
+            async (
+                data:
+                    Record<string, any>
+            ) => {
+
+                return await this.execute(
+
+                    "/api/auth/password",
+
+                    "PUT",
+
+                    data
+
+                );
+
+            },
+
+
+        /* --------------------------------------------------
+           VERIFY EMAIL
+        -------------------------------------------------- */
+
+        verifyEmail:
+            async (
+                data:
+                    Record<string, any>
+            ) => {
+
+                return await this.execute(
+
+                    "/api/auth/verify-email",
+
+                    "POST",
+
+                    data
+
+                );
+
+            },
+
+
+        /* --------------------------------------------------
+           VERIFY PHONE
+        -------------------------------------------------- */
+
+        verifyPhone:
+            async (
+                data:
+                    Record<string, any>
+            ) => {
+
+                return await this.execute(
+
+                    "/api/auth/verify-phone",
+
+                    "POST",
+
+                    data
+
+                );
+
+            }
+
+    };
+
+
+    /* ======================================================
+       PROFILE
+    ====================================================== */
+
+    readonly profile = {
+
+
+        get:
+            async () => {
+
+                return await this.execute(
+
+                    "/api/profile",
+
+                    "GET"
+
+                );
+
+            },
+
+
+        update:
+            async (
+                data:
+                    Record<string, any>
+            ) => {
+
+                return await this.execute(
+
+                    "/api/profile",
+
+                    "PUT",
+
+                    data
+
+                );
+
+            },
+
+
+        completion:
+            async () => {
+
+                return await this.execute(
+
+                    "/api/profile/completion",
+
+                    "GET"
+
+                );
+
+            },
+
+
+        avatar:
+            async (
+                data:
+                    any
+            ) => {
+
+                return await this.execute(
+
+                    "/api/profile/avatar",
+
+                    "POST",
+
+                    data
+
+                );
+
+            }
+
+    };
+
+
+    /* ======================================================
+       HOME / DASHBOARD
+    ====================================================== */
+
+    readonly home = {
+
+
+        dashboard:
+            async () => {
+
+                return await this.execute(
+
+                    "/api/dashboard",
+
+                    "GET"
+
+                );
+
+            },
+
+
+        feed:
+            async (
+                cursor:
+                    string = ""
+            ) => {
+
+                const query =
+                    cursor
+                        ? `?cursor=${encodeURIComponent(cursor)}`
+                        : "";
+
+                return await this.execute(
+
+                    `/api/feed${query}`,
+
+                    "GET"
+
+                );
+
+            },
+
+
+        createPost:
+            async (
+                data:
+                    Record<string, any>
+            ) => {
+
+                return await this.execute(
+
+                    "/api/feed",
+
+                    "POST",
+
+                    data
+
+                );
+
+            },
+
+
+        deletePost:
+            async (
+                postId:
+                    string
+            ) => {
+
+                return await this.execute(
+
+                    `/api/feed/${encodeURIComponent(postId)}`,
+
+                    "DELETE"
+
+                );
+
+            },
+
+
+        likePost:
+            async (
+                postId:
+                    string
+            ) => {
+
+                return await this.execute(
+
+                    `/api/feed/${encodeURIComponent(postId)}/like`,
+
+                    "POST"
+
+                );
+
+            },
+
+
+        comment:
+            async (
+                postId:
+                    string,
+
+                data:
+                    Record<string, any>
+            ) => {
+
+                return await this.execute(
+
+                    `/api/feed/${encodeURIComponent(postId)}/comments`,
+
+                    "POST",
+
+                    data
+
+                );
+
+            }
+
+    };
+
+
+    /* ======================================================
+       NOTIFICATIONS
+    ====================================================== */
+
+    readonly notifications = {
+
+
+        list:
+            async () => {
+
+                return await this.execute(
+
+                    "/api/notifications",
+
+                    "GET"
+
+                );
+
+            },
+
+
+        markRead:
+            async (
+                notificationId:
+                    string
+            ) => {
+
+                return await this.execute(
+
+                    `/api/notifications/${encodeURIComponent(notificationId)}/read`,
+
+                    "PATCH"
+
+                );
+
+            },
+
+
+        markAllRead:
+            async () => {
+
+                return await this.execute(
+
+                    "/api/notifications/read-all",
+
+                    "PATCH"
+
+                );
+
+            }
+
+    };
+
+
+    /* ======================================================
+       MESSAGING
+    ====================================================== */
+
+    readonly messages = {
+
+
+        conversations:
+            async () => {
+
+                return await this.execute(
+
+                    "/api/conversations",
+
+                    "GET"
+
+                );
+
+            },
+
+
+        createConversation:
+            async (
+                data:
+                    Record<string, any>
+            ) => {
+
+                return await this.execute(
+
+                    "/api/conversations",
+
+                    "POST",
+
+                    data
+
+                );
+
+            },
+
+
+        list:
+            async (
+                conversationId:
+                    string = ""
+            ) => {
+
+                const query =
+                    conversationId
+                        ? `?conversation_id=${encodeURIComponent(conversationId)}`
+                        : "";
+
+                return await this.execute(
+
+                    `/api/messages${query}`,
+
+                    "GET"
+
+                );
+
+            },
+
+
+        send:
+            async (
+
+                conversationId:
+                    string,
+
+                content:
+                    string,
+
+                replyTo:
+                    string = ""
+
+            ) => {
+
+                return await this.execute(
+
+                    "/api/messages",
+
+                    "POST",
+
+                    {
+
+                        conversation_id:
+                            conversationId,
+
+                        content,
+
+                        reply_to:
+                            replyTo
+
+                    }
+
+                );
+
+            },
+
+
+        delete:
+            async (
+                messageId:
+                    string
+            ) => {
+
+                return await this.execute(
+
+                    `/api/messages/${encodeURIComponent(messageId)}`,
+
+                    "DELETE"
+
+                );
+
+            }
+
+    };
+
+
+    /* ======================================================
+       LEARNING
+    ====================================================== */
+
+    readonly learning = {
+
+
+        list:
+            async (
+                cursor:
+                    string = ""
+            ) => {
+
+                const query =
+                    cursor
+                        ? `?cursor=${encodeURIComponent(cursor)}`
+                        : "";
+
+                return await this.execute(
+
+                    `/api/learning${query}`,
+
+                    "GET"
+
+                );
+
+            },
+
+
+        get:
+            async (
+                learningId:
+                    string
+            ) => {
+
+                return await this.execute(
+
+                    `/api/learning/${encodeURIComponent(learningId)}`,
+
+                    "GET"
+
+                );
+
+            },
+
+
+        enroll:
+            async (
+                learningId:
+                    string
+            ) => {
+
+                return await this.execute(
+
+                    `/api/learning/${encodeURIComponent(learningId)}/enroll`,
+
+                    "POST"
+
+                );
+
+            },
+
+
+        progress:
+            async (
+                learningId:
+                    string
+            ) => {
+
+                return await this.execute(
+
+                    `/api/learning/${encodeURIComponent(learningId)}/progress`,
+
+                    "GET"
+
+                );
+
+            }
+
+    };
+
+
+    /* ======================================================
+       JOBS
+    ====================================================== */
+
+    readonly jobs = {
+
+
+        list:
+            async (
+                params:
+                    Record<string, any> = {}
+            ) => {
+
+                const query =
+                    new URLSearchParams(
+                        params
+                    ).toString();
+
+                return await this.execute(
+
+                    `/api/jobs${query ? `?${query}` : ""}`,
+
+                    "GET"
+
+                );
+
+            },
+
+
+        get:
+            async (
+                jobId:
+                    string
+            ) => {
+
+                return await this.execute(
+
+                    `/api/jobs/${encodeURIComponent(jobId)}`,
+
+                    "GET"
+
+                );
+
+            },
+
+
+        apply:
+            async (
+                jobId:
+                    string,
+
+                data:
+                    Record<string, any> = {}
+            ) => {
+
+                return await this.execute(
+
+                    `/api/jobs/${encodeURIComponent(jobId)}/apply`,
+
+                    "POST",
+
+                    data
+
+                );
+
+            }
+
+    };
+
+
+    /* ======================================================
+       APPRENTICESHIP
+    ====================================================== */
+
+    readonly apprenticeship = {
+
+
+        opportunities:
+            async () => {
+
+                return await this.execute(
+
+                    "/api/apprenticeship/opportunities",
+
+                    "GET"
+
+                );
+
+            },
+
+
+        register:
+            async (
+                data:
+                    Record<string, any>
+            ) => {
+
+                return await this.execute(
+
+                    "/api/apprenticeship/register",
+
+                    "POST",
+
+                    data
+
+                );
+
+            },
+
+
+        applications:
+            async () => {
+
+                return await this.execute(
+
+                    "/api/apprenticeship/applications",
+
+                    "GET"
+
+                );
+
+            }
+
+    };
+
+
+    /* ======================================================
+       APPLICATIONS
+    ====================================================== */
+
+    readonly applications = {
+
+
+        list:
+            async () => {
+
+                return await this.execute(
+
+                    "/api/applications",
+
+                    "GET"
+
+                );
+
+            },
+
+
+        get:
+            async (
+                applicationId:
+                    string
+            ) => {
+
+                return await this.execute(
+
+                    `/api/applications/${encodeURIComponent(applicationId)}`,
+
+                    "GET"
+
+                );
+
+            },
+
+
+        withdraw:
+            async (
+                applicationId:
+                    string
+            ) => {
+
+                return await this.execute(
+
+                    `/api/applications/${encodeURIComponent(applicationId)}`,
+
+                    "DELETE"
+
+                );
+
+            }
+
+    };
+
+
+    /* ======================================================
+       MARKETPLACE
+    ====================================================== */
+
+    readonly marketplace = {
+
+
+        products:
+            async (
+                params:
+                    Record<string, any> = {}
+            ) => {
+
+                const query =
+                    new URLSearchParams(
+                        params
+                    ).toString();
+
+                return await this.execute(
+
+                    `/api/marketplace${query ? `?${query}` : ""}`,
+
+                    "GET"
+
+                );
+
+            },
+
+
+        product:
+            async (
+                productId:
+                    string
+            ) => {
+
+                return await this.execute(
+
+                    `/api/marketplace/${encodeURIComponent(productId)}`,
+
+                    "GET"
+
+                );
+
+            },
+
+
+        create:
+            async (
+                data:
+                    Record<string, any>
+            ) => {
+
+                return await this.execute(
+
+                    "/api/marketplace",
+
+                    "POST",
+
+                    data
+
+                );
+
+            },
+
+
+        update:
+            async (
+                productId:
+                    string,
+
+                data:
+                    Record<string, any>
+            ) => {
+
+                return await this.execute(
+
+                    `/api/marketplace/${encodeURIComponent(productId)}`,
+
+                    "PUT",
+
+                    data
+
+                );
+
+            },
+
+
+        delete:
+            async (
+                productId:
+                    string
+            ) => {
+
+                return await this.execute(
+
+                    `/api/marketplace/${encodeURIComponent(productId)}`,
+
+                    "DELETE"
+
+                );
+
+            }
+
+    };
+
+
+    /* ======================================================
+       BUSINESS
+    ====================================================== */
+
+    readonly business = {
+
+
+        list:
+            async () => {
+
+                return await this.execute(
+
+                    "/api/businesses",
+
+                    "GET"
+
+                );
+
+            },
+
+
+        get:
+            async (
+                businessId:
+                    string
+            ) => {
+
+                return await this.execute(
+
+                    `/api/businesses/${encodeURIComponent(businessId)}`,
+
+                    "GET"
+
+                );
+
+            },
+
+
+        create:
+            async (
+                data:
+                    Record<string, any>
+            ) => {
+
+                return await this.execute(
+
+                    "/api/businesses",
+
+                    "POST",
+
+                    data
+
+                );
+
+            },
+
+
+        update:
+            async (
+                businessId:
+                    string,
+
+                data:
+                    Record<string, any>
+            ) => {
+
+                return await this.execute(
+
+                    `/api/businesses/${encodeURIComponent(businessId)}`,
+
+                    "PUT",
+
+                    data
+
+                );
+
+            }
+
+    };
+
+
+    /* ======================================================
+       WALLET
+    ====================================================== */
+
+    readonly wallet = {
+
+
+        get:
+            async () => {
+
+                return await this.execute(
+
+                    "/api/wallet",
+
+                    "GET"
+
+                );
+
+            },
+
+
+        balance:
+            async () => {
+
+                return await this.execute(
+
+                    "/api/wallet/balance",
+
+                    "GET"
+
+                );
+
+            },
+
+
+        transactions:
+            async () => {
+
+                return await this.execute(
+
+                    "/api/wallet/transactions",
+
+                    "GET"
+
+                );
+
+            },
+
+
+        fund:
+            async (
+                amount:
+                    number,
+
+                email:
+                    string,
+
+                metadata:
+                    Record<string, any> = {}
+            ) => {
+
+                return await this.execute(
+
+                    "/api/wallet/fund/fiat",
+
+                    "POST",
+
+                    {
+
+                        amount,
+
+                        email,
+
+                        metadata
+
+                    }
+
+                );
+
+            },
+
+
+        withdraw:
+            async (
+                data:
+                    Record<string, any>
+            ) => {
+
+                return await this.execute(
+
+                    "/api/wallet/withdraw",
+
+                    "POST",
+
+                    data
+
+                );
+
+            },
+
+
+        transfer:
+            async (
+                data:
+                    Record<string, any>
+            ) => {
+
+                return await this.execute(
+
+                    "/api/wallet/transfer",
+
+                    "POST",
+
+                    data
+
+                );
+
+            },
+
+
+        redeemGiftCard:
+            async (
+                pinCode:
+                    string
+            ) => {
+
+                return await this.execute(
+
+                    "/api/wallet/giftcard/redeem",
+
+                    "POST",
+
+                    {
+
+                        pin_code:
+                            pinCode
+
+                    }
+
+                );
+
+            }
+
+    };
+
+
+    /* ======================================================
+       ESCROW
+    ====================================================== */
+
+    readonly escrow = {
+
+
+        list:
+            async () => {
+
+                return await this.execute(
+
+                    "/api/escrow",
+
+                    "GET"
+
+                );
+
+            },
+
+
+        get:
+            async (
+                escrowId:
+                    string
+            ) => {
+
+                return await this.execute(
+
+                    `/api/escrow/${encodeURIComponent(escrowId)}`,
+
+                    "GET"
+
+                );
+
+            },
+
+
+        create:
+            async (
+                data:
+                    Record<string, any>
+            ) => {
+
+                return await this.execute(
+
+                    "/api/escrow",
+
+                    "POST",
+
+                    data
+
+                );
+
+            },
+
+
+        fund:
+            async (
+                escrowId:
+                    string
+            ) => {
+
+                return await this.execute(
+
+                    `/api/escrow/${encodeURIComponent(escrowId)}/fund`,
+
+                    "POST"
+
+                );
+
+            },
+
+
+        release:
+            async (
+                escrowId:
+                    string
+            ) => {
+
+                return await this.execute(
+
+                    `/api/escrow/${encodeURIComponent(escrowId)}/release`,
+
+                    "POST"
+
+                );
+
+            },
+
+
+        dispute:
+            async (
+                escrowId:
+                    string,
+
+                data:
+                    Record<string, any> = {}
+            ) => {
+
+                return await this.execute(
+
+                    `/api/escrow/${encodeURIComponent(escrowId)}/dispute`,
+
+                    "POST",
+
+                    data
+
+                );
+
+            }
+
+    };
+
+
+    /* ======================================================
+       SEARCH
+    ====================================================== */
+
+    readonly search = {
+
+
+        all:
+            async (
+                query:
+                    string,
+
+                type:
+                    string = "all"
+            ) => {
+
+                return await this.execute(
+
+                    `/api/search?q=${encodeURIComponent(query)}&type=${encodeURIComponent(type)}`,
+
+                    "GET"
+
+                );
+
+            }
+
+    };
+
+
+    /* ======================================================
+       SETTINGS
+    ====================================================== */
+
+    readonly settings = {
+
+
+        get:
+            async () => {
+
+                return await this.execute(
+
+                    "/api/settings",
+
+                    "GET"
+
+                );
+
+            },
+
+
+        update:
+            async (
+                data:
+                    Record<string, any>
+            ) => {
+
+                return await this.execute(
+
+                    "/api/settings",
+
+                    "PUT",
+
+                    data
+
+                );
+
+            }
+
+    };
 
 }
 
-/* ========================================================
-   SAVE ACCOUNT
-======================================================== */
 
-private saveAccount(
+/* ==========================================================
+   CREATE API INSTANCE
+========================================================== */
 
-    account:
-        Record<string, unknown>
+const RemadefAPI =
+    new RemadefAPIClient();
 
-): void {
 
-    if (
-        typeof window === "undefined"
-    ) {
-
-        return;
-
-    }
-
-    localStorage.setItem(
-
-        STORAGE_KEYS.account,
-
-        JSON.stringify(
-            account
-        )
-
-    );
-
-}
-
-/* ========================================================
-   SAVE PROFILE
-======================================================== */
-
-private saveProfile(
-
-    profile:
-        Record<string, unknown>
-
-): void {
-
-    if (
-        typeof window === "undefined"
-    ) {
-
-        return;
-
-    }
-
-    localStorage.setItem(
-
-        STORAGE_KEYS.profile,
-
-        JSON.stringify(
-            profile
-        )
-
-    );
-
-}
-
-/* ========================================================
-   GET ACCOUNT SERVICE
-======================================================== */
-
-private getAccountService():
-
-    any {
-
-    if (
-        typeof window === "undefined"
-    ) {
-
-        return null;
-
-    }
-
-    /*
-     * app.ts will initialize the Appwrite SDK
-     * and expose the Account service here.
-     */
-
-    const globalAppwrite =
-        window.appwrite;
-
-    if (
-        !globalAppwrite
-    ) {
-
-        return null;
-
-    }
-
-    /*
-     * The account service is intentionally
-     * retrieved from the global application
-     * bootstrap layer.
-     */
-
-    return (
-        globalAppwrite as any
-    ).account || null;
-
-}
-
-}
-
-/* ============================================================
-SINGLETON
-============================================================ */
-
-const auth =
-new RemadefAuth();
-
-/* ============================================================
-GLOBAL EXPORT
-============================================================ */
+/* ==========================================================
+   GLOBAL BROWSER ACCESS
+========================================================== */
 
 if (
-typeof window !== "undefined"
+    typeof window !== "undefined"
 ) {
 
-(
-    window as any
-).RemadefAuth =
-    auth;
+    (
+        window as any
+    ).RemadefAPI =
+        RemadefAPI;
 
 }
 
-/* ============================================================
-MODULE EXPORT
-============================================================ */
 
-export default auth;
+/* ==========================================================
+   DEFAULT EXPORT
+========================================================== */
 
-export {
-auth as RemadefAuth
-};
+export default RemadefAPI;
