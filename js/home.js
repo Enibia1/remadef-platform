@@ -1,189 +1,61 @@
-document.addEventListener("DOMContentLoaded", () => {
-    
-    // 1. Initialize Lucide Icons
-    if (window.lucide) {
-        lucide.createIcons();
-    }
+        // 3. WALLET & ESCROW DATA LOADER INTEGRATION
+        const walletBalanceEl = document.getElementById("walletBalance");
+        const transactionListEl = document.getElementById("transactionList");
+        const escrowListEl = document.getElementById("escrowList");
 
-    // ==========================================
-    // 2. SIDEBAR TOGGLE & COLLAPSE LOGIC
-    // ==========================================
-    const sidebar = document.getElementById("sidebar");
-    const sidebarToggle = document.getElementById("sidebarToggle");
+        async function fetchWalletAndEscrow() {
+            try {
+                const [walletRes, escrowRes] = await Promise.all([
+                    fetch("/api/wallet", { headers: { "Content-Type": "application/json" } }),
+                    fetch("/api/escrow", { headers: { "Content-Type": "application/json" } })
+                ]);
 
-    if (sidebarToggle && sidebar) {
-        sidebarToggle.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
+                if (walletRes.ok) {
+                    const walletJson = await walletRes.json();
+                    const walletData = walletJson.data || walletJson;
+                    const wallet = walletData.wallet;
+                    const transactions = walletData.transactions || [];
 
-            if (window.innerWidth <= 768) {
-                sidebar.classList.toggle("show");
-            } else {
-                sidebar.classList.toggle("collapsed");
-            }
-        });
-    }
+                    if (walletBalanceEl && wallet) {
+                        const formattedBalance = new Intl.NumberFormat('en-NG', {
+                            style: 'currency',
+                            currency: wallet.currency || 'NGN'
+                        }).format(wallet.balance || 0);
+                        walletBalanceEl.textContent = formattedBalance;
+                    }
 
-    window.addEventListener("resize", () => {
-        if (window.innerWidth > 768 && sidebar) {
-            sidebar.classList.remove("show");
-        }
-    });
+                    if (transactionListEl && transactions.length > 0) {
+                        transactionListEl.innerHTML = transactions.map(tx => `
+                            <div class="transaction-item" style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9;">
+                                <div>
+                                    <p style="margin: 0; font-weight: 500;">${tx.description || tx.type || 'Transaction'}</p>
+                                    <small style="color: var(--text-muted);">${new Date(tx.created_at || tx.$createdAt).toLocaleDateString()}</small>
+                                </div>
+                                <div style="text-align: right; font-weight: 600; color: ${tx.amount < 0 ? '#ef4444' : '#10b981'};">
+                                    ${tx.amount < 0 ? '-' : '+'}₦${Math.abs(tx.amount || 0).toLocaleString()}
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                }
 
-    // ==========================================
-    // 3. BRAND DROPDOWN LOGIC
-    // ==========================================
-    const brandButton = document.getElementById("brandButton");
-    const brandDropdown = document.getElementById("brandDropdown");
+                if (escrowRes.ok) {
+                    const escrowJson = await escrowRes.json();
+                    const escrows = escrowJson.data || escrowJson;
 
-    if (brandButton && brandDropdown) {
-        brandButton.addEventListener("click", (e) => {
-            e.stopPropagation();
-            brandDropdown.classList.toggle("show");
-        });
-    }
-
-    // ==========================================
-    // 4. NOTIFICATIONS PANEL TOGGLE
-    // ==========================================
-    const notificationBtn = document.getElementById("notificationToggle");
-    const notificationsPanel = document.getElementById("notificationsPanel");
-
-    if (notificationBtn && notificationsPanel) {
-        notificationBtn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            notificationsPanel.classList.toggle("hidden");
-        });
-    }
-
-    // ==========================================
-    // 5. EMBEDDED MODAL LOGIC (WALLET & ESCROW)
-    // ==========================================
-    // Query exact links matching your sidebar markup structural layout
-    const walletLink = document.querySelector('aside .sidebar-nav a[href="wallet.html"]');
-    const escrowLink = document.querySelector('aside .sidebar-nav a[href="escrow.html"]');
-    
-    const walletModal = document.getElementById("walletModal");
-    const escrowModal = document.getElementById("escrowModal");
-    
-    const closeWallet = document.getElementById("closeWallet");
-    const closeEscrow = document.getElementById("closeEscrow");
-
-    // Open Wallet Trigger
-    if (walletLink && walletModal) {
-        walletLink.addEventListener("click", (e) => {
-            e.preventDefault(); // Stop page redirect to wallet.html
-            e.stopPropagation();
-            walletModal.classList.add("active");
-            if (sidebar && window.innerWidth <= 768) sidebar.classList.remove("show");
-        });
-    }
-
-    // Open Escrow Trigger
-    if (escrowLink && escrowModal) {
-        escrowLink.addEventListener("click", (e) => {
-            e.preventDefault(); // Stop page redirect to escrow.html
-            e.stopPropagation();
-            escrowModal.classList.add("active");
-            if (sidebar && window.innerWidth <= 768) sidebar.classList.remove("show");
-        });
-    }
-
-    // Close Button Controls
-    if (closeWallet && walletModal) {
-        closeWallet.addEventListener("click", () => walletModal.classList.remove("active"));
-    }
-    if (closeEscrow && escrowModal) {
-        closeEscrow.addEventListener("click", () => escrowModal.classList.remove("active"));
-    }
-
-    // ==========================================
-    // 6. GLOBAL CLICK HANDLER (CLOSE OUTSIDE)
-    // ==========================================
-    document.addEventListener("click", (e) => {
-        if (brandDropdown && !brandButton.contains(e.target) && !brandDropdown.contains(e.target)) {
-            brandDropdown.classList.remove("show");
-        }
-
-        if (notificationsPanel && !notificationBtn.contains(e.target) && !notificationsPanel.contains(e.target)) {
-            notificationsPanel.classList.add("hidden");
-        }
-
-        if (window.innerWidth <= 768 && sidebar && sidebar.classList.contains("show")) {
-            if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
-                sidebar.classList.remove("show");
+                    if (escrowListEl && Array.isArray(escrows) && escrows.length > 0) {
+                        escrowListEl.innerHTML = escrows.map(esc => `
+                            <div class="escrow-item-row" style="margin-bottom: 8px;">
+                                <span class="escrow-label"><i data-lucide="shield" style="width: 16px; height: 16px; color: var(--primary);"></i> ${esc.title || 'Escrow Agreement'}</span>
+                                <span class="escrow-count">₦${(esc.amount || 0).toLocaleString()}</span>
+                            </div>
+                        `).join('');
+                        if (window.lucide) lucide.createIcons();
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to sync wallet and escrow data:", err);
             }
         }
 
-        // Close Modals safely on outside dim area clicks
-        if (walletModal && walletModal.classList.contains("active")) {
-            const content = walletModal.querySelector(".modal-box");
-            if (content && !content.contains(e.target)) walletModal.classList.remove("active");
-        }
-        if (escrowModal && escrowModal.classList.contains("active")) {
-            const content = escrowModal.querySelector(".modal-box");
-            if (content && !content.contains(e.target)) escrowModal.classList.remove("active");
-        }
-    });
-
-    // ==========================================
-    // 7. INFINITE SCROLL IMPLEMENTATION
-    // ==========================================
-    const opportunityList = document.querySelector(".opportunity-list");
-    let isLoading = false;
-    let pageCount = 1;
-
-    function fetchMoreItems() {
-        if (isLoading || !opportunityList) return;
-        isLoading = true;
-
-        const loader = document.createElement("div");
-        loader.className = "scroll-loader";
-        loader.innerHTML = "<p style='text-align:center; padding:12px; color:var(--muted); font-size:13px;'>Loading more opportunities...</p>";
-        opportunityList.appendChild(loader);
-
-        setTimeout(() => {
-            loader.remove();
-
-            for (let i = 1; i <= 2; i++) {
-                const itemIndex = pageCount * 2 + i;
-                const newItem = document.createElement("div");
-                newItem.className = "opportunity-card";
-                newItem.setAttribute("onclick", "window.location.href='opportunities.html'");
-                newItem.innerHTML = `
-                    <div class="opportunity-icon">
-                        <i data-lucide="briefcase"></i>
-                    </div>
-                    <div>
-                        <h3>Trade Corridor Expansion Node #${itemIndex}</h3>
-                        <p>Consortium fulfillment & regional logistical distribution node model.</p>
-                    </div>
-                `;
-                opportunityList.appendChild(newItem);
-            }
-
-            if (window.lucide) {
-                lucide.createIcons();
-            }
-
-            pageCount++;
-            isLoading = false;
-        }, 800);
-    }
-
-    window.addEventListener("scroll", () => {
-        const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-
-        if (scrollTop + clientHeight >= scrollHeight - 150) {
-            fetchMoreItems();
-        }
-    });
-
-    // System Status Update
-    const apiStatus = document.getElementById("apiStatus");
-    if (apiStatus) {
-        setTimeout(() => {
-            apiStatus.textContent = "Connected to REMADEF";
-        }, 1200);
-    }
-});
+        fetchWalletAndEscrow();
