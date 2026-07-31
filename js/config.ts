@@ -1,10 +1,8 @@
+    },
 /* ==========================================================
    REMADEF PLATFORM
    Global Configuration
    File: js/config.ts
-   Description:
-   Central configuration for the entire REMADEF Platform.
-   Do NOT place business logic or API calls here.
 ========================================================== */
 
 export const CONFIG = {
@@ -12,92 +10,327 @@ export const CONFIG = {
     /* ======================================================
        APPLICATION
     ====================================================== */
+
     app: {
+
         name: "REMADEF Platform",
-        shortName: "REMADEF",
+
         version: "1.0.0",
+
         environment: "production",
-        debug: false,
-        timezone: "Africa/Lagos",
-        locale: "en-NG"
+
+        debug: false
+
     },
 
     /* ======================================================
        API
     ====================================================== */
+
     api: {
+
         baseUrl: "/api",
+
         timeout: 30000,
-        retries: 2,
-        retryDelay: 1000
+
+        retries: 2
+
     },
 
     /* ======================================================
        APPWRITE
     ====================================================== */
-    appwrite: {
-        endpoint: "",
-        projectId: "",
-        databaseId: "",
-        storageId: "",
-        functionsBase: "/api"
-    },
 
-    /* ======================================================
-       ROUTING
-    ====================================================== */
-    routes: {
-        login: "login.html",
-        register: "register.html",
-        home: "home.html",
-        profile: "profile.html",
-        learning: "learning.html",
-        apprenticeship: "apprenticeship.html",
-        business: "business.html",
-        wallet: "wallet.html",
-        settings: "settings.html",
-        help: "help.html"
+    appwrite: {
+
+        endpoint:
+            "https://fra.cloud.appwrite.io/v1",
+
+        projectId:
+            "6a634fdc00148a907132",
+
+        functionId:
+            "6a6380f40035f4b76305",
+
+        databaseId:
+            "6a66577c000d17565b18",
+
+        storageBucketId:
+            "",
+
+        tables: {
+
+            profiles:
+                "profiles",
+
+            conversations:
+                "conversations",
+
+            conversationMembers:
+                "conversation_members",
+
+            messages:
+                "messages",
+
+            notifications:
+                "notifications",
+
+            learning:
+                "learning",
+
+            jobs:
+                "jobs",
+
+            applications:
+                "applications",
+
+            businesses:
+                "businesses",
+
+            marketplace:
+                "marketplace",
+
+            wallets:
+                "wallets",
+
+            transactions:
+                "transactions",
+
+            escrows:
+                "escrows",
+
+            giftCards:
+                "remadef_gift_cards"
+
+        }
+
     },
 
     /* ======================================================
        SIDEBAR
     ====================================================== */
+
     sidebar: {
+
         collapsible: true,
-        expandedWidth: 260,
+
         collapsedWidth: 80,
+
+        expandedWidth: 260,
+
         mobileBreakpoint: 768,
-        animationDuration: 250,
-        rememberState: true
+
+        animationSpeed: 250
+
     },
 
     /* ======================================================
        MESSAGES
     ====================================================== */
+
     messages: {
+
         enabled: true,
+
         defaultWidth: 50,
+
         minWidth: 30,
+
         maxWidth: 70,
+
         autoCollapse: true,
+
         autoCollapseDelay: 60000,
-        rememberWidth: true,
+
         floatingTab: true,
-        preserveDrafts: true,
-        desktopSplitView: true
+
+        saveDrafts: true,
+
+        autoDeleteHours: 48,
+
+        emojiOnlyComposer: true
+
     },
 
     /* ======================================================
-       FEED
+       HOME FEED
     ====================================================== */
+
     feed: {
+
         infiniteScroll: true,
+
         pageSize: 20,
+
         preloadDistance: 300,
-        refreshInterval: 60000,
-        skeletonCards: 6
+
+        skeletonCards: 6,
+
+        autoplayMedia: false,
+
+        cacheFeeds: true
+
     },
 
+    /* ======================================================
+       SEARCH
+    ====================================================== */
+
+    search: {
+
+        liveSearch: true,
+
+        debounce: 300,
+
+        minimumCharacters: 2
+
+    },
+
+    /* ======================================================
+       NOTIFICATIONS
+    ====================================================== */
+
+    notifications: {
+
+        refreshInterval: 30000,
+
+        grouped: true,
+
+        desktop: true
+
+    },
+
+    /* ======================================================
+       WALLET
+    ====================================================== */
+
+    wallet: {
+
+        enabled: true,
+
+        currency: "NGN",
+
+        symbol: "₦",
+
+        decimals: 2,
+
+        allowBankFunding: true,
+
+        allowGiftCards: true,
+
+        allowTransfers: true
+
+    },
+
+    /* ======================================================
+       ESCROW
+    ====================================================== */
+
+    escrow: {
+
+        enabled: true,
+
+        allowDisputes: true,
+
+        autoRelease: false
+
+    },
+
+    /* ======================================================
+       PROFILE
+    ====================================================== */
+
+    profile: {
+
+        minimumCompletion: 80,
+
+        showProgress: true
+
+    },
+
+    /* ======================================================
+       FILES
+    ====================================================== */
+
+    uploads: {
+
+        imageSize:
+            5 * 1024 * 1024,
+
+        documentSize:
+            20 * 1024 * 1024,
+
+        avatarSize:
+            2 * 1024 * 1024
+
+    },
+
+    /* ======================================================
+       UI
+    ====================================================== */
+
+    ui: {
+
+        theme: "light",
+
+        roundedCorners: 16,
+
+        animationDuration: 250,
+
+        useSvgIcons: true,
+
+        useLucideIcons: true
+
+    },
+
+    /* ======================================================
+       SECURITY
+    ====================================================== */
+
+    security: {
+
+        sessionTimeout:
+            1800000,
+
+        rememberUser: true
+
+    },
+
+    /* ======================================================
+       MODULES
+    ====================================================== */
+
+    modules: {
+
+        home: true,
+
+        learning: true,
+
+        jobs: true,
+
+        apprenticeship: true,
+
+        business: true,
+
+        marketplace: false,
+
+        community: false,
+
+        messages: true,
+
+        wallet: true,
+
+        escrow: true,
+
+        notifications: true,
+
+        settings: true
+
+    }
+
+} as const;
+
+export default CONFIG;
     /* ======================================================
        SEARCH
     ====================================================== */
