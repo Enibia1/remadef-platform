@@ -382,4 +382,245 @@ export const MODULES: Record<
 
         home: true,
 
-       
+        searchable: true,
+
+        notifications: true,
+
+        wallet: true,
+
+        ai: true,
+
+        order: 10,
+
+        permissions: [],
+
+        dependencies: []
+    },
+
+    settings: {
+
+        id: "settings",
+
+        name: "Settings",
+
+        icon: "settings",
+
+        description:
+            "Preferences",
+
+        status: "active",
+
+        sidebar: true,
+
+        home: false,
+
+        searchable: false,
+
+        notifications: false,
+
+        wallet: false,
+
+        ai: false,
+
+        order: 11,
+
+        permissions: [],
+
+        dependencies: []
+    },
+
+    /* ======================================================
+       DORMANT MODULES
+    ====================================================== */
+
+    marketplace: {
+
+        id: "marketplace",
+
+        name: "Marketplace",
+
+        icon: "shopping-cart",
+
+        description:
+            "Products & Services",
+
+        status: "coming-soon",
+
+        sidebar: false,
+
+        home: false,
+
+        searchable: true,
+
+        notifications: true,
+
+        wallet: true,
+
+        ai: true,
+
+        order: 100,
+
+        permissions: [],
+
+        dependencies: [
+            "wallet"
+        ]
+    },
+
+    healthcare: {
+
+        id: "healthcare",
+
+        name: "Healthcare",
+
+        icon: "heart",
+
+        description:
+            "Healthcare platform",
+
+        status: "coming-soon",
+
+        sidebar: false,
+
+        home: false,
+
+        searchable: true,
+
+        notifications: true,
+
+        wallet: true,
+
+        ai: true,
+
+        order: 101,
+
+        permissions: [],
+
+        dependencies: []
+    },
+
+    government: {
+
+        id: "government",
+
+        name: "Government",
+
+        icon: "landmark",
+
+        description:
+            "Government services",
+
+        status: "coming-soon",
+
+        sidebar: false,
+
+        home: false,
+
+        searchable: true,
+
+        notifications: true,
+
+        wallet: true,
+
+        ai: true,
+
+        order: 102,
+
+        permissions: [],
+
+        dependencies: []
+    },
+
+    realEstate: {
+
+        id: "real-estate",
+
+        name: "Real Estate",
+
+        icon: "building-2",
+
+        description:
+            "Property ecosystem",
+
+        status: "coming-soon",
+
+        sidebar: false,
+
+        home: false,
+
+        searchable: true,
+
+        notifications: true,
+
+        wallet: true,
+
+        ai: true,
+
+        order: 103,
+
+        permissions: [],
+
+        dependencies: []
+    },
+
+    ai: {
+
+        id: "ai",
+
+        name: "AI",
+
+        icon: "sparkles",
+
+        description:
+            "Platform AI",
+
+        status: "coming-soon",
+
+        sidebar: false,
+
+        home: false,
+
+        searchable: true,
+
+        notifications: false,
+
+        wallet: false,
+
+        ai: false,
+
+        order: 104,
+
+        permissions: [],
+
+        dependencies: []
+    }
+
+};
+
+/* ==========================================================
+   HELPERS
+========================================================== */
+
+export const ACTIVE_MODULES =
+    Object.values(MODULES)
+        .filter(
+            m => m.status === "active"
+        );
+
+export const SIDEBAR_MODULES =
+    ACTIVE_MODULES
+        .filter(
+            m => m.sidebar
+        )
+        .sort(
+            (a, b) =>
+                a.order - b.order
+        );
+
+export const HOME_MODULES =
+    ACTIVE_MODULES
+        .filter(
+            m => m.home
+        );
+
+export default MODULES;
