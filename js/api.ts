@@ -1,1546 +1,896 @@
 /* ============================================================
 REMADEF PLATFORM
-API CLIENT
-File: js/api.ts
+AUTHENTICATION & SESSION MANAGER
+File: js/auth.ts
 
-Purpose:
+Responsibilities:
 
-- Central API communication layer
-- Appwrite Function Web Bridge
-- Typed request/response handling
-- Authentication-aware requests
-- Shared by all REMADEF modules
+- Appwrite authentication
+- Sign in
+- Registration handoff
+- Current user
+- Session validation
+- Protected-page enforcement
+- Sign out
+- Session state
+- Local application state
   ============================================================ */
+
+import RemadefAPI from "./api";
+import CONFIG from "./config";
 
 /* ============================================================
 TYPES
 ============================================================ */
 
-export type HttpMethod =
-| "GET"
-| "POST"
-| "PUT"
-| "PATCH"
-| "DELETE"
-| "OPTIONS";
+export interface AuthUser {
 
-export interface ApiResponse<T = unknown> {
-success: boolean;
-message?: string;
-data?: T;
-account?: AccountData;
-profile?: Profile;
-[key: string]: unknown;
-}
+$id: string;
 
-export interface AccountData {
-id: string;
-email?: string;
-phone?: string;
-}
-
-export interface Profile {
-$id?: string;
-account_id?: string;
-email?: string;
-phone?: string;
-first_name?: string;
-last_name?: string;
-display_name?: string;
-date_of_birth?: string;
-gender?: string;
-country?: string;
-state?: string;
-city?: string;
-headline?: string;
-about?: string;
-skills?: string | string[];
-education_level?: string;
-institution?: string;
-profile_completion?: number;
-created_at?: string;
-updated_at?: string;
-[key: string]: unknown;
-}
-
-export interface DashboardData {
-profile_completion: number;
-learning: number;
-applications: number;
-opportunities: number;
-messages: number;
-notifications: number;
-[key: string]: unknown;
-}
-
-export interface Conversation {
-$id?: string;
 name?: string;
-status?: string;
-last_message?: string;
-updated_at?: string;
-created_at?: string;
+
+email?: string;
+
+phone?: string;
+
+status?: boolean;
+
+emailVerification?: boolean;
+
+phoneVerification?: boolean;
+
+registration?: string;
+
+prefs?: Record<string, unknown>;
+
 [key: string]: unknown;
+
 }
 
-export interface Message {
-$id?: string;
-conversation_id?: string;
-sender_id?: string;
-content?: string;
-reply_preview?: string;
-status?: string;
-created_at?: string;
-[key: string]: unknown;
+export interface AuthState {
+
+authenticated: boolean;
+
+user: AuthUser | null;
+
+loading: boolean;
+
+lastChecked: number;
+
 }
 
-export interface Wallet {
-$id?: string;
-account_id?: string;
-balance?: number;
-currency?: string;
-status?: string;
-created_at?: string;
-updated_at?: string;
-[key: string]: unknown;
-}
+interface StoredAuth {
 
-export interface Transaction {
-$id?: string;
-account_id?: string;
-amount?: number;
-type?: string;
-status?: string;
-reference?: string;
-created_at?: string;
-[key: string]: unknown;
-}
+user: AuthUser;
 
-export interface Escrow {
-$id?: string;
-account_id?: string;
-amount?: number;
-status?: string;
-created_at?: string;
-updated_at?: string;
-[key: string]: unknown;
-}
+authenticated: boolean;
 
-export interface WalletData {
-wallet: Wallet;
-transactions: Transaction[];
-}
+timestamp: number;
 
-export interface FeedItem {
-$id?: string;
-author_id?: string;
-content?: string;
-media_url?: string;
-created_at?: string;
-likes?: number;
-comments?: number;
-shares?: number;
-[key: string]: unknown;
-}
-
-export interface Notification {
-$id?: string;
-user_id?: string;
-type?: string;
-title?: string;
-message?: string;
-read?: boolean;
-created_at?: string;
-[key: string]: unknown;
 }
 
 /* ============================================================
-API CONFIGURATION
+STORAGE KEYS
 ============================================================ */
 
-const API_CONFIG = {
+const STORAGE_KEYS = {
 
-functionId:
-    "6a6380f40035f4b76305",
+auth:
+    "remadef_auth",
 
-timeout:
-    30000,
+user:
+    "remadef_user",
 
-retries:
-    2
+account:
+    "remadef_account",
+
+profile:
+    "remadef_profile"
 
 } as const;
 
 /* ============================================================
-ERROR CLASS
+AUTH MANAGER
 ============================================================ */
 
-export class RemadefApiError extends Error {
+class RemadefAuth {
 
-status?: number;
+private state: AuthState = {
 
-code?: string;
+    authenticated:
+        false,
 
-response?: unknown;
+    user:
+        null,
 
-constructor(
-    message: string,
-    status?: number,
-    code?: string,
-    response?: unknown
-) {
+    loading:
+        false,
 
-    super(message);
+    lastChecked:
+        0
 
-    this.name =
-        "RemadefApiError";
+};
 
-    this.status =
-        status;
-
-    this.code =
-        code;
-
-    this.response =
-        response;
-}
-
-}
-
-/* ============================================================
-APPWRITE GLOBAL TYPE
-============================================================ */
-
-declare global {
-
-interface Window {
-
-    appwrite?: {
-
-        functions?: {
-
-            createExecution: (
-
-                functionId: string,
-
-                data?: string,
-
-                async?: boolean
-
-            ) => Promise<{
-
-                $id?: string;
-
-                status?: string;
-
-                responseStatusCode?: number;
-
-                responseBody?: string;
-
-                [key: string]: unknown;
-
-            }>;
-
-        };
-
-    };
-
-    RemadefAPI?: typeof RemadefAPI;
-
-}
-
-}
-
-/* ============================================================
-API CLIENT
-============================================================ */
-
-const RemadefAPI = {
+private listeners:
+    Array<(state: AuthState) => void> = [];
 
 /* ========================================================
-   INTERNAL REQUEST ENGINE
+   INITIALIZE
 ======================================================== */
 
-async _execute<T = unknown>(
+async initialize(): Promise<AuthState> {
 
-    path: string,
+    if (
+        typeof window === "undefined"
+    ) {
 
-    method: HttpMethod = "GET",
+        return this.state;
 
-    data: Record<string, unknown> | null = null,
+    }
 
-    attempt = 0
+    this.state.loading =
+        true;
 
-): Promise<ApiResponse<T>> {
+    this.notify();
 
     try {
 
-        if (
-            typeof window === "undefined" ||
-            !window.appwrite ||
-            !window.appwrite.functions
-        ) {
+        const user =
+            await this.getCurrentUser();
 
-            throw new RemadefApiError(
-                "Appwrite SDK is not initialized."
+        if (user) {
+
+            this.setAuthenticatedUser(
+                user
             );
 
-        }
+        } else {
 
-        const payload = {
-
-            path,
-
-            method,
-
-            body:
-                data || {}
-
-        };
-
-        const execution =
-            await this.withTimeout(
-
-                window.appwrite.functions.createExecution(
-
-                    API_CONFIG.functionId,
-
-                    JSON.stringify(payload),
-
-                    false
-
-                ),
-
-                API_CONFIG.timeout
-
-            );
-
-        let responseData:
-            ApiResponse<T> = {
-
-                success: false
-
-            };
-
-        if (
-            execution.responseBody
-        ) {
-
-            try {
-
-                responseData =
-                    JSON.parse(
-                        execution.responseBody
-                    );
-
-            } catch {
-
-                throw new RemadefApiError(
-                    "Invalid JSON response from server.",
-                    execution.responseStatusCode,
-                    "INVALID_JSON",
-                    execution.responseBody
-                );
-
-            }
+            this.clearAuthentication();
 
         }
-
-        const failed =
-            execution.status === "failed" ||
-            execution.responseStatusCode !== undefined &&
-            execution.responseStatusCode >= 400 ||
-            responseData.success === false;
-
-        if (failed) {
-
-            throw new RemadefApiError(
-
-                responseData.message ||
-                "API request failed.",
-
-                execution.responseStatusCode,
-
-                typeof responseData.code === "string"
-                    ? responseData.code
-                    : undefined,
-
-                responseData
-
-            );
-
-        }
-
-        return responseData;
 
     } catch (error) {
 
-        if (
-            attempt <
-            API_CONFIG.retries
-        ) {
-
-            await this.delay(
-                500 * (attempt + 1)
-            );
-
-            return this._execute<T>(
-
-                path,
-
-                method,
-
-                data,
-
-                attempt + 1
-
-            );
-
-        }
-
         console.error(
-
-            `[REMADEF API] ${method} ${path}`,
-
+            "[REMADEF AUTH] Initialization failed:",
             error
-
         );
 
-        if (
-            error instanceof RemadefApiError
-        ) {
-
-            throw error;
-
-        }
-
-        throw new RemadefApiError(
-
-            error instanceof Error
-                ? error.message
-                : "Unexpected API error."
-
-        );
-
-    }
-
-},
-
-/* ========================================================
-   TIMEOUT
-======================================================== */
-
-async withTimeout<T>(
-
-    promise: Promise<T>,
-
-    timeout: number
-
-): Promise<T> {
-
-    let timer: ReturnType<typeof setTimeout>;
-
-    const timeoutPromise =
-        new Promise<T>((_, reject) => {
-
-            timer =
-                setTimeout(() => {
-
-                    reject(
-
-                        new RemadefApiError(
-                            "Request timed out.",
-                            408,
-                            "TIMEOUT"
-                        )
-
-                    );
-
-                }, timeout);
-
-        });
-
-    try {
-
-        return await Promise.race([
-
-            promise,
-
-            timeoutPromise
-
-        ]);
+        this.clearAuthentication();
 
     } finally {
 
-        clearTimeout(timer!);
+        this.state.loading =
+            false;
+
+        this.state.lastChecked =
+            Date.now();
+
+        this.notify();
 
     }
 
-},
+    return this.state;
+
+}
 
 /* ========================================================
-   DELAY
+   SIGN IN
 ======================================================== */
 
-async delay(
-    ms: number
-): Promise<void> {
-
-    await new Promise(
-        resolve =>
-            setTimeout(resolve, ms)
-    );
-
-},
-
-/* ========================================================
-   HEALTH
-======================================================== */
-
-async checkHealth() {
-
-    return this._execute<{
-
-        service: string;
-
-        status: string;
-
-    }>(
-
-        "/api/health",
-
-        "GET"
-
-    );
-
-},
-
-/* ========================================================
-   AUTHENTICATION / REGISTRATION
-======================================================== */
-
-async register(
-
-    userData: Record<string, unknown>
-
-) {
-
-    return this._execute(
-
-        "/api/register",
-
-        "POST",
-
-        userData
-
-    );
-
-},
-
-async getCurrentUser() {
-
-    return this._execute(
-
-        "/api/auth/me",
-
-        "GET"
-
-    );
-
-},
-
-async logout() {
-
-    return this._execute(
-
-        "/api/auth/logout",
-
-        "POST"
-
-    );
-
-},
-
-async validateSession() {
-
-    return this._execute(
-
-        "/api/auth/session",
-
-        "GET"
-
-    );
-
-},
-
-/* ========================================================
-   PROFILE
-======================================================== */
-
-async getProfile() {
-
-    return this._execute<Profile>(
-
-        "/api/profile",
-
-        "GET"
-
-    );
-
-},
-
-async updateProfile(
-
-    profileData:
-        Partial<Profile>
-
-) {
-
-    return this._execute<Profile>(
-
-        "/api/profile",
-
-        "PUT",
-
-        profileData as Record<string, unknown>
-
-    );
-
-},
-
-/* ========================================================
-   DASHBOARD / HOME
-======================================================== */
-
-async getDashboard() {
-
-    return this._execute<DashboardData>(
-
-        "/api/dashboard",
-
-        "GET"
-
-    );
-
-},
-
-/* ========================================================
-   INFINITE HOME FEED
-======================================================== */
-
-async getFeed(
-
-    cursor?: string,
-
-    limit = 20
-
-) {
-
-    const params =
-        new URLSearchParams();
-
-    params.set(
-        "limit",
-        String(limit)
-    );
-
-    if (cursor) {
-
-        params.set(
-            "cursor",
-            cursor
-        );
-
-    }
-
-    return this._execute<{
-
-        items: FeedItem[];
-
-        next_cursor?: string;
-
-        has_more?: boolean;
-
-    }>(
-
-        `/api/feed?${params.toString()}`,
-
-        "GET"
-
-    );
-
-},
-
-async createPost(
-
-    content: string,
-
-    mediaUrl?: string
-
-) {
-
-    return this._execute(
-
-        "/api/feed",
-
-        "POST",
-
-        {
-
-            content,
-
-            media_url:
-                mediaUrl || ""
-
-        }
-
-    );
-
-},
-
-async likePost(
-
-    postId: string
-
-) {
-
-    return this._execute(
-
-        `/api/feed/${encodeURIComponent(postId)}/like`,
-
-        "POST"
-
-    );
-
-},
-
-async commentPost(
-
-    postId: string,
-
-    content: string
-
-) {
-
-    return this._execute(
-
-        `/api/feed/${encodeURIComponent(postId)}/comments`,
-
-        "POST",
-
-        {
-
-            content
-
-        }
-
-    );
-
-},
-
-/* ========================================================
-   NOTIFICATIONS
-======================================================== */
-
-async getNotifications(
-
-    cursor?: string
-
-) {
-
-    const query =
-        cursor
-            ? `?cursor=${encodeURIComponent(cursor)}`
-            : "";
-
-    return this._execute<{
-
-        items: Notification[];
-
-        next_cursor?: string;
-
-        has_more?: boolean;
-
-    }>(
-
-        `/api/notifications${query}`,
-
-        "GET"
-
-    );
-
-},
-
-async markNotificationRead(
-
-    notificationId: string
-
-) {
-
-    return this._execute(
-
-        `/api/notifications/${encodeURIComponent(notificationId)}/read`,
-
-        "PATCH"
-
-    );
-
-},
-
-/* ========================================================
-   CONVERSATIONS
-======================================================== */
-
-async getConversations() {
-
-    return this._execute<Conversation[]>(
-
-        "/api/conversations",
-
-        "GET"
-
-    );
-
-},
-
-async createConversation(
-
-    data: Record<string, unknown>
-
-) {
-
-    return this._execute<Conversation>(
-
-        "/api/conversations",
-
-        "POST",
-
-        data
-
-    );
-
-},
-
-/* ========================================================
-   MESSAGES
-======================================================== */
-
-async getMessages(
-
-    conversationId: string,
-
-    cursor?: string,
-
-    limit = 50
-
-) {
-
-    const params =
-        new URLSearchParams();
-
-    params.set(
-
-        "conversation_id",
-
-        conversationId
-
-    );
-
-    params.set(
-
-        "limit",
-
-        String(limit)
-
-    );
-
-    if (cursor) {
-
-        params.set(
-
-            "cursor",
-
-            cursor
-
-        );
-
-    }
-
-    return this._execute<{
-
-        items: Message[];
-
-        next_cursor?: string;
-
-        has_more?: boolean;
-
-    }>(
-
-        `/api/messages?${params.toString()}`,
-
-        "GET"
-
-    );
-
-},
-
-async sendMessage(
-
-    conversationId: string,
-
-    content: string,
-
-    replyTo: string | null = null
-
-) {
-
-    return this._execute<Message>(
-
-        "/api/messages",
-
-        "POST",
-
-        {
-
-            conversation_id:
-                conversationId,
-
-            content,
-
-            reply_to:
-                replyTo || ""
-
-        }
-
-    );
-
-},
-
-async deleteMessage(
-
-    messageId: string
-
-) {
-
-    return this._execute(
-
-        `/api/messages/${encodeURIComponent(messageId)}`,
-
-        "DELETE"
-
-    );
-
-},
-
-/* ========================================================
-   LEARNING
-======================================================== */
-
-async getLearning(
-
-    cursor?: string
-
-) {
-
-    const query =
-        cursor
-            ? `?cursor=${encodeURIComponent(cursor)}`
-            : "";
-
-    return this._execute(
-
-        `/api/learning${query}`,
-
-        "GET"
-
-    );
-
-},
-
-async getLearningProgram(
-
-    programId: string
-
-) {
-
-    return this._execute(
-
-        `/api/learning/${encodeURIComponent(programId)}`,
-
-        "GET"
-
-    );
-
-},
-
-async enrollLearning(
-
-    programId: string
-
-) {
-
-    return this._execute(
-
-        `/api/learning/${encodeURIComponent(programId)}/enroll`,
-
-        "POST"
-
-    );
-
-},
-
-async updateLearningProgress(
-
-    programId: string,
-
-    progress: number
-
-) {
-
-    return this._execute(
-
-        `/api/learning/${encodeURIComponent(programId)}/progress`,
-
-        "PATCH",
-
-        {
-
-            progress
-
-        }
-
-    );
-
-},
-
-/* ========================================================
-   APPRENTICESHIP
-======================================================== */
-
-async getApprenticeships(
-
-    cursor?: string
-
-) {
-
-    const query =
-        cursor
-            ? `?cursor=${encodeURIComponent(cursor)}`
-            : "";
-
-    return this._execute(
-
-        `/api/apprenticeships${query}`,
-
-        "GET"
-
-    );
-
-},
-
-async getApprenticeship(
-
-    apprenticeshipId: string
-
-) {
-
-    return this._execute(
-
-        `/api/apprenticeships/${encodeURIComponent(apprenticeshipId)}`,
-
-        "GET"
-
-    );
-
-},
-
-async applyApprenticeship(
-
-    apprenticeshipId: string
-
-) {
-
-    return this._execute(
-
-        `/api/apprenticeships/${encodeURIComponent(apprenticeshipId)}/apply`,
-
-        "POST"
-
-    );
-
-},
-
-/* ========================================================
-   BUSINESS
-======================================================== */
-
-async getBusinesses(
-
-    cursor?: string
-
-) {
-
-    const query =
-        cursor
-            ? `?cursor=${encodeURIComponent(cursor)}`
-            : "";
-
-    return this._execute(
-
-        `/api/businesses${query}`,
-
-        "GET"
-
-    );
-
-},
-
-async getBusiness(
-
-    businessId: string
-
-) {
-
-    return this._execute(
-
-        `/api/businesses/${encodeURIComponent(businessId)}`,
-
-        "GET"
-
-    );
-
-},
-
-async createBusiness(
-
-    businessData:
-        Record<string, unknown>
-
-) {
-
-    return this._execute(
-
-        "/api/businesses",
-
-        "POST",
-
-        businessData
-
-    );
-
-},
-
-/* ========================================================
-   GIGS / JOBS
-======================================================== */
-
-async getGigs(
-
-    cursor?: string
-
-) {
-
-    const query =
-        cursor
-            ? `?cursor=${encodeURIComponent(cursor)}`
-            : "";
-
-    return this._execute(
-
-        `/api/gigs${query}`,
-
-        "GET"
-
-    );
-
-},
-
-async getJobs(
-
-    cursor?: string
-
-) {
-
-    const query =
-        cursor
-            ? `?cursor=${encodeURIComponent(cursor)}`
-            : "";
-
-    return this._execute(
-
-        `/api/jobs${query}`,
-
-        "GET"
-
-    );
-
-},
-
-async applyForJob(
-
-    jobId: string
-
-) {
-
-    return this._execute(
-
-        `/api/jobs/${encodeURIComponent(jobId)}/apply`,
-
-        "POST"
-
-    );
-
-},
-
-/* ========================================================
-   APPLICATIONS
-======================================================== */
-
-async getApplications() {
-
-    return this._execute(
-
-        "/api/applications",
-
-        "GET"
-
-    );
-
-},
-
-async getApplication(
-
-    applicationId: string
-
-) {
-
-    return this._execute(
-
-        `/api/applications/${encodeURIComponent(applicationId)}`,
-
-        "GET"
-
-    );
-
-},
-
-/* ========================================================
-   WALLET
-======================================================== */
-
-async getWallet() {
-
-    return this._execute<WalletData>(
-
-        "/api/wallet",
-
-        "GET"
-
-    );
-
-},
-
-async getWalletBalance() {
-
-    return this._execute<{
-
-        balance: number;
-
-        currency: string;
-
-    }>(
-
-        "/api/wallet/balance",
-
-        "GET"
-
-    );
-
-},
-
-async fundWalletFiat(
-
-    amount: number,
+async signIn(
 
     email: string,
 
-    metadata:
-        Record<string, unknown> = {}
+    password: string
 
-) {
+): Promise<AuthUser> {
 
-    return this._execute(
+    if (!email.trim()) {
 
-        "/api/wallet/fund/fiat",
+        throw new Error(
+            "Email is required."
+        );
 
-        "POST",
+    }
 
-        {
+    if (!password) {
 
-            amount,
+        throw new Error(
+            "Password is required."
+        );
 
-            email,
+    }
 
-            metadata
+    this.state.loading =
+        true;
 
-        }
+    this.notify();
 
-    );
+    try {
 
-},
+        /*
+         * Appwrite Account SDK is used here.
+         *
+         * The SDK must already be initialized by app.ts.
+         */
 
-async getTransactions(
+        const account =
+            this.getAccountService();
 
-    cursor?: string
+        if (!account) {
 
-) {
-
-    const query =
-        cursor
-            ? `?cursor=${encodeURIComponent(cursor)}`
-            : "";
-
-    return this._execute(
-
-        `/api/wallet/transactions${query}`,
-
-        "GET"
-
-    );
-
-},
-
-async transferWallet(
-
-    recipientId: string,
-
-    amount: number,
-
-    description = ""
-
-) {
-
-    return this._execute(
-
-        "/api/wallet/transfer",
-
-        "POST",
-
-        {
-
-            recipient_id:
-                recipientId,
-
-            amount,
-
-            description
+            throw new Error(
+                "Appwrite Account service is not initialized."
+            );
 
         }
 
-    );
+        /*
+         * Appwrite SDK versions use createEmailPasswordSession()
+         * for email/password authentication.
+         */
 
-},
+        await account.createEmailPasswordSession(
 
-async withdrawWallet(
+            email.trim().toLowerCase(),
 
-    amount: number,
+            password
 
-    destination:
-        Record<string, unknown>
+        );
 
-) {
+        const user =
+            await this.getCurrentUser();
 
-    return this._execute(
+        if (!user) {
 
-        "/api/wallet/withdraw",
-
-        "POST",
-
-        {
-
-            amount,
-
-            destination
+            throw new Error(
+                "Authentication succeeded but the user could not be loaded."
+            );
 
         }
 
-    );
+        this.setAuthenticatedUser(
+            user
+        );
 
-},
+        return user;
 
-async redeemGiftCard(
+    } finally {
 
-    pinCode: string
+        this.state.loading =
+            false;
 
-) {
+        this.notify();
 
-    return this._execute(
+    }
 
-        "/api/wallet/giftcard/redeem",
-
-        "POST",
-
-        {
-
-            pin_code:
-                pinCode
-
-        }
-
-    );
-
-},
+}
 
 /* ========================================================
-   ESCROW
+   PHONE SIGN IN
 ======================================================== */
 
-async getEscrows() {
+async signInWithPhone(
 
-    return this._execute<Escrow[]>(
+    phone: string,
 
-        "/api/escrow",
+    password: string
 
-        "GET"
+): Promise<AuthUser> {
+
+    if (!phone.trim()) {
+
+        throw new Error(
+            "Phone number is required."
+        );
+
+    }
+
+    if (!password) {
+
+        throw new Error(
+            "Password is required."
+        );
+
+    }
+
+    const account =
+        this.getAccountService();
+
+    if (!account) {
+
+        throw new Error(
+            "Appwrite Account service is not initialized."
+        );
+
+    }
+
+    /*
+     * Appwrite phone/password sessions.
+     */
+
+    await account.createPhoneSession(
+
+        phone.trim(),
+
+        password
 
     );
 
-},
+    const user =
+        await this.getCurrentUser();
 
-async createEscrow(
+    if (!user) {
+
+        throw new Error(
+            "Unable to load authenticated user."
+        );
+
+    }
+
+    this.setAuthenticatedUser(
+        user
+    );
+
+    return user;
+
+}
+
+/* ========================================================
+   REGISTER
+======================================================== */
+
+async register(
 
     data:
         Record<string, unknown>
 
 ) {
 
-    return this._execute(
+    const response =
+        await RemadefAPI.register(
+            data
+        );
 
-        "/api/escrow",
+    /*
+     * Registration creates the account/profile
+     * on the backend.
+     *
+     * It does NOT automatically assume that a
+     * browser session exists.
+     */
 
-        "POST",
+    if (
+        response.success
+    ) {
 
-        data
+        if (
+            response.account
+        ) {
 
+            this.saveAccount(
+                response.account
+            );
+
+        }
+
+        if (
+            response.profile
+        ) {
+
+            this.saveProfile(
+                response.profile as Record<
+                    string,
+                    unknown
+                >
+            );
+
+        }
+
+    }
+
+    return response;
+
+}
+
+/* ========================================================
+   CURRENT USER
+======================================================== */
+
+async getCurrentUser():
+
+    Promise<AuthUser | null> {
+
+    try {
+
+        const account =
+            this.getAccountService();
+
+        if (!account) {
+
+            return null;
+
+        }
+
+        const user =
+            await account.get();
+
+        return user as AuthUser;
+
+    } catch {
+
+        return null;
+
+    }
+
+}
+
+/* ========================================================
+   VALIDATE SESSION
+======================================================== */
+
+async validateSession():
+
+    Promise<boolean> {
+
+    try {
+
+        const user =
+            await this.getCurrentUser();
+
+        if (!user) {
+
+            this.clearAuthentication();
+
+            return false;
+
+        }
+
+        this.setAuthenticatedUser(
+            user
+        );
+
+        return true;
+
+    } catch {
+
+        this.clearAuthentication();
+
+        return false;
+
+    }
+
+}
+
+/* ========================================================
+   REQUIRE AUTHENTICATION
+======================================================== */
+
+async requireAuth(
+
+    redirect = "login.html"
+
+): Promise<AuthUser> {
+
+    const user =
+        await this.getCurrentUser();
+
+    if (!user) {
+
+        this.clearAuthentication();
+
+        if (
+            typeof window !== "undefined"
+        ) {
+
+            const currentPage =
+                window.location.pathname;
+
+            const returnUrl =
+                encodeURIComponent(
+                    currentPage
+                );
+
+            window.location.href =
+                `${redirect}?return=${returnUrl}`;
+
+        }
+
+        throw new Error(
+            "Authentication required."
+        );
+
+    }
+
+    this.setAuthenticatedUser(
+        user
     );
 
-},
+    return user;
 
-async fundEscrow(
+}
 
-    escrowId: string
+/* ========================================================
+   SIGN OUT
+======================================================== */
 
-) {
+async signOut(
 
-    return this._execute(
+    redirect = "login.html"
 
-        `/api/escrow/${encodeURIComponent(escrowId)}/fund`,
+): Promise<void> {
 
-        "POST"
+    try {
 
+        const account =
+            this.getAccountService();
+
+        if (account) {
+
+            await account.deleteSession(
+                "current"
+            );
+
+        }
+
+    } catch (error) {
+
+        /*
+         * Even if the remote session has already
+         * expired, local authentication state must
+         * still be cleared.
+         */
+
+        console.warn(
+            "[REMADEF AUTH] Remote logout warning:",
+            error
+        );
+
+    } finally {
+
+        this.clearAuthentication();
+
+        if (
+            typeof window !== "undefined" &&
+            redirect
+        ) {
+
+            window.location.href =
+                redirect;
+
+        }
+
+    }
+
+}
+
+/* ========================================================
+   GET AUTH STATE
+======================================================== */
+
+getState(): AuthState {
+
+    return {
+
+        ...this.state
+
+    };
+
+}
+
+/* ========================================================
+   IS AUTHENTICATED
+======================================================== */
+
+isAuthenticated(): boolean {
+
+    return this.state.authenticated;
+
+}
+
+/* ========================================================
+   GET CACHED USER
+======================================================== */
+
+getCachedUser():
+
+    AuthUser | null {
+
+    return this.state.user;
+
+}
+
+/* ========================================================
+   STATE LISTENER
+======================================================== */
+
+subscribe(
+
+    listener:
+        (state: AuthState) => void
+
+): () => void {
+
+    this.listeners.push(
+        listener
     );
 
-},
+    /*
+     * Return unsubscribe function.
+     */
 
-async releaseEscrow(
+    return () => {
 
-    escrowId: string
+        this.listeners =
+            this.listeners.filter(
 
-) {
+                item =>
+                    item !== listener
 
-    return this._execute(
+            );
 
-        `/api/escrow/${encodeURIComponent(escrowId)}/release`,
+    };
 
-        "POST"
+}
 
-    );
+/* ========================================================
+   NOTIFY LISTENERS
+======================================================== */
 
-},
+private notify(): void {
 
-async cancelEscrow(
+    const snapshot = {
 
-    escrowId: string
+        ...this.state
 
-) {
+    };
 
-    return this._execute(
+    this.listeners.forEach(
 
-        `/api/escrow/${encodeURIComponent(escrowId)}/cancel`,
+        listener => {
 
-        "POST"
+            try {
 
-    );
+                listener(
+                    snapshot
+                );
 
-},
+            } catch (error) {
 
-async disputeEscrow(
+                console.error(
+                    "[REMADEF AUTH] Listener error:",
+                    error
+                );
 
-    escrowId: string,
-
-    reason: string
-
-) {
-
-    return this._execute(
-
-        `/api/escrow/${encodeURIComponent(escrowId)}/dispute`,
-
-        "POST",
-
-        {
-
-            reason
+            }
 
         }
 
     );
 
-},
+}
 
 /* ========================================================
-   SEARCH
+   SAVE AUTHENTICATED USER
 ======================================================== */
 
-async search(
+private setAuthenticatedUser(
 
-    query: string,
+    user: AuthUser
 
-    type = "all",
+): void {
 
-    limit = 20
+    this.state.user =
+        user;
 
-) {
+    this.state.authenticated =
+        true;
 
-    const params =
-        new URLSearchParams();
+    this.state.lastChecked =
+        Date.now();
 
-    params.set(
-        "q",
-        query
-    );
+    if (
+        typeof window !== "undefined"
+    ) {
 
-    params.set(
-        "type",
-        type
-    );
+        const authData:
+            StoredAuth = {
 
-    params.set(
-        "limit",
-        String(limit)
-    );
+                user,
 
-    return this._execute(
+                authenticated:
+                    true,
 
-        `/api/search?${params.toString()}`,
+                timestamp:
+                    Date.now()
 
-        "GET"
+            };
+
+        localStorage.setItem(
+
+            STORAGE_KEYS.auth,
+
+            JSON.stringify(
+                authData
+            )
+
+        );
+
+        localStorage.setItem(
+
+            STORAGE_KEYS.user,
+
+            JSON.stringify(
+                user
+            )
+
+        );
+
+    }
+
+    this.notify();
+
+}
+
+/* ========================================================
+   CLEAR AUTHENTICATION
+======================================================== */
+
+private clearAuthentication(): void {
+
+    this.state.user =
+        null;
+
+    this.state.authenticated =
+        false;
+
+    if (
+        typeof window !== "undefined"
+    ) {
+
+        localStorage.removeItem(
+            STORAGE_KEYS.auth
+        );
+
+        localStorage.removeItem(
+            STORAGE_KEYS.user
+        );
+
+        localStorage.removeItem(
+            STORAGE_KEYS.account
+        );
+
+        /*
+         * Profile data is deliberately retained
+         * temporarily because it is useful for
+         * registration/profile completion recovery.
+         *
+         * The backend remains the authoritative
+         * source of profile data.
+         */
+
+    }
+
+    this.notify();
+
+}
+
+/* ========================================================
+   SAVE ACCOUNT
+======================================================== */
+
+private saveAccount(
+
+    account:
+        Record<string, unknown>
+
+): void {
+
+    if (
+        typeof window === "undefined"
+    ) {
+
+        return;
+
+    }
+
+    localStorage.setItem(
+
+        STORAGE_KEYS.account,
+
+        JSON.stringify(
+            account
+        )
 
     );
 
 }
 
-};
+/* ========================================================
+   SAVE PROFILE
+======================================================== */
+
+private saveProfile(
+
+    profile:
+        Record<string, unknown>
+
+): void {
+
+    if (
+        typeof window === "undefined"
+    ) {
+
+        return;
+
+    }
+
+    localStorage.setItem(
+
+        STORAGE_KEYS.profile,
+
+        JSON.stringify(
+            profile
+        )
+
+    );
+
+}
+
+/* ========================================================
+   GET ACCOUNT SERVICE
+======================================================== */
+
+private getAccountService():
+
+    any {
+
+    if (
+        typeof window === "undefined"
+    ) {
+
+        return null;
+
+    }
+
+    /*
+     * app.ts will initialize the Appwrite SDK
+     * and expose the Account service here.
+     */
+
+    const globalAppwrite =
+        window.appwrite;
+
+    if (
+        !globalAppwrite
+    ) {
+
+        return null;
+
+    }
+
+    /*
+     * The account service is intentionally
+     * retrieved from the global application
+     * bootstrap layer.
+     */
+
+    return (
+        globalAppwrite as any
+    ).account || null;
+
+}
+
+}
+
+/* ============================================================
+SINGLETON
+============================================================ */
+
+const auth =
+new RemadefAuth();
 
 /* ============================================================
 GLOBAL EXPORT
@@ -1550,8 +900,10 @@ if (
 typeof window !== "undefined"
 ) {
 
-window.RemadefAPI =
-    RemadefAPI;
+(
+    window as any
+).RemadefAuth =
+    auth;
 
 }
 
@@ -1559,5 +911,8 @@ window.RemadefAPI =
 MODULE EXPORT
 ============================================================ */
 
-export default RemadefAPI;
-export { RemadefAPI };
+export default auth;
+
+export {
+auth as RemadefAuth
+};
