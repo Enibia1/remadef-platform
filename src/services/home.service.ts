@@ -32,11 +32,14 @@ class HomeService {
     getDashboard(): Promise<ApiResponse<Dashboard>> {
 
         return Client.get(
+
             ENDPOINTS.HOME.DASHBOARD,
+
             {
                 cache: true,
                 cacheTTL: 60000
             }
+
         );
 
     }
@@ -158,11 +161,8 @@ class HomeService {
     ====================================================== */
 
     react(
-
         postId: string,
-
         reaction: ReactionType
-
     ): Promise<ApiResponse> {
 
         return Client.post(
@@ -188,100 +188,3 @@ class HomeService {
         );
 
     }
-
-    /* ======================================================
-       COMMENTS
-    ====================================================== */
-
-    getComments(
-        postId: string
-    ): Promise<ApiResponse<Comment[]>> {
-
-        return Client.get(
-
-            `${ENDPOINTS.HOME.FEED}/${encodeURIComponent(postId)}/comments`
-
-        );
-
-    }
-
-    addComment(
-
-        postId: string,
-
-        data: CreateCommentRequest
-
-    ): Promise<ApiResponse<Comment>> {
-
-        return Client.post(
-
-            `${ENDPOINTS.HOME.FEED}/${encodeURIComponent(postId)}/comments`,
-
-            data
-
-        );
-
-    }
-
-    deleteComment(
-
-        postId: string,
-
-        commentId: string
-
-    ): Promise<ApiResponse> {
-
-        return Client.delete(
-
-            `${ENDPOINTS.HOME.FEED}/${encodeURIComponent(postId)}/comments/${encodeURIComponent(commentId)}`
-
-        );
-
-    }
-
-    /* ======================================================
-       SHARES
-    ====================================================== */
-
-    share(
-        postId: string
-    ): Promise<ApiResponse> {
-
-        return Client.post(
-
-            `${ENDPOINTS.HOME.FEED}/${encodeURIComponent(postId)}/share`
-
-        );
-
-    }
-
-    /* ======================================================
-       SAVED POSTS
-    ====================================================== */
-
-    save(
-        postId: string
-    ): Promise<ApiResponse> {
-
-        return Client.post(
-
-            `${ENDPOINTS.HOME.FEED}/${encodeURIComponent(postId)}/save`
-
-        );
-
-    }
-
-    unsave(
-        postId: string
-    ): Promise<ApiResponse> {
-
-        return Client.delete(
-
-            `${ENDPOINTS.HOME.FEED}/${encodeURIComponent(postId)}/save`
-
-        );
-
-    }
-
-}
-export default new HomeService();
