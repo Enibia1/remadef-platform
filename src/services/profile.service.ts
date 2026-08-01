@@ -7,7 +7,9 @@
 import Client from "./client";
 import ENDPOINTS from "../config/endpoints";
 
-import type { ApiResponse } from "../types/api";
+import type {
+    ApiResponse
+} from "../types/api";
 
 import type {
     Profile,
@@ -29,11 +31,28 @@ class ProfileService {
     get(): Promise<ApiResponse<Profile>> {
 
         return Client.get(
+
             ENDPOINTS.PROFILE.GET,
+
             {
                 cache: true,
                 cacheTTL: 5 * 60 * 1000
             }
+
+        );
+
+    }
+
+    refresh(): Promise<ApiResponse<Profile>> {
+
+        return Client.get(
+
+            ENDPOINTS.PROFILE.GET,
+
+            {
+                cache: false
+            }
+
         );
 
     }
@@ -43,8 +62,11 @@ class ProfileService {
     ): Promise<ApiResponse<Profile>> {
 
         return Client.put(
+
             ENDPOINTS.PROFILE.UPDATE,
+
             data
+
         );
 
     }
@@ -52,7 +74,9 @@ class ProfileService {
     completion(): Promise<ApiResponse<ProfileCompletion>> {
 
         return Client.get(
+
             ENDPOINTS.PROFILE.COMPLETION
+
         );
 
     }
@@ -66,10 +90,13 @@ class ProfileService {
     ): Promise<ApiResponse<Profile>> {
 
         return Client.post(
+
             ENDPOINTS.PROFILE.AVATAR,
+
             {
                 file_id: fileId
             }
+
         );
 
     }
@@ -77,7 +104,39 @@ class ProfileService {
     removeAvatar(): Promise<ApiResponse> {
 
         return Client.delete(
+
             ENDPOINTS.PROFILE.AVATAR
+
+        );
+
+    }
+
+    /* ======================================================
+       COVER PHOTO
+    ====================================================== */
+
+    uploadCover(
+        fileId: string
+    ): Promise<ApiResponse<Profile>> {
+
+        return Client.post(
+
+            ENDPOINTS.PROFILE.COVER,
+
+            {
+                file_id: fileId
+            }
+
+        );
+
+    }
+
+    removeCover(): Promise<ApiResponse> {
+
+        return Client.delete(
+
+            ENDPOINTS.PROFILE.COVER
+
         );
 
     }
