@@ -140,7 +140,7 @@ class ProfileService {
         );
 
     }
-
+   
     /* ======================================================
        EDUCATION
     ====================================================== */
@@ -148,10 +148,14 @@ class ProfileService {
     getEducation(): Promise<ApiResponse<Education[]>> {
 
         return Client.get(
+
             ENDPOINTS.PROFILE.EDUCATION,
+
             {
-                cache: true
+                cache: true,
+                cacheTTL: 5 * 60 * 1000
             }
+
         );
 
     }
@@ -161,8 +165,11 @@ class ProfileService {
     ): Promise<ApiResponse<Education>> {
 
         return Client.post(
+
             ENDPOINTS.PROFILE.EDUCATION,
+
             data
+
         );
 
     }
@@ -173,8 +180,11 @@ class ProfileService {
     ): Promise<ApiResponse<Education>> {
 
         return Client.put(
-            `${ENDPOINTS.PROFILE.EDUCATION}/${id}`,
+
+            `${ENDPOINTS.PROFILE.EDUCATION}/${encodeURIComponent(id)}`,
+
             data
+
         );
 
     }
@@ -184,7 +194,9 @@ class ProfileService {
     ): Promise<ApiResponse> {
 
         return Client.delete(
-            `${ENDPOINTS.PROFILE.EDUCATION}/${id}`
+
+            `${ENDPOINTS.PROFILE.EDUCATION}/${encodeURIComponent(id)}`
+
         );
 
     }
@@ -196,10 +208,14 @@ class ProfileService {
     getExperience(): Promise<ApiResponse<Experience[]>> {
 
         return Client.get(
+
             ENDPOINTS.PROFILE.EXPERIENCE,
+
             {
-                cache: true
+                cache: true,
+                cacheTTL: 5 * 60 * 1000
             }
+
         );
 
     }
@@ -209,8 +225,11 @@ class ProfileService {
     ): Promise<ApiResponse<Experience>> {
 
         return Client.post(
+
             ENDPOINTS.PROFILE.EXPERIENCE,
+
             data
+
         );
 
     }
@@ -221,8 +240,11 @@ class ProfileService {
     ): Promise<ApiResponse<Experience>> {
 
         return Client.put(
-            `${ENDPOINTS.PROFILE.EXPERIENCE}/${id}`,
+
+            `${ENDPOINTS.PROFILE.EXPERIENCE}/${encodeURIComponent(id)}`,
+
             data
+
         );
 
     }
@@ -232,7 +254,9 @@ class ProfileService {
     ): Promise<ApiResponse> {
 
         return Client.delete(
-            `${ENDPOINTS.PROFILE.EXPERIENCE}/${id}`
+
+            `${ENDPOINTS.PROFILE.EXPERIENCE}/${encodeURIComponent(id)}`
+
         );
 
     }
@@ -244,10 +268,14 @@ class ProfileService {
     getSkills(): Promise<ApiResponse<Skill[]>> {
 
         return Client.get(
+
             ENDPOINTS.PROFILE.SKILLS,
+
             {
-                cache: true
+                cache: true,
+                cacheTTL: 5 * 60 * 1000
             }
+
         );
 
     }
@@ -257,10 +285,13 @@ class ProfileService {
     ): Promise<ApiResponse<Skill[]>> {
 
         return Client.put(
+
             ENDPOINTS.PROFILE.SKILLS,
+
             {
                 skills
             }
+
         );
 
     }
@@ -272,7 +303,14 @@ class ProfileService {
     getCertifications(): Promise<ApiResponse<Certification[]>> {
 
         return Client.get(
-            ENDPOINTS.PROFILE.CERTIFICATIONS
+
+            ENDPOINTS.PROFILE.CERTIFICATIONS,
+
+            {
+                cache: true,
+                cacheTTL: 5 * 60 * 1000
+            }
+
         );
 
     }
@@ -282,8 +320,26 @@ class ProfileService {
     ): Promise<ApiResponse<Certification>> {
 
         return Client.post(
+
             ENDPOINTS.PROFILE.CERTIFICATIONS,
+
             data
+
+        );
+
+    }
+
+    updateCertification(
+        id: string,
+        data: Certification
+    ): Promise<ApiResponse<Certification>> {
+
+        return Client.put(
+
+            `${ENDPOINTS.PROFILE.CERTIFICATIONS}/${encodeURIComponent(id)}`,
+
+            data
+
         );
 
     }
@@ -293,7 +349,9 @@ class ProfileService {
     ): Promise<ApiResponse> {
 
         return Client.delete(
-            `${ENDPOINTS.PROFILE.CERTIFICATIONS}/${id}`
+
+            `${ENDPOINTS.PROFILE.CERTIFICATIONS}/${encodeURIComponent(id)}`
+
         );
 
     }
@@ -305,7 +363,14 @@ class ProfileService {
     getPortfolio(): Promise<ApiResponse<PortfolioItem[]>> {
 
         return Client.get(
-            ENDPOINTS.PROFILE.PORTFOLIO
+
+            ENDPOINTS.PROFILE.PORTFOLIO,
+
+            {
+                cache: true,
+                cacheTTL: 5 * 60 * 1000
+            }
+
         );
 
     }
@@ -315,8 +380,26 @@ class ProfileService {
     ): Promise<ApiResponse<PortfolioItem>> {
 
         return Client.post(
+
             ENDPOINTS.PROFILE.PORTFOLIO,
+
             data
+
+        );
+
+    }
+
+    updatePortfolioItem(
+        id: string,
+        data: PortfolioItem
+    ): Promise<ApiResponse<PortfolioItem>> {
+
+        return Client.put(
+
+            `${ENDPOINTS.PROFILE.PORTFOLIO}/${encodeURIComponent(id)}`,
+
+            data
+
         );
 
     }
@@ -326,15 +409,46 @@ class ProfileService {
     ): Promise<ApiResponse> {
 
         return Client.delete(
-            `${ENDPOINTS.PROFILE.PORTFOLIO}/${id}`
+
+            `${ENDPOINTS.PROFILE.PORTFOLIO}/${encodeURIComponent(id)}`
+
         );
 
     }
 
-}
+    /* ======================================================
+       SOCIAL LINKS
+    ====================================================== */
 
-export default new ProfileService();
+    getSocialLinks(): Promise<ApiResponse<Record<string, string>>> {
 
+        return Client.get(
+
+            ENDPOINTS.PROFILE.SOCIALS,
+
+            {
+                cache: true,
+                cacheTTL: 5 * 60 * 1000
+            }
+
+        );
+
+    }
+
+    updateSocialLinks(
+        data: Record<string, string>
+    ): Promise<ApiResponse<Record<string, string>>> {
+
+        return Client.put(
+
+            ENDPOINTS.PROFILE.SOCIALS,
+
+            data
+
+        );
+
+    }
+   
 /* ======================================================
    COVER PHOTO
 ====================================================== */
@@ -347,124 +461,125 @@ uploadCover(
 
         ENDPOINTS.PROFILE.COVER,
 
-        {
-            file_id: fileId
-        }
 
-    );
+    /* ======================================================
+       VERIFICATION
+    ====================================================== */
 
+    getVerification(): Promise<ApiResponse> {
+
+        return Client.get(
+
+            ENDPOINTS.PROFILE.VERIFICATION,
+
+            {
+                cache: true,
+                cacheTTL: 5 * 60 * 1000
+            }
+
+        );
+
+    }
+
+    submitVerification(
+        data: Record<string, any>
+    ): Promise<ApiResponse> {
+
+        return Client.post(
+
+            ENDPOINTS.PROFILE.VERIFICATION,
+
+            data
+
+        );
+
+    }
+
+    /* ======================================================
+       PRIVACY
+    ====================================================== */
+
+    getPrivacy(): Promise<ApiResponse> {
+
+        return Client.get(
+
+            ENDPOINTS.PROFILE.PRIVACY,
+
+            {
+                cache: true,
+                cacheTTL: 5 * 60 * 1000
+            }
+
+        );
+
+    }
+
+    updatePrivacy(
+        data: Record<string, any>
+    ): Promise<ApiResponse> {
+
+        return Client.put(
+
+            ENDPOINTS.PROFILE.PRIVACY,
+
+            data
+
+        );
+
+    }
+
+    /* ======================================================
+       PROFILE VISIBILITY
+    ====================================================== */
+
+    updateVisibility(
+        visibility: string
+    ): Promise<ApiResponse> {
+
+        return Client.patch(
+
+            ENDPOINTS.PROFILE.VISIBILITY,
+
+            {
+                visibility
+            }
+
+        );
+
+    }
+
+    /* ======================================================
+       PROFILE PREFERENCES
+    ====================================================== */
+
+    getPreferences(): Promise<ApiResponse> {
+
+        return Client.get(
+
+            ENDPOINTS.PROFILE.PREFERENCES,
+
+            {
+                cache: true,
+                cacheTTL: 5 * 60 * 1000
+            }
+
+        );
+
+    }
+
+    updatePreferences(
+        data: Record<string, any>
+    ): Promise<ApiResponse> {
+
+        return Client.put(
+
+            ENDPOINTS.PROFILE.PREFERENCES,
+
+            data
+
+        );
+
+    }
 }
 
-removeCover(): Promise<ApiResponse> {
-
-    return Client.delete(
-
-        ENDPOINTS.PROFILE.COVER
-
-    );
-
-}
-
-/* ======================================================
-   SOCIAL LINKS
-====================================================== */
-
-getSocialLinks(): Promise<ApiResponse> {
-
-    return Client.get(
-
-        ENDPOINTS.PROFILE.SOCIALS
-
-    );
-
-}
-
-updateSocialLinks(
-    data: Record<string, string>
-): Promise<ApiResponse> {
-
-    return Client.put(
-
-        ENDPOINTS.PROFILE.SOCIALS,
-
-        data
-
-    );
-
-}
-
-/* ======================================================
-   VERIFICATION
-====================================================== */
-
-getVerification(): Promise<ApiResponse> {
-
-    return Client.get(
-
-        ENDPOINTS.PROFILE.VERIFICATION
-
-    );
-
-}
-
-submitVerification(
-    data: Record<string, any>
-): Promise<ApiResponse> {
-
-    return Client.post(
-
-        ENDPOINTS.PROFILE.VERIFICATION,
-
-        data
-
-    );
-
-}
-
-/* ======================================================
-   PRIVACY
-====================================================== */
-
-getPrivacy(): Promise<ApiResponse> {
-
-    return Client.get(
-
-        ENDPOINTS.PROFILE.PRIVACY
-
-    );
-
-}
-
-updatePrivacy(
-    data: Record<string, any>
-): Promise<ApiResponse> {
-
-    return Client.put(
-
-        ENDPOINTS.PROFILE.PRIVACY,
-
-        data
-
-    );
-
-}
-
-/* ======================================================
-   VISIBILITY
-====================================================== */
-
-updateVisibility(
-    visibility: string
-): Promise<ApiResponse> {
-
-    return Client.patch(
-
-        ENDPOINTS.PROFILE.VISIBILITY,
-
-        {
-            visibility
-        }
-
-    );
-
-}
+export default new ProfileService();
