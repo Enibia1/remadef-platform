@@ -109,6 +109,78 @@ class MessageService {
 
     }
 
+       archiveConversation(
+        conversationId: string
+    ): Promise<ApiResponse> {
+
+        return Client.patch(
+
+            `${ENDPOINTS.MESSAGES.CONVERSATIONS}/${encodeURIComponent(conversationId)}/archive`
+
+        );
+
+    }
+
+    unarchiveConversation(
+        conversationId: string
+    ): Promise<ApiResponse> {
+
+        return Client.patch(
+
+            `${ENDPOINTS.MESSAGES.CONVERSATIONS}/${encodeURIComponent(conversationId)}/unarchive`
+
+        );
+
+    }
+
+    pinConversation(
+        conversationId: string
+    ): Promise<ApiResponse> {
+
+        return Client.patch(
+
+            `${ENDPOINTS.MESSAGES.CONVERSATIONS}/${encodeURIComponent(conversationId)}/pin`
+
+        );
+
+    }
+
+    unpinConversation(
+        conversationId: string
+    ): Promise<ApiResponse> {
+
+        return Client.patch(
+
+            `${ENDPOINTS.MESSAGES.CONVERSATIONS}/${encodeURIComponent(conversationId)}/unpin`
+
+        );
+
+    }
+
+    muteConversation(
+        conversationId: string
+    ): Promise<ApiResponse> {
+
+        return Client.patch(
+
+            `${ENDPOINTS.MESSAGES.CONVERSATIONS}/${encodeURIComponent(conversationId)}/mute`
+
+        );
+
+    }
+
+    unmuteConversation(
+        conversationId: string
+    ): Promise<ApiResponse> {
+
+        return Client.patch(
+
+            `${ENDPOINTS.MESSAGES.CONVERSATIONS}/${encodeURIComponent(conversationId)}/unmute`
+
+        );
+
+    }
+
     /* ======================================================
        MEMBERS
     ====================================================== */
@@ -179,6 +251,24 @@ class MessageService {
             `${ENDPOINTS.MESSAGES.CONVERSATIONS}/${encodeURIComponent(conversationId)}/messages`,
 
             data
+
+        );
+
+    }
+
+       replyMessage(
+        conversationId: string,
+        messageId: string,
+        content: string
+    ): Promise<ApiResponse<Message>> {
+
+        return Client.post(
+
+            `${ENDPOINTS.MESSAGES.CONVERSATIONS}/${encodeURIComponent(conversationId)}/messages/${encodeURIComponent(messageId)}/reply`,
+
+            {
+                content
+            }
 
         );
 
@@ -292,6 +382,50 @@ class MessageService {
 
     }
 
+       startTyping(
+        conversationId: string
+    ): Promise<ApiResponse> {
+
+        return this.typing(
+
+            conversationId,
+
+            {
+                typing: true
+            }
+
+        );
+
+    }
+
+    stopTyping(
+        conversationId: string
+    ): Promise<ApiResponse> {
+
+        return this.typing(
+
+            conversationId,
+
+            {
+                typing: false
+            }
+
+        );
+
+    }
+
+    getTypingUsers(
+        conversationId: string
+    ): Promise<ApiResponse> {
+
+        return Client.get(
+
+            `${ENDPOINTS.MESSAGES.CONVERSATIONS}/${encodeURIComponent(conversationId)}/typing`
+
+        );
+
+    }
+
     /* ======================================================
        SEARCH
     ====================================================== */
@@ -313,3 +447,25 @@ class MessageService {
 }
 
 export default new MessageService();
+
+    loadOlderMessages(
+        conversationId: string,
+        beforeMessageId: string,
+        limit = 50
+    ): Promise<ListResponse<Message>> {
+
+        const params = new URLSearchParams({
+
+            before: beforeMessageId,
+
+            limit: String(limit)
+
+        });
+
+        return Client.get(
+
+            `${ENDPOINTS.MESSAGES.CONVERSATIONS}/${encodeURIComponent(conversationId)}/messages?${params.toString()}`
+
+        );
+
+    }
