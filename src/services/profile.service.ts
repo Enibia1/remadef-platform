@@ -275,3 +275,137 @@ class ProfileService {
 }
 
 export default new ProfileService();
+
+/* ======================================================
+   COVER PHOTO
+====================================================== */
+
+uploadCover(
+    fileId: string
+): Promise<ApiResponse<Profile>> {
+
+    return Client.post(
+
+        ENDPOINTS.PROFILE.COVER,
+
+        {
+            file_id: fileId
+        }
+
+    );
+
+}
+
+removeCover(): Promise<ApiResponse> {
+
+    return Client.delete(
+
+        ENDPOINTS.PROFILE.COVER
+
+    );
+
+}
+
+/* ======================================================
+   SOCIAL LINKS
+====================================================== */
+
+getSocialLinks(): Promise<ApiResponse> {
+
+    return Client.get(
+
+        ENDPOINTS.PROFILE.SOCIALS
+
+    );
+
+}
+
+updateSocialLinks(
+    data: Record<string, string>
+): Promise<ApiResponse> {
+
+    return Client.put(
+
+        ENDPOINTS.PROFILE.SOCIALS,
+
+        data
+
+    );
+
+}
+
+/* ======================================================
+   VERIFICATION
+====================================================== */
+
+getVerification(): Promise<ApiResponse> {
+
+    return Client.get(
+
+        ENDPOINTS.PROFILE.VERIFICATION
+
+    );
+
+}
+
+submitVerification(
+    data: Record<string, any>
+): Promise<ApiResponse> {
+
+    return Client.post(
+
+        ENDPOINTS.PROFILE.VERIFICATION,
+
+        data
+
+    );
+
+}
+
+/* ======================================================
+   PRIVACY
+====================================================== */
+
+getPrivacy(): Promise<ApiResponse> {
+
+    return Client.get(
+
+        ENDPOINTS.PROFILE.PRIVACY
+
+    );
+
+}
+
+updatePrivacy(
+    data: Record<string, any>
+): Promise<ApiResponse> {
+
+    return Client.put(
+
+        ENDPOINTS.PROFILE.PRIVACY,
+
+        data
+
+    );
+
+}
+
+/* ======================================================
+   VISIBILITY
+====================================================== */
+
+updateVisibility(
+    visibility: string
+): Promise<ApiResponse> {
+
+    return Client.patch(
+
+        ENDPOINTS.PROFILE.VISIBILITY,
+
+        {
+            visibility
+        }
+
+    );
+
+}
