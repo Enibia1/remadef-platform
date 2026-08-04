@@ -711,3 +711,263 @@ export interface CurrentUser {
     lastSeen?: string;
 
 }
+
+/* ==========================================================
+   REMADEF PLATFORM
+   MASTER USER PROFILE
+========================================================== */
+
+export interface UserProfile {
+
+    account: UserAccount;
+
+    profile: User;
+
+    location?: UserLocation;
+
+    contact?: UserContact;
+
+    emergencyContact?: UserEmergencyContact;
+
+    education: UserEducation[];
+
+    experience: UserExperience[];
+
+    skills: UserSkill[];
+
+    certifications: UserCertification[];
+
+    portfolio: UserPortfolio[];
+
+    resume?: UserResume;
+
+    interests: UserInterest[];
+
+    achievements: UserAchievement[];
+
+    statistics: UserStatistics;
+
+    verification: UserVerification;
+
+    settings: UserSettings;
+
+    socialLinks: UserSocialLinks;
+
+    languages: UserLanguage[];
+
+    badges: UserBadge[];
+
+    createdAt: string;
+
+    updatedAt: string;
+
+}
+
+/* ==========================================================
+   USER SUMMARY
+========================================================== */
+
+export interface UserSummary {
+
+    id: string;
+
+    username: string;
+
+    displayName: string;
+
+    avatar?: string;
+
+    headline?: string;
+
+    role: UserRole;
+
+    verified: boolean;
+
+    onlineStatus?: OnlineStatus;
+
+    location?: string;
+
+}
+
+/* ==========================================================
+   USER SEARCH RESULT
+========================================================== */
+
+export interface UserSearchResult {
+
+    score: number;
+
+    user: UserSummary;
+
+    matchedFields: string[];
+
+}
+
+/* ==========================================================
+   USER PROFILE COMPLETION
+========================================================== */
+
+export interface UserProfileCompletion {
+
+    percentage: number;
+
+    completed: string[];
+
+    remaining: string[];
+
+    nextRecommendedStep?: string;
+
+}
+
+/* ==========================================================
+   USER SESSION
+========================================================== */
+
+export interface UserSession {
+
+    sessionId: string;
+
+    deviceId?: string;
+
+    deviceName?: string;
+
+    platform?: string;
+
+    browser?: string;
+
+    ipAddress?: string;
+
+    location?: string;
+
+    createdAt: string;
+
+    lastActiveAt: string;
+
+    expiresAt: string;
+
+    current: boolean;
+
+}
+
+/* ==========================================================
+   USER NOTIFICATION PREFERENCES
+========================================================== */
+
+export interface UserNotificationPreferences {
+
+    push: boolean;
+
+    email: boolean;
+
+    sms: boolean;
+
+    inApp: boolean;
+
+    marketing: boolean;
+
+    security: boolean;
+
+    messages: boolean;
+
+    jobs: boolean;
+
+    learning: boolean;
+
+    apprenticeship: boolean;
+
+    business: boolean;
+
+}
+
+/* ==========================================================
+   USER SECURITY
+========================================================== */
+
+export interface UserSecurity {
+
+    twoFactorEnabled: boolean;
+
+    backupCodesEnabled: boolean;
+
+    loginAlerts: boolean;
+
+    biometricEnabled: boolean;
+
+    lastPasswordChange?: string;
+
+}
+
+/* ==========================================================
+   USER WALLET SUMMARY
+========================================================== */
+
+export interface UserWalletSummary {
+
+    walletId?: string;
+
+    availableBalance: number;
+
+    pendingBalance: number;
+
+    escrowBalance: number;
+
+    currency: string;
+
+}
+
+/* ==========================================================
+   USER DASHBOARD
+========================================================== */
+
+export interface UserDashboard {
+
+    profileCompletion: UserProfileCompletion;
+
+    wallet?: UserWalletSummary;
+
+    statistics: UserStatistics;
+
+    recommendations: string[];
+
+    quickActions: string[];
+
+}
+
+/* ==========================================================
+   TYPE HELPERS
+========================================================== */
+
+export type UserID = string;
+
+export type Username = string;
+
+export type EmailAddress = string;
+
+export type PhoneNumber = string;
+
+export type VerificationLevel =
+
+    | 0
+    | 1
+    | 2
+    | 3
+    | 4
+    | 5;
+
+/* ==========================================================
+   DEFAULT EXPORT TYPES
+========================================================== */
+
+export type {
+
+    User as DefaultUser,
+
+    UserProfile as DefaultUserProfile,
+
+    UserAccount as DefaultUserAccount,
+
+    UserSettings as DefaultUserSettings,
+
+    UserVerification as DefaultUserVerification
+
+};
