@@ -319,3 +319,430 @@ class JobsModule {
         );
 
     }
+
+    /* ======================================================
+       APPLY
+    ====================================================== */
+
+    async apply(
+        jobId: string,
+        data: Record<string, unknown>
+    ): Promise<void> {
+
+        await API.jobs.apply(
+
+            jobId,
+
+            data
+
+        );
+
+        await this.reloadApplications();
+
+    }
+
+    /* ======================================================
+       WITHDRAW APPLICATION
+    ====================================================== */
+
+    async withdrawApplication(
+        applicationId: string
+    ): Promise<void> {
+
+        await API.jobs.withdrawApplication(
+
+            applicationId
+
+        );
+
+        await this.reloadApplications();
+
+    }
+
+    /* ======================================================
+       SAVE JOB
+    ====================================================== */
+
+    async saveJob(
+        jobId: string
+    ): Promise<void> {
+
+        await API.jobs.saveJob(
+
+            jobId
+
+        );
+
+        await this.reloadSavedJobs();
+
+    }
+
+    async unsaveJob(
+        jobId: string
+    ): Promise<void> {
+
+        await API.jobs.unsaveJob(
+
+            jobId
+
+        );
+
+        await this.reloadSavedJobs();
+
+    }
+
+    /* ======================================================
+       CREATE JOB
+    ====================================================== */
+
+    async createJob(
+        data: Record<string, unknown>
+    ): Promise<void> {
+
+        await API.jobs.createJob(
+
+            data
+
+        );
+
+        await this.refresh();
+
+    }
+
+    /* ======================================================
+       UPDATE JOB
+    ====================================================== */
+
+    async updateJob(
+        jobId: string,
+        data: Record<string, unknown>
+    ): Promise<void> {
+
+        await API.jobs.updateJob(
+
+            jobId,
+
+            data
+
+        );
+
+        await this.refresh();
+
+    }
+
+    /* ======================================================
+       DELETE JOB
+    ====================================================== */
+
+    async deleteJob(
+        jobId: string
+    ): Promise<void> {
+
+        await API.jobs.deleteJob(
+
+            jobId
+
+        );
+
+        await this.refresh();
+
+    }
+
+    /* ======================================================
+       SEARCH
+    ====================================================== */
+
+    async search(
+        query: string
+    ): Promise<void> {
+
+        const response =
+            await API.jobs.search(
+                query
+            );
+
+        State.set(
+
+            "jobs.search",
+
+            response.data ?? []
+
+        );
+
+        Events.emit(
+
+            "jobs:searchUpdated",
+
+            response.data ?? []
+
+        );
+
+    }
+
+    /* ======================================================
+       FILTER
+    ====================================================== */
+
+    async filter(
+        filters: Record<string, unknown>
+    ): Promise<void> {
+
+        const response =
+            await API.jobs.filter(
+                filters
+            );
+
+        State.set(
+
+            "jobs.filtered",
+
+            response.data ?? []
+
+        );
+
+        Events.emit(
+
+            "jobs:filteredUpdated",
+
+            response.data ?? []
+
+        );
+
+    }
+
+    /* ======================================================
+       FOLLOW EMPLOYER
+    ====================================================== */
+
+    async followEmployer(
+        employerId: string
+    ): Promise<void> {
+
+        await API.jobs.followEmployer(
+            employerId
+        );
+
+        await this.reloadEmployers();
+
+    }
+
+    async unfollowEmployer(
+        employerId: string
+    ): Promise<void> {
+
+        await API.jobs.unfollowEmployer(
+            employerId
+        );
+
+        await this.reloadEmployers();
+
+    }
+
+    /* ======================================================
+       REPORT JOB
+    ====================================================== */
+
+    async reportJob(
+        jobId: string,
+        reason: string
+    ): Promise<void> {
+
+        await API.jobs.reportJob({
+
+            jobId,
+
+            reason
+
+        });
+
+    }
+
+    /* ======================================================
+       HELPERS
+    ====================================================== */
+
+    getJobs(): Job[] {
+
+        return (
+
+            State.get(
+
+                this.JOBS_KEY
+
+            ) || []
+
+        );
+
+    }
+
+    getSavedJobs(): SavedJob[] {
+
+        return (
+
+            State.get(
+
+                this.SAVED_KEY
+
+            ) || []
+
+        );
+
+    }
+
+    getApplications(): JobApplication[] {
+
+        return (
+
+            State.get(
+
+                this.APPLICATIONS_KEY
+
+            ) || []
+
+        );
+
+    }
+
+    getRecommendations(): JobRecommendation[] {
+
+        return (
+
+            State.get(
+
+                this.RECOMMENDATIONS_KEY
+
+            ) || []
+
+        );
+
+    }
+
+    getCategories(): JobCategory[] {
+
+        return (
+
+            State.get(
+
+                this.CATEGORIES_KEY
+
+            ) || []
+
+        );
+
+    }
+
+    getEmployers(): Employer[] {
+
+        return (
+
+            State.get(
+
+                this.EMPLOYERS_KEY
+
+            ) || []
+
+        );
+
+    }
+
+    /* ======================================================
+       CACHE
+    ====================================================== */
+
+    private restore(): void {
+
+        const cached =
+
+            Cache.get(
+
+                this.CACHE_KEY
+
+            );
+
+        if (!cached) {
+
+            return;
+
+        }
+
+        State.set(
+
+            this.JOBS_KEY,
+
+            cached
+
+        );
+
+    }
+
+    /* ======================================================
+       CLEAR
+    ====================================================== */
+
+    clear(): void {
+
+        State.remove(
+
+            this.JOBS_KEY
+
+        );
+
+        State.remove(
+
+            this.SAVED_KEY
+
+        );
+
+        State.remove(
+
+            this.APPLICATIONS_KEY
+
+        );
+
+        State.remove(
+
+            this.RECOMMENDATIONS_KEY
+
+        );
+
+        State.remove(
+
+            this.CATEGORIES_KEY
+
+        );
+
+        State.remove(
+
+            this.EMPLOYERS_KEY
+
+        );
+
+        State.remove(
+
+            "jobs.search"
+
+        );
+
+        State.remove(
+
+            "jobs.filtered"
+
+        );
+
+        Cache.remove(
+
+            this.CACHE_KEY
+
+        );
+
+        Events.emit(
+
+            "jobs:cleared"
+
+        );
+
+    }
+
+}
+
+export default new JobsModule();
