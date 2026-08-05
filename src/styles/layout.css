@@ -1,0 +1,263 @@
+/* ==========================================================
+   REMADEF PLATFORM
+   Layout System
+   File: src/styles/layout.css
+========================================================== */
+
+/* ==========================================================
+   APPLICATION
+========================================================== */
+
+#app {
+
+    min-height: 100vh;
+
+    display: flex;
+
+    flex-direction: column;
+
+    background: var(--color-background);
+
+}
+
+/* ==========================================================
+   SHELL
+========================================================== */
+
+.app-shell {
+
+    display: flex;
+
+    flex: 1;
+
+    min-height: 100vh;
+
+}
+
+/* ==========================================================
+   SIDEBAR
+========================================================== */
+
+.app-sidebar {
+
+    width: var(--sidebar-width);
+
+    min-width: var(--sidebar-width);
+
+    background: var(--color-primary);
+
+    color: var(--color-text-inverse);
+
+    display: flex;
+
+    flex-direction: column;
+
+    transition: width var(--transition-normal);
+
+    overflow-y: auto;
+
+}
+
+.app-sidebar.collapsed {
+
+    width: var(--sidebar-collapsed-width);
+
+    min-width: var(--sidebar-collapsed-width);
+
+}
+
+/* ==========================================================
+   MAIN
+========================================================== */
+
+.app-main {
+
+    flex: 1;
+
+    display: flex;
+
+    flex-direction: column;
+
+    min-width: 0;
+
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.app-header {
+
+    height: var(--header-height);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 0 var(--container-padding);
+
+    background: var(--color-surface);
+
+    border-bottom: 1px solid var(--color-border);
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: var(--z-sticky);
+
+}
+
+/* ==========================================================
+   CONTENT
+========================================================== */
+
+.app-content {
+
+    flex: 1;
+
+    padding: var(--container-padding);
+
+    overflow-x: hidden;
+
+    overflow-y: auto;
+
+}
+
+/* ==========================================================
+   CONTAINER
+========================================================== */
+
+.container {
+
+    width: 100%;
+
+    max-width: var(--content-max-width);
+
+    margin: 0 auto;
+
+}
+
+/* ==========================================================
+   SECTION
+========================================================== */
+
+.section {
+
+    margin-bottom: var(--space-8);
+
+}
+
+/* ==========================================================
+   PAGE
+========================================================== */
+
+.page {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: var(--space-6);
+
+}
+
+/* ==========================================================
+   PAGE HEADER
+========================================================== */
+
+.page-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: var(--space-4);
+
+}
+
+/* ==========================================================
+   PAGE BODY
+========================================================== */
+
+.page-body {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: var(--space-6);
+
+}
+
+/* ==========================================================
+   FOOTER
+========================================================== */
+
+.app-footer {
+
+    padding: var(--space-4);
+
+    border-top: 1px solid var(--color-border);
+
+    background: var(--color-surface);
+
+    text-align: center;
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 1024px) {
+
+    .app-sidebar {
+
+        position: fixed;
+
+        left: -100%;
+
+        top: 0;
+
+        bottom: 0;
+
+        z-index: var(--z-overlay);
+
+    }
+
+    .app-sidebar.open {
+
+        left: 0;
+
+    }
+
+    .app-content {
+
+        padding: var(--space-4);
+
+    }
+
+}
+
+@media (max-width: 768px) {
+
+    .app-header {
+
+        padding: 0 var(--space-4);
+
+    }
+
+    .page-header {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+    }
+
+}
