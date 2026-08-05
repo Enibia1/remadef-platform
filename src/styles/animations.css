@@ -1,0 +1,378 @@
+/* ==========================================================
+   REMADEF PLATFORM
+   Animations
+   File: src/styles/animations.css
+========================================================== */
+
+/* ==========================================================
+   TRANSITIONS
+========================================================== */
+
+.transition-fast {
+    transition: all var(--transition-fast);
+}
+
+.transition-normal {
+    transition: all var(--transition-normal);
+}
+
+.transition-slow {
+    transition: all var(--transition-slow);
+}
+
+/* ==========================================================
+   FADE
+========================================================== */
+
+.fade-in {
+    animation: fadeIn .3s ease forwards;
+}
+
+.fade-out {
+    animation: fadeOut .3s ease forwards;
+}
+
+@keyframes fadeIn {
+
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+
+}
+
+@keyframes fadeOut {
+
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+
+}
+
+/* ==========================================================
+   SLIDE
+========================================================== */
+
+.slide-up {
+    animation: slideUp .35s ease forwards;
+}
+
+.slide-down {
+    animation: slideDown .35s ease forwards;
+}
+
+.slide-left {
+    animation: slideLeft .35s ease forwards;
+}
+
+.slide-right {
+    animation: slideRight .35s ease forwards;
+}
+
+@keyframes slideUp {
+
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+@keyframes slideDown {
+
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+@keyframes slideLeft {
+
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+}
+
+@keyframes slideRight {
+
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+}
+
+/* ==========================================================
+   SCALE
+========================================================== */
+
+.scale-in {
+    animation: scaleIn .25s ease forwards;
+}
+
+.scale-out {
+    animation: scaleOut .25s ease forwards;
+}
+
+@keyframes scaleIn {
+
+    from {
+        opacity: 0;
+        transform: scale(.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+}
+
+@keyframes scaleOut {
+
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(.95);
+    }
+
+}
+
+/* ==========================================================
+   SPINNER
+========================================================== */
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+
+}
+
+/* ==========================================================
+   PULSE
+========================================================== */
+
+.pulse {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .5;
+    }
+
+    100% {
+        opacity: 1;
+    }
+
+}
+
+/* ==========================================================
+   BOUNCE
+========================================================== */
+
+.bounce {
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+
+}
+
+/* ==========================================================
+   SHAKE
+========================================================== */
+
+.shake {
+    animation: shake .45s ease;
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-6px);
+    }
+
+    40% {
+        transform: translateX(6px);
+    }
+
+    60% {
+        transform: translateX(-4px);
+    }
+
+    80% {
+        transform: translateX(4px);
+    }
+
+}
+
+/* ==========================================================
+   RIPPLE
+========================================================== */
+
+.ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple::after {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    background: rgba(255,255,255,.25);
+
+    opacity: 0;
+
+    transform: scale(0);
+
+    border-radius: inherit;
+
+}
+
+.ripple:active::after {
+
+    animation: ripple .45s ease;
+
+}
+
+@keyframes ripple {
+
+    from {
+
+        opacity: .4;
+
+        transform: scale(0);
+
+    }
+
+    to {
+
+        opacity: 0;
+
+        transform: scale(2);
+
+    }
+
+}
+
+/* ==========================================================
+   HOVER
+========================================================== */
+
+.hover-lift:hover {
+
+    transform: translateY(-3px);
+
+    box-shadow: var(--shadow-md);
+
+}
+
+.hover-scale:hover {
+
+    transform: scale(1.02);
+
+}
+
+.hover-bright:hover {
+
+    filter: brightness(1.05);
+
+}
+
+/* ==========================================================
+   PAGE TRANSITION
+========================================================== */
+
+.page-enter {
+
+    animation: pageEnter .35s ease forwards;
+
+}
+
+@keyframes pageEnter {
+
+    from {
+
+        opacity: 0;
+
+        transform: translateY(12px);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform: translateY(0);
+
+    }
+
+}
