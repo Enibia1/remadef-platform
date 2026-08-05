@@ -1,0 +1,189 @@
+/* ==========================================================
+   REMADEF PLATFORM
+   Design Tokens
+   File: src/styles/variables.css
+========================================================== */
+
+:root {
+
+    /* ======================================================
+       BRAND COLORS
+    ====================================================== */
+
+    --color-primary: #071A3D;
+    --color-primary-light: #0D2A5C;
+    --color-primary-dark: #041126;
+
+    --color-secondary: #2563EB;
+    --color-secondary-light: #3B82F6;
+    --color-secondary-dark: #1D4ED8;
+
+    --color-accent: #14B8A6;
+    --color-success: #22C55E;
+    --color-warning: #F59E0B;
+    --color-danger: #EF4444;
+    --color-info: #0EA5E9;
+
+    /* ======================================================
+       SURFACE
+    ====================================================== */
+
+    --color-background: #F5F7FB;
+    --color-surface: #FFFFFF;
+    --color-surface-alt: #F9FAFB;
+
+    /* ======================================================
+       TEXT
+    ====================================================== */
+
+    --color-text: #152238;
+    --color-text-light: #4B5563;
+    --color-text-muted: #6B7280;
+    --color-text-inverse: #FFFFFF;
+
+    /* ======================================================
+       BORDER
+    ====================================================== */
+
+    --color-border: #E5E7EB;
+    --color-divider: #D1D5DB;
+
+    /* ======================================================
+       SHADOWS
+    ====================================================== */
+
+    --shadow-xs: 0 1px 2px rgba(0,0,0,.05);
+
+    --shadow-sm: 0 2px 6px rgba(0,0,0,.08);
+
+    --shadow-md: 0 8px 20px rgba(0,0,0,.10);
+
+    --shadow-lg: 0 12px 32px rgba(0,0,0,.14);
+
+    --shadow-xl: 0 20px 40px rgba(0,0,0,.18);
+
+    /* ======================================================
+       RADIUS
+    ====================================================== */
+
+    --radius-xs: 4px;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 18px;
+    --radius-xl: 24px;
+    --radius-pill: 999px;
+    --radius-circle: 50%;
+
+    /* ======================================================
+       SPACING
+    ====================================================== */
+
+    --space-0: 0;
+
+    --space-1: .25rem;
+    --space-2: .5rem;
+    --space-3: .75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+    --space-20: 5rem;
+    --space-24: 6rem;
+
+    /* ======================================================
+       TYPOGRAPHY
+    ====================================================== */
+
+    --font-family-base:
+        "Inter",
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+
+    --font-family-heading:
+        "Inter",
+        sans-serif;
+
+    --font-size-xs: .75rem;
+    --font-size-sm: .875rem;
+    --font-size-md: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 2rem;
+    --font-size-4xl: 2.5rem;
+
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    --line-height-tight: 1.2;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.75;
+
+    /* ======================================================
+       LAYOUT
+    ====================================================== */
+
+    --header-height: 72px;
+
+    --sidebar-width: 280px;
+
+    --sidebar-collapsed-width: 88px;
+
+    --content-max-width: 1440px;
+
+    --container-padding: 24px;
+
+    /* ======================================================
+       Z-INDEX
+    ====================================================== */
+
+    --z-dropdown: 1000;
+
+    --z-sticky: 1010;
+
+    --z-fixed: 1020;
+
+    --z-overlay: 1030;
+
+    --z-modal: 1040;
+
+    --z-toast: 1050;
+
+    --z-tooltip: 1060;
+
+    /* ======================================================
+       TRANSITIONS
+    ====================================================== */
+
+    --transition-fast: .15s ease;
+
+    --transition-normal: .25s ease;
+
+    --transition-slow: .4s ease;
+
+    /* ======================================================
+       BREAKPOINTS
+    ====================================================== */
+
+    --breakpoint-xs: 480px;
+
+    --breakpoint-sm: 640px;
+
+    --breakpoint-md: 768px;
+
+    --breakpoint-lg: 1024px;
+
+    --breakpoint-xl: 1280px;
+
+    --breakpoint-2xl: 1536px;
+
+}
