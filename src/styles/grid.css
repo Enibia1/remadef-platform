@@ -1,0 +1,291 @@
+/* ==========================================================
+   REMADEF PLATFORM
+   Responsive Grid System
+   File: src/styles/grid.css
+========================================================== */
+
+/* ==========================================================
+   CONTAINER
+========================================================== */
+
+.container {
+
+    width: 100%;
+
+    max-width: var(--content-max-width);
+
+    margin: 0 auto;
+
+    padding-inline: var(--container-padding);
+
+}
+
+/* ==========================================================
+   GRID
+========================================================== */
+
+.grid {
+
+    display: grid;
+
+    gap: var(--space-6);
+
+}
+
+.grid-1 {
+
+    grid-template-columns: 1fr;
+
+}
+
+.grid-2 {
+
+    grid-template-columns: repeat(2, 1fr);
+
+}
+
+.grid-3 {
+
+    grid-template-columns: repeat(3, 1fr);
+
+}
+
+.grid-4 {
+
+    grid-template-columns: repeat(4, 1fr);
+
+}
+
+.grid-5 {
+
+    grid-template-columns: repeat(5, 1fr);
+
+}
+
+.grid-6 {
+
+    grid-template-columns: repeat(6, 1fr);
+
+}
+
+/* ==========================================================
+   REMADEF DESKTOP LAYOUT
+========================================================== */
+
+.grid-platform {
+
+    display: grid;
+
+    grid-template-columns:
+
+        280px
+
+        minmax(0, 1fr)
+
+        320px;
+
+    gap: var(--space-6);
+
+    align-items: start;
+
+}
+
+.grid-feed {
+
+    display: grid;
+
+    gap: var(--space-6);
+
+}
+
+.grid-sidebar {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: var(--space-4);
+
+}
+
+.grid-widgets {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: var(--space-4);
+
+}
+
+/* ==========================================================
+   AUTO GRID
+========================================================== */
+
+.grid-auto {
+
+    display: grid;
+
+    grid-template-columns:
+
+        repeat(
+
+            auto-fit,
+
+            minmax(280px, 1fr)
+
+        );
+
+    gap: var(--space-6);
+
+}
+
+/* ==========================================================
+   COLUMN SPAN
+========================================================== */
+
+.col-span-1 {
+
+    grid-column: span 1;
+
+}
+
+.col-span-2 {
+
+    grid-column: span 2;
+
+}
+
+.col-span-3 {
+
+    grid-column: span 3;
+
+}
+
+.col-span-4 {
+
+    grid-column: span 4;
+
+}
+
+/* ==========================================================
+   ALIGNMENT
+========================================================== */
+
+.align-start {
+
+    align-items: start;
+
+}
+
+.align-center {
+
+    align-items: center;
+
+}
+
+.align-end {
+
+    align-items: end;
+
+}
+
+.justify-start {
+
+    justify-items: start;
+
+}
+
+.justify-center {
+
+    justify-items: center;
+
+}
+
+.justify-end {
+
+    justify-items: end;
+
+}
+
+/* ==========================================================
+   GAP UTILITIES
+========================================================== */
+
+.gap-sm {
+
+    gap: var(--space-3);
+
+}
+
+.gap-md {
+
+    gap: var(--space-6);
+
+}
+
+.gap-lg {
+
+    gap: var(--space-8);
+
+}
+
+/* ==========================================================
+   TABLET
+========================================================== */
+
+@media (max-width: 1024px) {
+
+    .grid-platform {
+
+        grid-template-columns:
+
+            minmax(0, 1fr)
+
+            280px;
+
+    }
+
+    .grid-4,
+
+    .grid-5,
+
+    .grid-6 {
+
+        grid-template-columns:
+
+            repeat(2, 1fr);
+
+    }
+
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width: 768px) {
+
+    .grid-platform,
+
+    .grid-2,
+
+    .grid-3,
+
+    .grid-4,
+
+    .grid-5,
+
+    .grid-6 {
+
+        grid-template-columns: 1fr;
+
+    }
+
+    .container {
+
+        padding-inline: var(--space-4);
+
+    }
+
+}
